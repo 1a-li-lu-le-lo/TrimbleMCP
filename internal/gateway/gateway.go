@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -287,7 +288,7 @@ func decode(args json.RawMessage, v any) error {
 	dec := json.NewDecoder(bytes.NewReader(args))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(v); err != nil {
-		return errs.Newf(errs.Validation, "invalid arguments: %s", cleanUntrusted(err.Error()))
+		return errs.Newf(errs.Validation, "invalid arguments: %s", describeDecodeError(err))
 	}
 	if dec.More() {
 		return errs.Newf(errs.Validation, "invalid arguments: trailing data")
@@ -313,4 +314,20 @@ func (g *Gateway) resolveProduct(c *call, product string) (trimble.Base, error) 
 		return nil, err
 	}
 	return g.reg.Resolve(c.p.Tenant, pr)
+}
+
+// describeDecodeError names the offending field without exposing Go types.
+func describeDecodeError(err error) string {
+	var te *json.UnmarshalTypeError
+	if errors.As(err, &te) {
+		if te.Field != "" {
+			return "field " + cleanUntrusted(te.Field) + " has the wrong type (" + te.Value + ")"
+		}
+		return "arguments must be a JSON object"
+	}
+	msg := err.Error()
+	if strings.HasPrefix(msg, "json: unknown field ") {
+		return "unknown field " + cleanUntrusted(strings.TrimPrefix(msg, "json: unknown field "))
+	}
+	return "malformed JSON"
 }

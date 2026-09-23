@@ -73,11 +73,27 @@ func (g *Gateway) verifyProject(ctx context.Context, c *call, id domain.ProjectI
 		Detail: fmt.Sprintf("project not found in the first %d pages; lookup stopped", maxVerifyPages)}
 }
 
-func (g *Gateway) desktopCommon(ctx context.Context, c *call, args json.RawMessage) (desktopArgs, trimble.DesktopLauncher, trimble.DesktopLink, verification, error) {
+type linkArgs struct {
+	Product   string `json:"product"`
+	ProjectID string `json:"project_id"`
+	View      string `json:"view"`
+	Panel     string `json:"panel"`
+}
+
+func (g *Gateway) desktopCommon(ctx context.Context, c *call, args json.RawMessage, launch bool) (desktopArgs, trimble.DesktopLauncher, trimble.DesktopLink, verification, error) {
 	var in desktopArgs
 	var none trimble.DesktopLink
-	if err := decode(args, &in); err != nil {
-		return in, nil, none, verification{}, err
+	if launch {
+		if err := decode(args, &in); err != nil {
+			return in, nil, none, verification{}, err
+		}
+	} else {
+		// The link tool's schema has no dry_run or reason; reject them.
+		var l linkArgs
+		if err := decode(args, &l); err != nil {
+			return in, nil, none, verification{}, err
+		}
+		in = desktopArgs{Product: l.Product, ProjectID: l.ProjectID, View: l.View, Panel: l.Panel}
 	}
 	pid, err := domain.ParseProjectID(in.ProjectID)
 	if err != nil {
@@ -108,7 +124,7 @@ func desktopWarnings(v verification) []string {
 }
 
 func (g *Gateway) buildDesktopLink(ctx context.Context, c *call, args json.RawMessage) (*Envelope, error) {
-	_, _, link, v, err := g.desktopCommon(ctx, c, args)
+	_, _, link, v, err := g.desktopCommon(ctx, c, args, false)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +158,7 @@ func (g *Gateway) openInDesktop(ctx context.Context, c *call, args json.RawMessa
 		// remote caller must never open applications on the server host.
 		return nil, errs.Newf(errs.PolicyDenied, "desktop launch is only available to the local operator session")
 	}
-	in, l, link, v, err := g.desktopCommon(ctx, c, args)
+	in, l, link, v, err := g.desktopCommon(ctx, c, args, true)
 	if err != nil {
 		return nil, err
 	}

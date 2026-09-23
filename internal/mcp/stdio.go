@@ -13,9 +13,18 @@ import (
 // MaxMessageBytes bounds a single inbound JSON-RPC message on any transport.
 const MaxMessageBytes = 1 << 20
 
+// maxInFlight bounds concurrently executing stdio requests.
+const maxInFlight = 8
+
 // ServeStdio reads newline-delimited JSON-RPC messages from r and writes
 // responses to w until r is exhausted or ctx is cancelled. Nothing but MCP
 // messages is ever written to w; diagnostics belong on stderr.
+//
+// Requests run concurrently so a slow upstream call does not block others,
+// and notifications/cancelled can stop one: its context is cancelled and no
+// response is sent for it. initialize and notifications are handled in
+// order, and the legacy "not initialized" gate is evaluated when a request
+// is received, so lifecycle ordering is preserved.
 func (srv *Server) ServeStdio(ctx context.Context, sess *Session, r io.Reader, w io.Writer) error {
 	sc := bufio.NewScanner(r)
 	sc.Buffer(make([]byte, 64*1024), MaxMessageBytes)
@@ -30,6 +39,15 @@ func (srv *Server) ServeStdio(ctx context.Context, sess *Session, r io.Reader, w
 		_, err = w.Write(append(b, '\n'))
 		return err
 	}
+
+	var (
+		mu       sync.Mutex
+		inflight = map[string]context.CancelFunc{}
+		wg       sync.WaitGroup
+		slots    = make(chan struct{}, maxInFlight)
+	)
+	defer wg.Wait()
+
 	for sc.Scan() {
 		if ctx.Err() != nil {
 			return ctx.Err()
@@ -45,18 +63,61 @@ func (srv *Server) ServeStdio(ctx context.Context, sess *Session, r io.Reader, w
 			}
 			continue
 		}
-		var m Message
-		if err := json.Unmarshal(line, &m); err != nil {
-			if err := write(errorResponse(nil, CodeParseError, "parse error")); err != nil {
+		m, bad := DecodeMessage(line)
+		if bad != nil {
+			if err := write(bad); err != nil {
 				return err
 			}
 			continue
 		}
-		if resp := srv.Handle(ctx, sess, &m); resp != nil {
-			if err := write(resp); err != nil {
+		if m.IsNotification() {
+			if m.Method == "notifications/cancelled" {
+				var p struct {
+					RequestID json.RawMessage `json:"requestId"`
+				}
+				if json.Unmarshal(m.Params, &p) == nil {
+					mu.Lock()
+					if cancel, ok := inflight[string(p.RequestID)]; ok {
+						cancel()
+						delete(inflight, string(p.RequestID))
+					}
+					mu.Unlock()
+				}
+			}
+			continue
+		}
+		if m.IsResponse() {
+			continue
+		}
+		_, modern, _ := requestMeta(m.Params)
+		if m.Method == "initialize" || (!modern && needsInit(m.Method) && !sess.Initialized()) {
+			// Synchronous: initialize must complete before later requests,
+			// and a pre-initialize rejection must reflect arrival order.
+			if err := write(srv.Handle(ctx, sess, m)); err != nil {
 				return err
 			}
+			continue
 		}
+		key := string(m.ID)
+		rctx, cancel := context.WithCancel(ctx)
+		mu.Lock()
+		inflight[key] = cancel
+		mu.Unlock()
+		slots <- struct{}{}
+		wg.Add(1)
+		go func(m *Message) {
+			defer wg.Done()
+			defer func() { <-slots }()
+			resp := srv.Handle(rctx, sess, m)
+			mu.Lock()
+			_, live := inflight[key]
+			delete(inflight, key)
+			mu.Unlock()
+			cancel()
+			if live && resp != nil {
+				_ = write(resp)
+			}
+		}(m)
 	}
 	if err := sc.Err(); err != nil {
 		if errors.Is(err, bufio.ErrTooLong) {

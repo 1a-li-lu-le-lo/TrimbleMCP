@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
@@ -68,52 +69,56 @@ func (s *Session) Initialized() bool {
 	return s.initialized
 }
 
-// requestMeta extracts the modern-revision protocol version from params._meta.
-func requestMeta(params json.RawMessage) (version string, modern bool) {
+// requestMeta inspects params._meta. modern is true when a protocol version
+// key is present. bad is non-empty when the modern metadata is malformed:
+// the revision requires a string protocolVersion and an object
+// clientCapabilities on every request.
+func requestMeta(params json.RawMessage) (version string, modern bool, bad string) {
 	if len(params) == 0 {
-		return "", false
+		return "", false, ""
 	}
 	var p struct {
 		Meta map[string]json.RawMessage `json:"_meta"`
 	}
 	if json.Unmarshal(params, &p) != nil || p.Meta == nil {
-		return "", false
+		return "", false, ""
 	}
 	raw, ok := p.Meta[MetaProtocolVersion]
 	if !ok {
-		return "", false
+		return "", false, ""
 	}
 	if json.Unmarshal(raw, &version) != nil {
-		return "", true
+		return "", true, MetaProtocolVersion + " must be a string"
 	}
-	return version, true
+	caps := strings.TrimSpace(string(p.Meta[MetaClientCapabilities]))
+	if !strings.HasPrefix(caps, "{") {
+		return version, true, MetaClientCapabilities + " is required and must be an object"
+	}
+	return version, true, ""
 }
 
-// Handle processes one inbound message and returns the response, or nil for
-// notifications and client responses.
+func unsupportedVersion(id json.RawMessage, requested string) *Message {
+	return &Message{JSONRPC: "2.0", ID: id, Error: &RPCError{
+		Code: CodeUnsupportedVersion, Message: "unsupported protocol version",
+		Data: map[string]any{"supported": ModernProtocolVersions, "requested": requested},
+	}}
+}
+
+// Handle processes one decoded message (see DecodeMessage) and returns the
+// response, or nil for notifications and client responses.
 func (srv *Server) Handle(ctx context.Context, sess *Session, m *Message) *Message {
-	if m.JSONRPC != "2.0" {
-		return errorResponse(m.ID, CodeInvalidRequest, "jsonrpc must be \"2.0\"")
-	}
-	if m.IsResponse() {
+	if m.IsResponse() || m.IsNotification() {
 		// The server sends no requests, so client responses are ignored.
+		// Notifications need no reply; transports handle cancellation.
 		return nil
 	}
-	if m.Method == "" {
-		return errorResponse(m.ID, CodeInvalidRequest, "method is required")
-	}
-	if m.IsNotification() {
-		// notifications/initialized and notifications/cancelled need no reply;
-		// cancellation of in-flight calls is carried by transport contexts.
-		return nil
-	}
-	version, modern := requestMeta(m.Params)
+	version, modern, bad := requestMeta(m.Params)
 	if modern && m.Method != "initialize" {
+		if bad != "" {
+			return &Message{JSONRPC: "2.0", ID: m.ID, Error: &RPCError{Code: CodeInvalidParams, Message: bad}}
+		}
 		if !slices.Contains(ModernProtocolVersions, version) {
-			return &Message{JSONRPC: "2.0", ID: m.ID, Error: &RPCError{
-				Code: CodeUnsupportedVersion, Message: "unsupported protocol version",
-				Data: map[string]any{"supported": ModernProtocolVersions, "requested": version},
-			}}
+			return unsupportedVersion(m.ID, version)
 		}
 		result, rpcErr := srv.dispatch(ctx, sess, m, true)
 		if rpcErr != nil {
@@ -128,7 +133,16 @@ func (srv *Server) Handle(ctx context.Context, sess *Session, m *Message) *Messa
 	if rpcErr != nil {
 		return &Message{JSONRPC: "2.0", ID: m.ID, Error: rpcErr}
 	}
+	if m.Method == "server/discover" {
+		// A modern-revision result even when probed without _meta.
+		result = srv.decorateModern(m.Method, result)
+	}
 	return &Message{JSONRPC: "2.0", ID: m.ID, Result: result}
+}
+
+// needsInit reports whether a legacy request must wait for initialize.
+func needsInit(method string) bool {
+	return method != "initialize" && method != "ping" && method != "server/discover"
 }
 
 // decorateModern adds the fields the modern revision requires on results.
@@ -173,10 +187,16 @@ func (srv *Server) dispatch(ctx context.Context, sess *Session, m *Message, mode
 	case "initialize":
 		return srv.initialize(sess, m.Params)
 	case "ping":
+		if modern {
+			// ping was removed in the 2026-07-28 revision.
+			return nil, &RPCError{Code: CodeMethodNotFound, Message: "method not found"}
+		}
 		return struct{}{}, nil
 	case "server/discover":
 		return map[string]any{
-			"supportedVersions": SupportedProtocolVersions,
+			// Versions usable in params._meta. Legacy clients negotiate
+			// through initialize instead.
+			"supportedVersions": ModernProtocolVersions,
 			"capabilities":      srv.capabilities(),
 			"instructions":      srv.Provider.Instructions(),
 			"ttlMs":             3600000,
@@ -185,6 +205,16 @@ func (srv *Server) dispatch(ctx context.Context, sess *Session, m *Message, mode
 	}
 	if !modern && !sess.Initialized() {
 		return nil, &RPCError{Code: CodeInvalidRequest, Message: "session is not initialized"}
+	}
+	switch m.Method {
+	case "tools/list", "resources/list", "resources/templates/list", "prompts/list":
+		// The server never issues nextCursor, so any cursor is invalid.
+		var pg struct {
+			Cursor *string `json:"cursor"`
+		}
+		if json.Unmarshal(m.Params, &pg) == nil && pg.Cursor != nil {
+			return nil, &RPCError{Code: CodeInvalidParams, Message: "invalid cursor"}
+		}
 	}
 	p := sess.principal()
 	switch m.Method {
@@ -200,6 +230,9 @@ func (srv *Server) dispatch(ctx context.Context, sess *Session, m *Message, mode
 		}
 		if len(params.Arguments) == 0 || string(params.Arguments) == "null" {
 			params.Arguments = json.RawMessage("{}")
+		}
+		if !strings.HasPrefix(strings.TrimSpace(string(params.Arguments)), "{") {
+			return nil, &RPCError{Code: CodeInvalidParams, Message: "tools/call arguments must be an object"}
 		}
 		return srv.Provider.CallTool(ctx, p, params.Name, params.Arguments)
 	case "resources/list":
@@ -255,10 +288,9 @@ func (srv *Server) initialize(sess *Session, raw json.RawMessage) (any, *RPCErro
 	}, nil
 }
 
+// errorResponse builds an error response. An ID that could not be read is
+// omitted, as the MCP schema makes the error response ID optional.
 func errorResponse(id json.RawMessage, code int, msg string) *Message {
-	if len(id) == 0 {
-		id = json.RawMessage("null")
-	}
 	return &Message{JSONRPC: "2.0", ID: id, Error: &RPCError{Code: code, Message: msg}}
 }
 

@@ -167,19 +167,12 @@ func (h *HTTPHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	p, err := h.opts.Auth.Authenticate(r)
 	if err != nil {
-		h.challenge(w)
+		h.challenge(w, r)
 		return
 	}
 	if ok, wait := h.limiter.Allow(string(p.Tenant) + "\x00" + p.Subject); !ok {
 		w.Header().Set("Retry-After", strconv.Itoa(int(math.Ceil(wait.Seconds()))))
 		http.Error(w, "rate limited", http.StatusTooManyRequests)
-		return
-	}
-	if v := r.Header.Get("MCP-Protocol-Version"); v != "" && !slices.Contains(SupportedProtocolVersions, v) {
-		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: json.RawMessage("null"), Error: &RPCError{
-			Code: CodeUnsupportedVersion, Message: "unsupported protocol version",
-			Data: map[string]any{"supported": SupportedProtocolVersions, "requested": v},
-		}})
 		return
 	}
 	if r.Method == http.MethodDelete {
@@ -199,8 +192,11 @@ func (h *HTTPHandler) hostAllowed(host string) bool {
 	return slices.Contains(h.opts.AllowedHosts, host)
 }
 
-func (h *HTTPHandler) challenge(w http.ResponseWriter) {
+func (h *HTTPHandler) challenge(w http.ResponseWriter, r *http.Request) {
 	v := `Bearer realm="trimble-mcp"`
+	if r.Header.Get("Authorization") != "" {
+		v += `, error="invalid_token"`
+	}
 	if h.opts.ResourceMetadataURL != "" {
 		v += `, resource_metadata="` + h.opts.ResourceMetadataURL + `"`
 	}
@@ -231,14 +227,33 @@ func (h *HTTPHandler) post(w http.ResponseWriter, r *http.Request, p *authz.Prin
 		writeJSON(w, http.StatusBadRequest, errorResponse(nil, CodeInvalidRequest, "batch requests are not supported"))
 		return
 	}
-	var m Message
-	if err := json.Unmarshal(body, &m); err != nil {
-		writeJSON(w, http.StatusBadRequest, errorResponse(nil, CodeParseError, "parse error"))
+	mp, bad := DecodeMessage(body)
+	if bad != nil {
+		writeJSON(w, http.StatusBadRequest, bad)
+		return
+	}
+	m := *mp
+	// Checked after parsing so the error can carry the request ID.
+	hv := r.Header.Get("MCP-Protocol-Version")
+	if hv != "" && !slices.Contains(SupportedProtocolVersions, hv) {
+		writeJSON(w, http.StatusBadRequest, unsupportedVersion(m.ID, hv))
 		return
 	}
 
-	if version, modern := requestMeta(m.Params); modern && m.Method != "initialize" {
+	version, modern, metaErr := requestMeta(m.Params)
+	if modern && m.Method != "initialize" {
+		if metaErr != "" {
+			writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: m.ID, Error: &RPCError{Code: CodeInvalidParams, Message: metaErr}})
+			return
+		}
 		h.postModern(w, r, p, &m, version)
+		return
+	}
+	if slices.Contains(ModernProtocolVersions, hv) && m.Method != "initialize" {
+		// A modern header without modern metadata: answer in JSON so a
+		// dual-era client can recognise the modern error and adapt.
+		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: m.ID, Error: &RPCError{
+			Code: CodeInvalidParams, Message: "params._meta must carry " + MetaProtocolVersion + " and " + MetaClientCapabilities}})
 		return
 	}
 
@@ -283,18 +298,18 @@ func (h *HTTPHandler) post(w http.ResponseWriter, r *http.Request, p *authz.Prin
 // confused about what is being invoked.
 func (h *HTTPHandler) postModern(w http.ResponseWriter, r *http.Request, p *authz.Principal, m *Message, version string) {
 	if hv := r.Header.Get("MCP-Protocol-Version"); hv != version {
-		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: idOrNull(m.ID),
+		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: m.ID,
 			Error: &RPCError{Code: CodeHeaderMismatch, Message: "MCP-Protocol-Version header must match params._meta"}})
 		return
 	}
 	if !m.IsResponse() && r.Header.Get("Mcp-Method") != m.Method {
-		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: idOrNull(m.ID),
+		writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: m.ID,
 			Error: &RPCError{Code: CodeHeaderMismatch, Message: "Mcp-Method header must match the request method"}})
 		return
 	}
 	if name, ok := routedName(m); ok {
 		if decodeHeaderValue(r.Header.Get("Mcp-Name")) != name {
-			writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: idOrNull(m.ID),
+			writeJSON(w, http.StatusBadRequest, &Message{JSONRPC: "2.0", ID: m.ID,
 				Error: &RPCError{Code: CodeHeaderMismatch, Message: "Mcp-Name header must match the request"}})
 			return
 		}
@@ -349,13 +364,6 @@ func decodeHeaderValue(v string) string {
 	return v
 }
 
-func idOrNull(id json.RawMessage) json.RawMessage {
-	if len(id) == 0 {
-		return json.RawMessage("null")
-	}
-	return id
-}
-
 func (h *HTTPHandler) newSession(p *authz.Principal) (*httpSession, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -385,7 +393,13 @@ func (h *HTTPHandler) lookup(id string, p *authz.Principal) *httpSession {
 
 func (h *HTTPHandler) deleteSession(w http.ResponseWriter, r *http.Request, p *authz.Principal) {
 	id := r.Header.Get("Mcp-Session-Id")
-	if id == "" || h.lookup(id, p) == nil {
+	if id == "" {
+		// Without a session DELETE has no meaning (modern clients have none).
+		w.Header().Set("Allow", "POST")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if h.lookup(id, p) == nil {
 		http.Error(w, "session not found", http.StatusNotFound)
 		return
 	}

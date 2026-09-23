@@ -31,14 +31,18 @@ func server(t testing.TB) *mcp.Server {
 
 var alice = &authz.Principal{Subject: "alice", Tenant: "t1", Scopes: []authz.Scope{authz.ScopeCapabilitiesRead, authz.ScopeProjectsRead, authz.ScopeFilesRead}}
 
-func stdio(t *testing.T, lines ...string) []map[string]any {
+// stdio runs the lines through ServeStdio and returns responses keyed by
+// request ID (JSON text), plus responses that carry no ID. Requests may be
+// answered out of order, as JSON-RPC permits.
+func stdio(t *testing.T, lines ...string) (map[string]map[string]any, []map[string]any) {
 	t.Helper()
 	var out bytes.Buffer
 	in := strings.NewReader(strings.Join(lines, "\n") + "\n")
 	if err := server(t).ServeStdio(context.Background(), &mcp.Session{Principal: alice}, in, &out); err != nil {
 		t.Fatal(err)
 	}
-	var res []map[string]any
+	byID := map[string]map[string]any{}
+	var noID []map[string]any
 	for _, l := range strings.Split(strings.TrimSpace(out.String()), "\n") {
 		if l == "" {
 			continue
@@ -47,34 +51,52 @@ func stdio(t *testing.T, lines ...string) []map[string]any {
 		if err := json.Unmarshal([]byte(l), &m); err != nil {
 			t.Fatalf("stdout carried a non-JSON line: %q", l)
 		}
-		res = append(res, m)
+		id, ok := m["id"]
+		if !ok {
+			noID = append(noID, m)
+			continue
+		}
+		if id == nil {
+			t.Fatalf("response carries a null id: %s", l)
+		}
+		k, _ := json.Marshal(id)
+		byID[string(k)] = m
 	}
-	return res
+	return byID, noID
+}
+
+func errCode(t *testing.T, m map[string]any) float64 {
+	t.Helper()
+	e, ok := m["error"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected an error response, got %v", m)
+	}
+	return e["code"].(float64)
 }
 
 func TestStdioLegacyLifecycle(t *testing.T) {
-	res := stdio(t,
+	res, noID := stdio(t,
 		`{"jsonrpc":"2.0","id":0,"method":"tools/list"}`,
 		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"c","version":"1"}}}`,
 		`{"jsonrpc":"2.0","method":"notifications/initialized"}`,
 		`{"jsonrpc":"2.0","id":2,"method":"tools/list"}`,
 		`{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"trimble_list_projects","arguments":{"product":"mock","page_size":2}}}`,
 		`{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"trimble_nope","arguments":{}}}`,
-		`{"jsonrpc":"2.0","id":5,"method":"ping"}`,
+		`{"jsonrpc":"2.0","id":"five","method":"ping"}`,
 		`not json`,
 		`[{"jsonrpc":"2.0","id":6,"method":"ping"}]`,
 	)
-	if len(res) != 8 {
-		t.Fatalf("got %d responses: %v", len(res), res)
+	if len(res) != 6 || len(noID) != 2 {
+		t.Fatalf("got %d id responses and %d id-less: %v %v", len(res), len(noID), res, noID)
 	}
-	if res[0]["error"] == nil {
+	if errCode(t, res["0"]) != mcp.CodeInvalidRequest {
 		t.Fatal("requests before initialize must fail")
 	}
-	init := res[1]["result"].(map[string]any)
+	init := res["1"]["result"].(map[string]any)
 	if init["protocolVersion"] != "2025-06-18" || init["instructions"] == "" {
 		t.Fatalf("initialize: %v", init)
 	}
-	tools := res[2]["result"].(map[string]any)["tools"].([]any)
+	tools := res["2"]["result"].(map[string]any)["tools"].([]any)
 	if len(tools) != 5 {
 		t.Fatalf("tools: %d", len(tools))
 	}
@@ -84,24 +106,73 @@ func TestStdioLegacyLifecycle(t *testing.T) {
 			t.Fatalf("annotations: %v", ann)
 		}
 	}
-	call := res[3]["result"].(map[string]any)
+	call := res["3"]["result"].(map[string]any)
 	if call["isError"] != false || call["structuredContent"].(map[string]any)["audit_id"] == "" {
 		t.Fatalf("call: %v", call)
 	}
-	if res[4]["error"].(map[string]any)["code"].(float64) != mcp.CodeInvalidParams {
-		t.Fatalf("unknown tool: %v", res[4])
+	if errCode(t, res["4"]) != mcp.CodeInvalidParams {
+		t.Fatalf("unknown tool: %v", res["4"])
 	}
-	if res[6]["error"].(map[string]any)["code"].(float64) != mcp.CodeParseError {
-		t.Fatal("parse error expected")
+	if _, ok := res[`"five"`]["result"]; !ok {
+		t.Fatal("legacy ping with a string id must succeed")
 	}
-	if res[7]["error"] == nil {
-		t.Fatal("batch must be rejected")
+	if errCode(t, noID[0]) != mcp.CodeParseError || errCode(t, noID[1]) != mcp.CodeInvalidRequest {
+		t.Fatalf("parse error / batch: %v", noID)
+	}
+}
+
+func TestStdioInvalidIDsAndMethods(t *testing.T) {
+	res, noID := stdio(t,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"c","version":"1"}}}`,
+		`{"jsonrpc":"2.0","id":null,"method":"ping"}`,
+		`{"jsonrpc":"2.0","id":1.5,"method":"ping"}`,
+		`{"jsonrpc":"2.0","id":{"a":1},"method":"ping"}`,
+		`{"jsonrpc":"2.0","id":true,"method":"ping"}`,
+		`{"jsonrpc":"2.0","id":7,"method":5}`,
+		`{"jsonrpc":"1.0","id":8,"method":"ping"}`,
+		`5`,
+		`{"jsonrpc":"2.0","id":9,"method":"tools/list","params":{"cursor":"zzz"}}`,
+		`{"jsonrpc":"2.0","id":10,"method":"tools/call","params":{"name":"trimble_list_projects","arguments":"x"}}`,
+		`{"jsonrpc":"2.0","id":11,"method":"tools/call","params":{"name":"trimble_list_projects","arguments":{"product":"mock","page_size":0}}}`,
+	)
+	if len(noID) != 5 {
+		t.Fatalf("null/fraction/object/bool ids and a non-object message must be rejected without an id: %v", noID)
+	}
+	for _, m := range noID {
+		if errCode(t, m) != mcp.CodeInvalidRequest {
+			t.Fatalf("%v", m)
+		}
+	}
+	if errCode(t, res["7"]) != mcp.CodeInvalidRequest || errCode(t, res["8"]) != mcp.CodeInvalidRequest {
+		t.Fatal("non-string method / wrong jsonrpc must be -32600 with the id")
+	}
+	if errCode(t, res["9"]) != mcp.CodeInvalidParams {
+		t.Fatal("an unknown cursor must be rejected")
+	}
+	if errCode(t, res["10"]) != mcp.CodeInvalidParams {
+		t.Fatal("non-object arguments are a protocol error")
+	}
+	r11 := res["11"]["result"].(map[string]any)
+	if r11["isError"] != true || !strings.Contains(r11["content"].([]any)[0].(map[string]any)["text"].(string), "page_size") {
+		t.Fatalf("page_size 0 must be a validation error: %v", r11)
+	}
+}
+
+func TestStdioCancellation(t *testing.T) {
+	// A cancelled request gets no response; others still do.
+	res, _ := stdio(t,
+		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"c","version":"1"}}}`,
+		`{"jsonrpc":"2.0","id":2,"method":"tools/list"}`,
+		`{"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":99}}`,
+	)
+	if _, ok := res["2"]; !ok {
+		t.Fatal("uncancelled request lost")
 	}
 }
 
 func TestLegacyVersionNegotiation(t *testing.T) {
-	res := stdio(t, `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1999-01-01","capabilities":{},"clientInfo":{"name":"c","version":"1"}}}`)
-	if v := res[0]["result"].(map[string]any)["protocolVersion"]; v != mcp.LegacyProtocolVersions[0] {
+	res, _ := stdio(t, `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"1999-01-01","capabilities":{},"clientInfo":{"name":"c","version":"1"}}}`)
+	if v := res["1"]["result"].(map[string]any)["protocolVersion"]; v != mcp.LegacyProtocolVersions[0] {
 		t.Fatalf("got %v", v)
 	}
 }
@@ -109,29 +180,47 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 const modernMeta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`
 
 func TestStdioModernStateless(t *testing.T) {
-	res := stdio(t,
+	res, _ := stdio(t,
 		`{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{`+modernMeta+`}}`,
 		`{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{`+modernMeta+`}}`,
-		`{"jsonrpc":"2.0","id":3,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2031-01-01"}}}`,
+		`{"jsonrpc":"2.0","id":3,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2031-01-01","io.modelcontextprotocol/clientCapabilities":{}}}}`,
 		`{"jsonrpc":"2.0","id":4,"method":"resources/read","params":{"uri":"trimble://nope",`+modernMeta+`}}`,
+		`{"jsonrpc":"2.0","id":5,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}`,
+		`{"jsonrpc":"2.0","id":6,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":5,"io.modelcontextprotocol/clientCapabilities":{}}}}`,
+		`{"jsonrpc":"2.0","id":7,"method":"ping","params":{`+modernMeta+`}}`,
+		`{"jsonrpc":"2.0","id":8,"method":"resources/read","params":{"uri":"trimble://nosuch/projects/x",`+modernMeta+`}}`,
+		`{"jsonrpc":"2.0","id":9,"method":"server/discover"}`,
 	)
-	disc := res[0]["result"].(map[string]any)
-	if disc["resultType"] != "complete" || disc["supportedVersions"] == nil {
+	disc := res["1"]["result"].(map[string]any)
+	if disc["resultType"] != "complete" {
 		t.Fatalf("discover: %v", disc)
 	}
-	list := res[1]["result"].(map[string]any)
+	sv := disc["supportedVersions"].([]any)
+	if len(sv) != len(mcp.ModernProtocolVersions) {
+		t.Fatalf("discover must list versions usable in _meta: %v", sv)
+	}
+	list := res["2"]["result"].(map[string]any)
 	if list["resultType"] != "complete" || list["cacheScope"] != "private" || list["ttlMs"] == nil {
 		t.Fatalf("modern list decoration: %v", list)
 	}
 	if _, ok := list["_meta"].(map[string]any)[mcp.MetaServerInfo]; !ok {
 		t.Fatal("serverInfo missing from _meta")
 	}
-	e := res[2]["error"].(map[string]any)
-	if e["code"].(float64) != mcp.CodeUnsupportedVersion {
+	e := res["3"]["error"].(map[string]any)
+	if e["code"].(float64) != mcp.CodeUnsupportedVersion || len(e["data"].(map[string]any)["supported"].([]any)) != len(mcp.ModernProtocolVersions) {
 		t.Fatalf("unsupported version: %v", e)
 	}
-	if res[3]["error"].(map[string]any)["code"].(float64) != mcp.CodeInvalidParams {
-		t.Fatalf("modern resource-not-found code: %v", res[3])
+	if errCode(t, res["4"]) != mcp.CodeInvalidParams || errCode(t, res["8"]) != mcp.CodeInvalidParams {
+		t.Fatal("modern resource-not-found must be -32602 and never success content")
+	}
+	if errCode(t, res["5"]) != mcp.CodeInvalidParams || errCode(t, res["6"]) != mcp.CodeInvalidParams {
+		t.Fatal("missing clientCapabilities / non-string version must be -32602")
+	}
+	if errCode(t, res["7"]) != mcp.CodeMethodNotFound {
+		t.Fatal("ping was removed in the modern revision")
+	}
+	if res["9"]["result"].(map[string]any)["resultType"] != "complete" {
+		t.Fatal("discover without _meta still needs resultType")
 	}
 }
 
@@ -229,8 +318,8 @@ func TestHTTPLegacySessionBinding(t *testing.T) {
 	if w := post(h, bobToken, sid, list, nil); w.Code != 404 {
 		t.Fatalf("session hijack by another subject must fail: %d", w.Code)
 	}
-	if w := post(h, aliceToken, sid, list, map[string]string{"MCP-Protocol-Version": "1999-01-01"}); w.Code != 400 {
-		t.Fatalf("bad version header: %d", w.Code)
+	if w := post(h, aliceToken, sid, list, map[string]string{"MCP-Protocol-Version": "1999-01-01"}); w.Code != 400 || !strings.Contains(w.Body.String(), `"id":2`) {
+		t.Fatalf("bad version header must keep the request id: %d %s", w.Code, w.Body.String())
 	}
 	if w := post(h, aliceToken, sid, `[`+list+`]`, nil); w.Code != 400 {
 		t.Fatalf("batch: %d", w.Code)
@@ -297,4 +386,38 @@ func FuzzStdioNeverPanicsAndEmitsOnlyJSON(f *testing.F) {
 			}
 		}
 	})
+}
+
+func TestHTTPSpecEdges(t *testing.T) {
+	h := httpHandler(t)
+	// DELETE without a session: 405.
+	del := httptest.NewRequest(http.MethodDelete, "/mcp", nil)
+	del.Header.Set("Authorization", "Bearer "+aliceToken)
+	dw := httptest.NewRecorder()
+	h.ServeHTTP(dw, del)
+	if dw.Code != 405 {
+		t.Fatalf("DELETE without session: %d", dw.Code)
+	}
+	// Modern header but no _meta: JSON 400 with -32602, not plain text.
+	w := post(h, aliceToken, "", `{"jsonrpc":"2.0","id":3,"method":"tools/list"}`, map[string]string{"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/list"})
+	if w.Code != 400 || !strings.Contains(w.Body.String(), "-32602") {
+		t.Fatalf("modern header without meta: %d %s", w.Code, w.Body.String())
+	}
+	// Missing clientCapabilities over HTTP: 400.
+	body := `{"jsonrpc":"2.0","id":4,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}`
+	w = post(h, aliceToken, "", body, map[string]string{"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/list"})
+	if w.Code != 400 {
+		t.Fatalf("missing clientCapabilities: %d", w.Code)
+	}
+	// Null id over HTTP: rejected.
+	body = `{"jsonrpc":"2.0","id":null,"method":"tools/list","params":{` + modernMeta + `}}`
+	w = post(h, aliceToken, "", body, map[string]string{"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/list"})
+	if w.Code != 400 || strings.Contains(w.Body.String(), `"tools"`) {
+		t.Fatalf("null id: %d %s", w.Code, w.Body.String())
+	}
+	// Bad bearer token: invalid_token in the challenge.
+	w = post(h, "wrong", "", initBody, nil)
+	if !strings.Contains(w.Header().Get("WWW-Authenticate"), `error="invalid_token"`) {
+		t.Fatalf("challenge: %q", w.Header().Get("WWW-Authenticate"))
+	}
 }

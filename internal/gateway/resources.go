@@ -67,9 +67,18 @@ func (g *Gateway) ReadResource(ctx context.Context, p *authz.Principal, uri stri
 		return nil, notFound
 	}
 	env, _ := res.StructuredContent.(*Envelope)
-	if res.IsError && env != nil && env.Error != nil &&
-		(env.Error.Code == errs.ResourceNotFound || env.Error.Code == errs.ProjectNotFound || env.Error.Code == errs.Authorization) {
-		return nil, notFound
+	if res.IsError {
+		// A failed read is never returned as resource contents.
+		if env != nil && env.Error != nil {
+			switch env.Error.Code {
+			case errs.ResourceNotFound, errs.ProjectNotFound, errs.Authorization,
+				errs.UnsupportedProduct, errs.UnsupportedCapability, errs.Validation:
+				return nil, notFound
+			}
+			return nil, &mcp.RPCError{Code: mcp.CodeInternalError, Message: env.Error.Message,
+				Data: map[string]any{"code": env.Error.Code, "retryable": env.Error.Retryable, "request_id": env.RequestID}}
+		}
+		return nil, &mcp.RPCError{Code: mcp.CodeInternalError, Message: "resource read failed"}
 	}
 	return []mcp.ResourceContents{{URI: uri, MimeType: "application/json", Text: res.Content[0].Text}}, nil
 }

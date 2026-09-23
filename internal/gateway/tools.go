@@ -266,10 +266,14 @@ func cleanProject(p trimble.Project) trimble.Project {
 func (g *Gateway) listProjects(ctx context.Context, c *call, args json.RawMessage) (*Envelope, error) {
 	var in struct {
 		Product   string `json:"product"`
-		PageSize  int    `json:"page_size"`
+		PageSize  *int   `json:"page_size"`
 		PageToken string `json:"page_token"`
 	}
 	if err := decode(args, &in); err != nil {
+		return nil, err
+	}
+	size, err := pageSize(in.PageSize)
+	if err != nil {
 		return nil, err
 	}
 	a, err := g.resolveProduct(c, in.Product)
@@ -280,7 +284,7 @@ func (g *Gateway) listProjects(ctx context.Context, c *call, args json.RawMessag
 	if !ok || !a.Describe().Supports(trimble.CapListProjects) {
 		return nil, errs.New(errs.UnsupportedCapability)
 	}
-	page, err := r.ListProjects(ctx, trimble.ListProjectsQuery{Page: domain.PageRequest{Token: in.PageToken, Size: in.PageSize}})
+	page, err := r.ListProjects(ctx, trimble.ListProjectsQuery{Page: domain.PageRequest{Token: in.PageToken, Size: size}})
 	if err != nil {
 		return nil, err
 	}
@@ -372,10 +376,14 @@ func (g *Gateway) listFolderItems(ctx context.Context, c *call, args json.RawMes
 		Product   string `json:"product"`
 		ProjectID string `json:"project_id"`
 		FolderID  string `json:"folder_id"`
-		PageSize  int    `json:"page_size"`
+		PageSize  *int   `json:"page_size"`
 		PageToken string `json:"page_token"`
 	}
 	if err := decode(args, &in); err != nil {
+		return nil, err
+	}
+	size, err := pageSize(in.PageSize)
+	if err != nil {
 		return nil, err
 	}
 	fid, err := domain.ParseFolderID(in.FolderID)
@@ -390,7 +398,7 @@ func (g *Gateway) listFolderItems(ctx context.Context, c *call, args json.RawMes
 	if !a.Describe().Supports(trimble.CapListFolder) {
 		return nil, errs.New(errs.UnsupportedCapability)
 	}
-	page, err := r.ListFolderItems(ctx, c.project, fid, domain.PageRequest{Token: in.PageToken, Size: in.PageSize})
+	page, err := r.ListFolderItems(ctx, c.project, fid, domain.PageRequest{Token: in.PageToken, Size: size})
 	if err != nil {
 		return nil, err
 	}
@@ -460,4 +468,16 @@ func labels(a trimble.Base) []string {
 		return []string{"simulated_data", "not_certified"}
 	}
 	return []string{"observed_data", "not_certified"}
+}
+
+// pageSize applies the tool schema bounds: absent means the default, and an
+// explicit value must be 1..MaxPageSize (0 is rejected, not defaulted).
+func pageSize(v *int) (int, error) {
+	if v == nil {
+		return 0, nil
+	}
+	if *v < 1 || *v > domain.MaxPageSize {
+		return 0, errs.Newf(errs.Validation, "page_size must be between 1 and %d", domain.MaxPageSize)
+	}
+	return *v, nil
 }
