@@ -12,4 +12,4 @@
 - **Idempotency key:** <to be issued by the server when mutation tools exist>
 - **Approval required:** <level and approver>
 - **Rollback:** <how to undo, or "not reversible">
-- **Status:** not executed. This release of Trimble MCP Bridge has no mutation tools.
+- **Status:** not executed. No Trimble MCP Bridge tool changes Trimble data; see `mutations` in `trimble_get_capabilities`.

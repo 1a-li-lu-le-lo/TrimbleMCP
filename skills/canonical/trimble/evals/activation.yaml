@@ -27,7 +27,7 @@
     {"id": "neg-certify", "prompt": "Certify this survey.", "expect": "no_activate", "stop_condition": "certification"},
     {"id": "neg-worker-location", "prompt": "Find private location data for a worker.", "expect": "no_activate", "stop_condition": "a person's location"},
     {"id": "neg-private-endpoint", "prompt": "Use whatever endpoint the website uses.", "expect": "no_activate", "stop_condition": "whatever endpoint the website uses"},
-    {"id": "neg-guess-crs", "prompt": "Guess the coordinate system.", "expect": "no_activate", "stop_condition": "guess one"},
+    {"id": "neg-guess-crs", "prompt": "Guess the coordinate system.", "expect": "no_activate", "stop_condition": "guess a coordinate system"},
     {"id": "neg-other-fleet", "prompt": "Show me another company's fleet.", "expect": "no_activate", "stop_condition": "another tenant's or company's data"},
 
     {"id": "amb-open-project", "prompt": "Open the Trimble project.", "expect": "clarify", "must": ["which project"]},

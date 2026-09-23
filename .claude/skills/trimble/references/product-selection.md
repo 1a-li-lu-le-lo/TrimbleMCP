@@ -2,17 +2,19 @@
 
 "Trimble API" is not one API. Trimble business units publish separate APIs with different portals, identity models, tenants, and contracts. Credentials and IDs from one product never apply to another.
 
-## Configured in this release
+## Supported in this release (an operator must enable each)
 
-| Product ID | What it is | Tools | Status |
+| Product ID | What it is | Tools | Status and switch |
 |---|---|---|---|
-| `trimble-connect` | Trimble Connect REST API (Core), construction project collaboration: projects, folders, files | `trimble_list_projects`, `trimble_list_folder_items`, `trimble_get_file_metadata` | provisional (re-verify before production) |
-| `trimble-connect-desktop` | Trimble Connect for Windows command line: `trimbleconnect:/projects/<id>?show=<view>,<panel>` | `trimble_build_desktop_link`, `trimble_open_in_desktop` (local Windows only, opt-in) | provisional; syntax verified, ID equivalence assumed |
-| `mock` | Simulated adapter with synthetic data for development and evaluation | all read tools | simulated |
+| `trimble-connect` | Trimble Connect REST API (Core), construction project collaboration: projects, folders, files | `trimble_list_projects`, `trimble_list_folder_items`, `trimble_get_file_metadata` | Provisional (re-verify before production). Enable with `TRIMBLE_CONNECT_ENABLED=true` |
+| `trimble-connect-desktop` | Trimble Connect for Windows links: `trimbleconnect:/projects/<id>?show=<view>,<panel>` | `trimble_build_desktop_link`, `trimble_open_in_desktop` (local Windows only, opt-in) | Provisional: link syntax verified, ID equivalence assumed. Enable with `TRIMBLE_CONNECT_DESKTOP_ENABLED=true` |
+| `mock` | Simulated adapter with synthetic data for development and evaluation | `trimble_list_projects`, `trimble_get_project`, `trimble_list_folder_items`, `trimble_get_file_metadata` | Simulated. On by default; disable with `TRIMBLE_MCP_ENABLE_MOCK=false` |
 
 Always confirm with `trimble_get_capabilities`; an operator may have disabled a product.
 
-`trimble_get_project` appears only for adapters with a verified single-project endpoint. Trimble Connect does not have one in this release, so resolve projects through `trimble_list_projects`.
+`trimble_get_project` is listed only when a configured adapter supports it, which is currently only `mock`. The `trimble-connect` adapter does not support it, so resolve Connect projects through `trimble_list_projects`.
+
+For anything beyond capabilities: a product is served by an adapter, and each tool is listed only when an enabled adapter supports it.
 
 ## Not configured (do not attempt)
 

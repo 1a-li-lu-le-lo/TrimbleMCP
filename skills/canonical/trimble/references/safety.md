@@ -17,5 +17,7 @@ Use the labels a tool reports in `data_labels`:
 - `observed_data`: returned by the upstream API.
 - `simulated_data`: synthetic data from the mock adapter.
 - `not_certified`: never professional certification.
+- `configuration`: capability and configuration data.
+- `local_launch_link`, `no_project_data`, `dry_run`, `local_side_effect`: results for a Trimble Connect for Windows link or launch. No project data was read.
 
 Label your own summaries as "model-generated summary" and planning output as "planning aid; qualified review required".

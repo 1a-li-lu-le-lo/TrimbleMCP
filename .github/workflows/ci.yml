@@ -22,6 +22,12 @@ jobs:
         run: |
           go test ./internal/domain -run=XXX -fuzz=FuzzIDNeverAllowsPathOrQueryBreakout -fuzztime=20s
           go test ./internal/mcp -run=XXX -fuzz=FuzzStdioNeverPanicsAndEmitsOnlyJSON -fuzztime=20s
+      - name: skill frontmatter (official Agent Skills validator)
+        run: |
+          python3 -m pip install --quiet skills-ref==0.1.0
+          skills-ref validate skills/canonical/trimble
+          skills-ref validate .claude/skills/trimble
+          skills-ref validate .agents/skills/trimble
       - name: skill adapters in sync
         run: ./scripts/sync-skills.sh && git diff --exit-code
       - name: smoke (built binaries, stdio + CLI)

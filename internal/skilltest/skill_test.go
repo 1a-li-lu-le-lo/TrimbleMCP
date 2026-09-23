@@ -13,6 +13,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
@@ -55,7 +56,15 @@ func frontmatter(t *testing.T, doc string) (map[string]string, string) {
 		if !ok {
 			t.Fatalf("unsupported frontmatter line %q", line)
 		}
-		fm[strings.TrimSpace(k)] = strings.TrimSpace(v)
+		k, v = strings.TrimSpace(k), strings.TrimSpace(v)
+		// Reject plain scalars that YAML would misparse: ": " starts a nested
+		// mapping, " #" starts a comment, and indicator characters cannot
+		// begin a plain scalar. (This once let an invalid description pass.)
+		if v != "" && !strings.HasPrefix(v, `"`) && !strings.HasPrefix(v, "'") &&
+			(strings.Contains(v, ": ") || strings.HasSuffix(v, ":") || strings.Contains(v, " #") || strings.ContainsAny(v[:1], "[]{}&*!|>%@`,?-")) {
+			t.Fatalf("frontmatter %s: unquoted value is not valid YAML", k)
+		}
+		fm[k] = v
 	}
 	return fm, doc[4+end+5:]
 }
@@ -66,12 +75,23 @@ func TestFrontmatterAndLimits(t *testing.T) {
 	if fm["name"] != "trimble" {
 		t.Fatalf("name %q must match directory", fm["name"])
 	}
-	if !regexp.MustCompile(`^[a-z0-9-]{1,64}$`).MatchString(fm["name"]) {
-		t.Fatal("name must be lower-case letters, digits, hyphens")
+	// agentskills.io: 1-64 chars, lowercase alphanumerics and single inner
+	// hyphens. Anthropic: no reserved words, no XML tags.
+	name := fm["name"]
+	if len(name) > 64 || !regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`).MatchString(name) ||
+		strings.Contains(name, "anthropic") || strings.Contains(name, "claude") {
+		t.Fatalf("name %q violates the Agent Skills naming rules", name)
 	}
 	d := fm["description"]
-	if len(d) == 0 || len(d) > 1024 {
-		t.Fatalf("description length %d (1..1024)", len(d))
+	if n := utf8.RuneCountInString(d); n == 0 || n > 1024 {
+		t.Fatalf("description length %d characters (1..1024)", n)
+	}
+	xml := regexp.MustCompile(`<[A-Za-z/!]`)
+	if xml.MatchString(name) || xml.MatchString(d) {
+		t.Fatal("name and description must not contain XML tags")
+	}
+	if len(body) > 20000 {
+		t.Errorf("SKILL.md body is %d bytes; keep instructions under ~5000 tokens", len(body))
 	}
 	for _, want := range []string{"Trimble", "Do not use", "machinery", "certification"} {
 		if !strings.Contains(d, want) {
@@ -128,6 +148,47 @@ func TestAdapterParity(t *testing.T) {
 		})
 		if err != nil {
 			t.Fatal(err)
+		}
+		// Reverse direction: no stale files in the installed copy.
+		_ = filepath.WalkDir(dir, func(p string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() {
+				return err
+			}
+			rel, _ := filepath.Rel(dir, p)
+			if _, err := os.Stat(filepath.Join(canonical, rel)); err != nil {
+				t.Errorf("%s has %s, which is not in canonical (run scripts/sync-skills.sh)", dir, rel)
+			}
+			return nil
+		})
+	}
+}
+
+// Anthropic best practice: keep references one level deep from SKILL.md, so
+// reference files must not point at other bundled files.
+func TestReferencesOneLevelDeep(t *testing.T) {
+	re := regexp.MustCompile("`((?:references|templates)/[^`]+)`")
+	for _, dir := range []string{"references", "templates"} {
+		entries, _ := os.ReadDir(filepath.Join(canonical, dir))
+		for _, e := range entries {
+			p := filepath.Join(canonical, dir, e.Name())
+			if m := re.FindString(read(t, p)); m != "" {
+				t.Errorf("%s links %s; link bundled files only from SKILL.md", p, m)
+			}
+		}
+	}
+}
+
+func TestEveryLiveToolIsDocumented(t *testing.T) {
+	all := ""
+	_ = filepath.WalkDir(canonical, func(p string, d os.DirEntry, err error) error {
+		if err == nil && !d.IsDir() && strings.HasSuffix(p, ".md") {
+			all += read(t, p)
+		}
+		return nil
+	})
+	for _, n := range liveToolNames(t) {
+		if !strings.Contains(all, "`"+n+"`") {
+			t.Errorf("tool %s is exposed by the server but never mentioned in the skill", n)
 		}
 	}
 }

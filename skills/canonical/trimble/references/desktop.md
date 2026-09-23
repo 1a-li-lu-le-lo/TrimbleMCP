@@ -18,7 +18,16 @@ Source: https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for
 | Tool | Effect | Requirements |
 |---|---|---|
 | `trimble_build_desktop_link` | Returns the link; opens nothing | `trimble:projects:read`; product `trimble-connect-desktop` configured |
-| `trimble_open_in_desktop` | Opens Trimble Connect for Windows on the operator's own machine. **Dry run unless `dry_run: false`** | `trimble:desktop:launch` scope; local stdio session; Windows host; operator set `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`; a `reason` |
+| `trimble_open_in_desktop` | Opens Trimble Connect for Windows on the operator's own machine. **Dry run unless `dry_run: false`** | See the list below |
+
+Requirements for `trimble_open_in_desktop`:
+
+- `trimble:desktop:launch` added to `TRIMBLE_MCP_LOCAL_SCOPES`.
+- A local stdio session on a Windows host.
+- `TRIMBLE_CONNECT_DESKTOP_ENABLED=true` and `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`.
+- `trimble-connect` configured, with `trimble:projects:read`, so the project can be verified. This applies to dry runs too.
+- A `reason` of 1–200 characters.
+- Launches are rate-limited per caller.
 
 ## Rules
 
