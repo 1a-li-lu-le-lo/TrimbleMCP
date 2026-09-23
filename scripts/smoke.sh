@@ -21,4 +21,9 @@ echo "$out" | grep -q '"code":"resource_not_found"' || { echo "FAIL IDOR check";
 "$root/bin/trimblectl" capabilities >/dev/null
 "$root/bin/trimblectl" projects list --product mock --page-size 2 | grep -q '"complete": false' || { echo "FAIL cli"; exit 1; }
 if "$root/bin/trimblectl" projects list --product trimble-connect >/dev/null 2>&1; then echo "FAIL unconfigured product accepted"; exit 1; fi
+# Trimble Connect for Windows command line: link building (no launch on Linux).
+TRIMBLE_CONNECT_DESKTOP_ENABLED=true "$root/bin/trimblectl" desktop link --product trimble-connect-desktop --project rQR1yhTGj9I --view 3d --panel todos \
+  | grep -q '"uri": "trimbleconnect:/projects/rQR1yhTGj9I?show=3D,ToDos"' || { echo "FAIL desktop link"; exit 1; }
+if TRIMBLE_CONNECT_DESKTOP_ENABLED=true "$root/bin/trimblectl" desktop link --product trimble-connect-desktop --project 'x?show=1' >/dev/null 2>&1; then echo "FAIL desktop injection accepted"; exit 1; fi
+if TRIMBLE_CONNECT_DESKTOP_LAUNCH=true "$root/bin/trimblectl" diagnostics >/dev/null 2>&1; then echo "FAIL launch without desktop enabled"; exit 1; fi
 echo "smoke: OK"

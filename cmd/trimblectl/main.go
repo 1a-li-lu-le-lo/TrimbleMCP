@@ -35,6 +35,9 @@ Usage:
   trimblectl projects get    --product P --project ID
   trimblectl files list      --product P --project ID --folder ID [--page-size N] [--page-token T]
   trimblectl files metadata  --product P --project ID --file ID
+  trimblectl desktop link    --product trimble-connect-desktop --project ID [--view V] [--panel P]
+  trimblectl desktop open    --product trimble-connect-desktop --project ID [--view V] [--panel P] --reason R [--launch]
+                             (Trimble Connect for Windows command line; dry run unless --launch)
   trimblectl auth login      (Trimble Identity authorization code + PKCE, loopback redirect)
   trimblectl auth logout     (revokes the refresh token and deletes the local store)
   trimblectl audit verify    --file PATH
@@ -71,6 +74,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return tool(stdout, stderr, gateway.ToolListFolderItems, rest, []string{"product", "project", "folder", "page-size", "page-token"})
 	case "files metadata":
 		return tool(stdout, stderr, gateway.ToolGetFileMetadata, rest, []string{"product", "project", "file"})
+	case "desktop link":
+		return tool(stdout, stderr, gateway.ToolBuildDesktop, rest, []string{"product", "project", "view", "panel"})
+	case "desktop open":
+		return tool(stdout, stderr, gateway.ToolOpenDesktop, rest, []string{"product", "project", "view", "panel", "reason", "launch"})
 	case "auth login":
 		return fail(stderr, authLogin())
 	case "auth logout":
@@ -100,19 +107,28 @@ func fail(stderr io.Writer, err error) int {
 var flagToArg = map[string]string{
 	"product": "product", "project": "project_id", "folder": "folder_id", "file": "file_id",
 	"page-size": "page_size", "page-token": "page_token",
+	"view": "view", "panel": "panel", "reason": "reason",
 }
 
 func tool(stdout, stderr io.Writer, name string, args []string, allowed []string) int {
 	fs := flag.NewFlagSet(name, flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	vals := map[string]*string{}
+	var launch *bool
 	for _, f := range allowed {
+		if f == "launch" {
+			launch = fs.Bool("launch", false, "actually open the application (default: dry run)")
+			continue
+		}
 		vals[f] = fs.String(f, "", "")
 	}
 	if err := fs.Parse(args); err != nil || fs.NArg() > 0 {
 		return 2
 	}
 	in := map[string]any{}
+	if launch != nil {
+		in["dry_run"] = !*launch
+	}
 	for f, v := range vals {
 		if *v == "" {
 			continue

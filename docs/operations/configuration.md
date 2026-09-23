@@ -21,6 +21,8 @@ All configuration comes from environment variables. Secrets are passed only as p
 | `TRIMBLE_TOKEN_STORE` | — | Encrypted token store path |
 | `TRIMBLE_TOKEN_KEY_FILE` | — | 64-hex-character key file (`openssl rand -hex 32 > key && chmod 600 key`) |
 | `TRIMBLE_ACCESS_TOKEN_FILE` | — | Sandbox only: a short-lived access token, never refreshed |
+| `TRIMBLE_CONNECT_DESKTOP_ENABLED` | `false` | Trimble Connect for Windows command line (link building) |
+| `TRIMBLE_CONNECT_DESKTOP_LAUNCH` | `false` | Allow `trimble_open_in_desktop` to open the app. Also needs `TRIMBLE_CONNECT_DESKTOP_ENABLED`, a Windows host, and `trimble:desktop:launch` in `TRIMBLE_MCP_LOCAL_SCOPES` |
 | `TRIMBLE_MCP_HTTP_ADDR` | `127.0.0.1:8787` | HTTP listen address |
 | `TRIMBLE_MCP_HTTP_TOKENS_FILE` | — | Required for HTTP; see `docs/security/remote-auth.md` |
 | `TRIMBLE_MCP_ALLOWED_ORIGINS` | (none) | Exact Origin allowlist; any other Origin gets 403 |

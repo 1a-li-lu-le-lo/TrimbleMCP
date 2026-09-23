@@ -17,6 +17,7 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/gateway"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/desktop"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/mock"
 )
 
@@ -134,11 +135,13 @@ func TestAdapterParity(t *testing.T) {
 func liveToolNames(t *testing.T) []string {
 	reg := gateway.NewRegistry()
 	reg.Register("t", mock.New())
+	reg.Register("t", desktop.New(desktop.Config{LaunchEnabled: true, GOOS: "windows",
+		Open: func(context.Context, string) error { return nil }}))
 	g, err := gateway.New(gateway.Options{Registry: reg, Audit: &audit.Memory{}})
 	if err != nil {
 		t.Fatal(err)
 	}
-	p := &authz.Principal{Subject: "s", Tenant: "t", Scopes: authz.KnownScopes}
+	p := &authz.Principal{Subject: "s", Tenant: "t", Scopes: authz.KnownScopes, Local: true}
 	var names []string
 	for _, ti := range g.ListTools(context.Background(), p) {
 		names = append(names, ti.Name)

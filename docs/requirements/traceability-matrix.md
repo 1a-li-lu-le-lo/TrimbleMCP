@@ -12,6 +12,14 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-FR-004 | Read file metadata within an authorized project | `getFileMetadata` | `TestFileMetadata` | Done |
 | TRM-FR-005 | Get a single project (only where verified) | `getProject` (mock only) | `TestDescriptorDoesNotClaimGetProject` | Done |
 | TRM-FR-006 | Upload, version, download, delete | none | n/a | Planned (needs approvals) |
+| TRM-CLI-001 | Build documented Trimble Connect for Windows `trimbleconnect:` links | `trimble/desktop.BuildURI` | `TestBuildURIDocumentedExample`, `TestBuildURIVariants` | Done |
+| TRM-CLI-002 | Only documented views and panels; case-insensitive input, documented spelling out | `desktop.canonical` | `TestBuildURIVariants`, `TestBuildURIRejectsInjectionAndUndocumentedValues` | Done |
+| TRM-CLI-003 | URI contains only safe characters (no injection into the protocol handler) | `desktop.projectID` regexp | `FuzzBuildURIOnlyEmitsSafeURIs` | Done |
+| TRM-CLI-004 | Project ID verified via the Connect API; fabricated IDs rejected | `gateway.verifyProject` | `TestDesktopLinkBuiltAndVerified`, `TestDesktopLinkUnknownProjectRejected`, `TestDesktopLaunchUnverifiedRefused` | Done |
+| TRM-CLI-005 | Launch is opt-in, Windows-only, local-operator-only, dry run by default, reason required, rate-limited, audited | `desktop.Launch`, `gateway.openInDesktop` | `TestLaunchGating`, `TestDesktopLaunchVisibility`, `TestDesktopLaunchDryRunThenLaunch`, `TestDesktopLaunchRefusals`, `TestDesktopLaunchRateLimited` | Done |
+| TRM-CLI-006 | Launch via documented ShellExecuteW, never a shell | `desktop/open_windows.go` | `GOOS=windows go vet` and build; manual check on Windows pending | Partial |
+| TRM-CLI-007 | Remote callers cannot hold `trimble:desktop:launch` | `cmd/trimble-mcp` tokens loading | code review | Done |
+| TRM-CLI-008 | CLI parity (`trimblectl desktop link/open`) | `cmd/trimblectl` | `scripts/smoke.sh` | Done |
 | TRM-API-001 | Use only documented Trimble Connect endpoints and fields | `trimble/connect` | `docs/trimble-products/trimble-connect.md`, contract tests | Done |
 | TRM-API-002 | Regional base URLs from the documented host list only | `connect.BaseURL` | `TestBaseURLOnlyDocumentedHosts`, `TestOverrideRequiresExplicitTestFlag` | Done |
 | TRM-API-003 | Retry per the Connect error table; never retry 401 | `connect.get`, `mapStatus` | `TestRetryOn429ThenSuccess`, `TestNoRetryOn401AndBodyStaysPrivate`, `TestRetriesExhaustedOn503` | Done |

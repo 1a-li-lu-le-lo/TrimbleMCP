@@ -64,6 +64,15 @@ func toolNames(g *Gateway, p *authz.Principal) []string {
 func TestNoMutationToolsExist(t *testing.T) {
 	g, _, _ := setup(t)
 	for _, tl := range g.tools {
+		if tl.info.Name == ToolOpenDesktop {
+			// The only non-read-only tool: it opens a local application,
+			// changes no data, is local-only, and needs its own scope.
+			a := tl.info.Annotations
+			if a.ReadOnlyHint || a.DestructiveHint || a.OpenWorldHint || !tl.localOnly || tl.scope != authz.ScopeDesktopLaunch {
+				t.Errorf("desktop launch tool constraints changed: %+v", tl)
+			}
+			continue
+		}
 		if !tl.info.Annotations.ReadOnlyHint || tl.info.Annotations.DestructiveHint {
 			t.Errorf("%s is not annotated read-only", tl.info.Name)
 		}

@@ -9,3 +9,4 @@ These need answers from the project owner or from Trimble before the pilot.
 5. **Q-5: Remote authorization server.** Which IdP should issue tokens for remote MCP clients (Claude app, Perplexity)? This is needed for the OAuth 2.1 resource-server work.
 6. **Q-6: Data classification.** What classification applies to project names, file names, and documents, and may they be sent to third-party model providers?
 7. **Q-7: Rate limits.** Trimble does not publish Connect rate limits. Ask Trimble for tenant limits so the client-side 5 req/s default can be tuned.
+8. **Q-8: Desktop project IDs.** Do `trimbleconnect:/projects/<id>` links take the same ID as the REST API (`GET /2.1/projects` `id`)? Please confirm on a machine with Trimble Connect for Windows installed.

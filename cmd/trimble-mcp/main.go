@@ -76,6 +76,9 @@ func serveHTTP(ctx context.Context, a *app.App) error {
 			if s == authz.ScopeFilesWrite || s == authz.ScopeFilesDelete {
 				return errors.New("write and delete scopes are not available in this release")
 			}
+			if s == authz.ScopeDesktopLaunch {
+				return errors.New("trimble:desktop:launch is only for the local operator; remote callers must never open applications on the server host")
+			}
 		}
 		p := authz.Principal{Subject: e.Subject, Client: e.Client, Tenant: cfg.Tenant, Scopes: scopes}
 		for _, id := range e.Projects {

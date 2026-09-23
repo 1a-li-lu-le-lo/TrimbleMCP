@@ -7,6 +7,7 @@
 | Product ID | What it is | Tools | Status |
 |---|---|---|---|
 | `trimble-connect` | Trimble Connect REST API (Core), construction project collaboration: projects, folders, files | `trimble_list_projects`, `trimble_list_folder_items`, `trimble_get_file_metadata` | provisional (re-verify before production) |
+| `trimble-connect-desktop` | Trimble Connect for Windows command line: `trimbleconnect:/projects/<id>?show=<view>,<panel>` | `trimble_build_desktop_link`, `trimble_open_in_desktop` (local Windows only, opt-in) | provisional; syntax verified, ID equivalence assumed |
 | `mock` | Simulated adapter with synthetic data for development and evaluation | all read tools | simulated |
 
 Always confirm with `trimble_get_capabilities`; an operator may have disabled a product.
@@ -30,4 +31,5 @@ These Trimble products exist but have no adapter here. Say so and stop:
 - "Connect project", "TC project", "Trimble Connect", or a construction document folder: `trimble-connect`.
 - A truck, route, fleet, or hours-of-service question: not configured.
 - A drawing open in Tekla or SketchUp on the user's machine: a desktop SDK, not reachable here.
+- "Open it in Trimble Connect for Windows", "the desktop app", "show the ToDos panel": `trimble-connect-desktop`. Resolve the project through `trimble-connect` first.
 - Unsure: ask the user which product, after showing what `trimble_get_capabilities` reports.

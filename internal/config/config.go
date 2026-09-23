@@ -27,6 +27,10 @@ type Config struct {
 
 	EnableMock bool
 
+	// Trimble Connect for Windows command line (trimbleconnect: URL scheme).
+	DesktopEnabled bool
+	DesktopLaunch  bool
+
 	Connect ConnectConfig
 
 	// Remote HTTP.
@@ -120,6 +124,15 @@ func Load() (*Config, error) {
 	}
 	if c.Connect.Enabled, err = envBool("TRIMBLE_CONNECT_ENABLED", false); err != nil {
 		return nil, err
+	}
+	if c.DesktopEnabled, err = envBool("TRIMBLE_CONNECT_DESKTOP_ENABLED", false); err != nil {
+		return nil, err
+	}
+	if c.DesktopLaunch, err = envBool("TRIMBLE_CONNECT_DESKTOP_LAUNCH", false); err != nil {
+		return nil, err
+	}
+	if c.DesktopLaunch && !c.DesktopEnabled {
+		return nil, errs.Newf(errs.Configuration, "TRIMBLE_CONNECT_DESKTOP_LAUNCH requires TRIMBLE_CONNECT_DESKTOP_ENABLED=true")
 	}
 	if c.AllowPlainHTTP, err = envBool("TRIMBLE_MCP_ALLOW_PLAIN_HTTP", false); err != nil {
 		return nil, err

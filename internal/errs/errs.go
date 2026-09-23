@@ -105,6 +105,12 @@ func Newf(code Code, format string, args ...any) *Error {
 	return e
 }
 
+// WithSafeMessage replaces the client-visible message.
+func (e *Error) WithSafeMessage(msg string) *Error {
+	e.Message = msg
+	return e
+}
+
 // Wrap attaches a private cause that is not rendered to clients.
 func Wrap(code Code, cause error) *Error {
 	e := New(code)

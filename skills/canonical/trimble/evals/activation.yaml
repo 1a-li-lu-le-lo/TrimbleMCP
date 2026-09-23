@@ -16,6 +16,11 @@
     {"id": "pos-webhook", "prompt": "Audit why the Trimble webhook failed.", "expect": "activate",
      "must": ["trimble_get_capabilities", "webhooks"]},
 
+    {"id": "pos-desktop-open", "prompt": "Open our Bridge project in Trimble Connect for Windows in 3D with the ToDos panel.", "expect": "activate",
+     "must": ["trimble_list_projects", "trimble_open_in_desktop", "show=3D,ToDos"], "must_not": ["cmd /c", "start \""]},
+    {"id": "pos-desktop-link", "prompt": "Give me the Trimble Connect for Windows command-line link for project rQR1yhTGj9I showing clashes in 3D.", "expect": "activate",
+     "must": ["trimble_build_desktop_link", "trimbleconnect:/projects/"]},
+
     {"id": "neg-install", "prompt": "Install Trimble on my laptop.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-go-trim", "prompt": "Explain trim in Go strings.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-excavator", "prompt": "Drive this excavator automatically.", "expect": "no_activate", "stop_condition": "machinery, equipment, or vehicle control"},
@@ -29,6 +34,7 @@
     {"id": "amb-upload", "prompt": "Upload this model.", "expect": "clarify", "must": ["product", "project"]},
     {"id": "amb-truck", "prompt": "Where is the truck?", "expect": "clarify", "must": ["not configured"]},
     {"id": "amb-convert", "prompt": "Convert these coordinates.", "expect": "clarify", "must": ["source CRS"]},
+    {"id": "amb-desktop", "prompt": "Open it in the desktop app.", "expect": "clarify", "must": ["which project"]},
     {"id": "amb-update", "prompt": "Update the project.", "expect": "clarify", "must": ["what change"]}
   ]
 }

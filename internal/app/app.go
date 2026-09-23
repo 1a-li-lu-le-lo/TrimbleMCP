@@ -17,6 +17,7 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/identity"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/mcp"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/connect"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/desktop"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/mock"
 )
 
@@ -42,7 +43,7 @@ func (a *App) Close() error {
 func (a *App) LocalPrincipal() *authz.Principal {
 	return &authz.Principal{
 		Subject: a.Config.LocalSubject, Client: "local", Tenant: a.Config.Tenant,
-		Scopes: a.Config.LocalScopes, Projects: a.Config.LocalProjects,
+		Scopes: a.Config.LocalScopes, Projects: a.Config.LocalProjects, Local: true,
 	}
 }
 
@@ -80,6 +81,9 @@ func New(cfg *config.Config) (*App, error) {
 			return nil, err
 		}
 		reg.Register(cfg.Tenant, ad)
+	}
+	if cfg.DesktopEnabled {
+		reg.Register(cfg.Tenant, desktop.New(desktop.Config{LaunchEnabled: cfg.DesktopLaunch}))
 	}
 	gw, err := gateway.New(gateway.Options{Registry: reg, Audit: sink, Logger: logger})
 	if err != nil {

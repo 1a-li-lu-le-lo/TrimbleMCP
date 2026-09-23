@@ -19,6 +19,12 @@ const (
 	CapGetProject   Capability = "get_project"
 	CapListFolder   Capability = "list_folder_items"
 	CapFileMetadata Capability = "get_file_metadata"
+	// CapDesktopLink builds a documented Trimble Connect for Windows launch
+	// URI. It has no side effects.
+	CapDesktopLink Capability = "build_desktop_link"
+	// CapDesktopLaunch opens Trimble Connect for Windows on the operator's own
+	// machine via its registered URL scheme. It reads and changes no data.
+	CapDesktopLaunch Capability = "launch_desktop"
 )
 
 // VerificationStatus records how well an adapter's contract is evidenced.
@@ -62,6 +68,8 @@ type Descriptor struct {
 	Status        VerificationStatus `json:"verification_status"`
 	DisableSwitch string             `json:"disable_switch"`
 	ReadOnly      bool               `json:"read_only"`
+	// LaunchMode describes local-application launching, when relevant.
+	LaunchMode string `json:"launch_mode,omitempty"`
 }
 
 // Supports reports whether the descriptor lists c.
@@ -165,4 +173,20 @@ type FileReader interface {
 	Base
 	ListFolderItems(ctx context.Context, project domain.ProjectID, folder domain.FolderID, page domain.PageRequest) (ItemPage, error)
 	GetFileMetadata(ctx context.Context, project domain.ProjectID, file domain.FileID) (FileMetadata, domain.Provenance, error)
+}
+
+// DesktopLink is a validated launch URI for a desktop Trimble application.
+type DesktopLink struct {
+	URI     string           `json:"uri"`
+	Project domain.ProjectID `json:"project_id"`
+	View    string           `json:"view,omitempty"`
+	Panel   string           `json:"panel,omitempty"`
+}
+
+// DesktopLauncher builds and opens launch URIs for a desktop application's
+// documented command-line interface. It never reads or writes project data.
+type DesktopLauncher interface {
+	Base
+	BuildLink(project domain.ProjectID, view, panel string) (DesktopLink, error)
+	Launch(ctx context.Context, link DesktopLink) error
 }

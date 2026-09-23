@@ -22,6 +22,9 @@ const (
 	ScopeFilesWrite       Scope = "trimble:files:write"
 	ScopeFilesDelete      Scope = "trimble:files:delete"
 	ScopeAuditRead        Scope = "trimble:audit:read"
+	// ScopeDesktopLaunch permits opening a desktop Trimble application on the
+	// operator's own machine. Never granted by default; local principals only.
+	ScopeDesktopLaunch Scope = "trimble:desktop:launch"
 )
 
 // ReadOnlyDefault is granted when configuration does not say otherwise.
@@ -31,7 +34,7 @@ var ReadOnlyDefault = []Scope{ScopeCapabilitiesRead, ScopeProjectsRead}
 // configuration are rejected rather than silently ignored.
 var KnownScopes = []Scope{
 	ScopeCapabilitiesRead, ScopeProjectsRead, ScopeFilesRead,
-	ScopeFilesWrite, ScopeFilesDelete, ScopeAuditRead,
+	ScopeFilesWrite, ScopeFilesDelete, ScopeAuditRead, ScopeDesktopLaunch,
 }
 
 // Principal is an authenticated caller bound to exactly one tenant.
@@ -45,6 +48,10 @@ type Principal struct {
 	// the tenant's upstream credential can see.
 	Projects []domain.ProjectID `json:"projects,omitempty"`
 	Expires  time.Time          `json:"expires,omitempty"`
+	// Local is true only for the operator principal of a stdio or CLI
+	// process on the operator's own machine. Remote principals are never
+	// local, so they can never launch desktop applications.
+	Local bool `json:"local"`
 }
 
 // Request is the resource and operation being authorized.

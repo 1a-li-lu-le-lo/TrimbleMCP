@@ -9,3 +9,5 @@
 | A-5 | The file `hash` algorithm is undocumented | Not used for integrity | Warning emitted with every metadata result |
 | A-6 | One tenant per bridge process (single Trimble Identity session) | Multi-tenant hosting needs a per-tenant registry config | The registry already keys adapters by tenant |
 | A-7 | MCP revision 2026-07-28 is current, per the research report | Modern-mode details may drift | Legacy mode is the primary path; modern mode is marked Partial |
+| A-8 | The `[project-id]` in `trimbleconnect:` links equals the REST API project `id` | The desktop app opens the wrong project or none | Adapter marked Provisional; every result carries a warning; confirm with Trimble or on a real install |
+| A-9 | A panel without a view is not a valid `show=` form (only `[view],[panel]` is documented) | Slightly over-strict | Panel-only input is rejected rather than guessed |

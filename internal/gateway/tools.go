@@ -3,12 +3,14 @@ package gateway
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/domain"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/errs"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/mcp"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/desktop"
 )
 
 // Tool names. Mutation, download, and delete tools are intentionally absent
@@ -19,6 +21,8 @@ const (
 	ToolGetProject      = "trimble_get_project"
 	ToolListFolderItems = "trimble_list_folder_items"
 	ToolGetFileMetadata = "trimble_get_file_metadata"
+	ToolBuildDesktop    = "trimble_build_desktop_link"
+	ToolOpenDesktop     = "trimble_open_in_desktop"
 )
 
 var readOnly = mcp.ToolAnnotations{ReadOnlyHint: true, DestructiveHint: false, IdempotentHint: true, OpenWorldHint: true}
@@ -101,7 +105,74 @@ func (g *Gateway) buildTools() []*tool {
 			scope: authz.ScopeFilesRead, capability: trimble.CapFileMetadata,
 			run: g.getFileMetadata,
 		},
+		{
+			info: mcp.ToolInfo{
+				Name:  ToolBuildDesktop,
+				Title: "Build a Trimble Connect for Windows link",
+				Description: "Builds the documented Trimble Connect for Windows command-line link " +
+					"(trimbleconnect:/projects/<id>?show=<view>,<panel>) for a project resolved through trimble_list_projects. " +
+					"No side effects: nothing is opened. Views: " + strings.Join(desktop.Views(), ", ") +
+					". Panels: " + strings.Join(desktop.Panels(), ", ") + ".",
+				InputSchema:  schema(desktopSchema(false)),
+				OutputSchema: envelopeSchema,
+				Annotations:  mcp.ToolAnnotations{Title: "Build a Trimble Connect for Windows link", ReadOnlyHint: true, IdempotentHint: true},
+			},
+			scope: authz.ScopeProjectsRead, capability: trimble.CapDesktopLink,
+			run: g.buildDesktopLink,
+		},
+		{
+			info: mcp.ToolInfo{
+				Name:  ToolOpenDesktop,
+				Title: "Open in Trimble Connect for Windows",
+				Description: "Opens Trimble Connect for Windows on this machine at a verified project, view, and panel, using its " +
+					"documented command-line link. Reads and changes no project data. dry_run defaults to true; set dry_run=false " +
+					"only when the user has asked to open the application. Local operator sessions on Windows only.",
+				InputSchema:  schema(desktopSchema(true)),
+				OutputSchema: envelopeSchema,
+				Annotations:  mcp.ToolAnnotations{Title: "Open in Trimble Connect for Windows", ReadOnlyHint: false, DestructiveHint: false, IdempotentHint: false, OpenWorldHint: false},
+			},
+			scope: authz.ScopeDesktopLaunch, capability: trimble.CapDesktopLaunch, localOnly: true,
+			run: g.openInDesktop,
+		},
 	}
+}
+
+func desktopSchema(launch bool) string {
+	enum := func(vs []string) string {
+		b, _ := json.Marshal(vs)
+		return string(b)
+	}
+	s := `{"type": "object", "additionalProperties": false, "required": ["product", "project_id"`
+	if launch {
+		s += `, "reason"`
+	}
+	s += `], "properties": {
+    ` + productProp + `,
+    "project_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$", "description": "Project ID from trimble_list_projects."},
+    "view": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Views(), ", ") + `", "enum": ` + enum(caseVariants(desktop.Views())) + `},
+    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Requires view.", "enum": ` + enum(caseVariants(desktop.Panels())) + `}`
+	if launch {
+		s += `,
+    "dry_run": {"type": "boolean", "default": true, "description": "When true (default) nothing is opened."},
+    "reason": {"type": "string", "minLength": 1, "maxLength": 200, "description": "Why the user wants the application opened (recorded in the audit input hash)."}`
+	}
+	return s + `}}`
+}
+
+// caseVariants lists documented spellings plus lower- and upper-case forms,
+// since upstream parameters are case-insensitive.
+func caseVariants(vs []string) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, v := range vs {
+		for _, x := range []string{v, strings.ToLower(v), strings.ToUpper(v)} {
+			if !seen[x] {
+				seen[x] = true
+				out = append(out, x)
+			}
+		}
+	}
+	return out
 }
 
 func withTitle(a mcp.ToolAnnotations, title string) mcp.ToolAnnotations {
@@ -130,10 +201,12 @@ type capabilitiesResult struct {
 }
 
 var capabilityTools = map[trimble.Capability]string{
-	trimble.CapListProjects: ToolListProjects,
-	trimble.CapGetProject:   ToolGetProject,
-	trimble.CapListFolder:   ToolListFolderItems,
-	trimble.CapFileMetadata: ToolGetFileMetadata,
+	trimble.CapListProjects:  ToolListProjects,
+	trimble.CapGetProject:    ToolGetProject,
+	trimble.CapListFolder:    ToolListFolderItems,
+	trimble.CapFileMetadata:  ToolGetFileMetadata,
+	trimble.CapDesktopLink:   ToolBuildDesktop,
+	trimble.CapDesktopLaunch: ToolOpenDesktop,
 }
 
 func (g *Gateway) getCapabilities(ctx context.Context, c *call, args json.RawMessage) (*Envelope, error) {
