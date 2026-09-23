@@ -50,6 +50,8 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-SEC-004 | Secrets never logged, printed, or returned | `identity.Secret`, `errs` | `TestSecretNeverPrints`, `TestTokenErrorDoesNotEchoBody`, `TestUpstreamFaultsMapToSafeErrors` | Done |
 | TRM-SEC-005 | Refresh tokens encrypted at rest; private file permissions enforced | `identity.FileStore` | `TestFileStoreRoundTripAndPermissions` | Done |
 | TRM-SEC-006 | PKCE S256 with state check | `identity`, `trimblectl auth login` | `TestPKCEChallengeRFC7636Vector`, `TestNewClientValidation` | Done |
+| TRM-SEC-013 | Desktop project verification requires the caller's grant on the project API product (no existence oracle) | `gateway.verifyProject` | `TestDesktopVerificationRespectsProductGrant` | Done |
+| TRM-SEC-014 | Serial PKCE session never stranded: refreshed token kept when a save fails (retried, logged without secrets); newer stored session from another process adopted | `identity.RefreshingSource` | `TestRefreshSurvivesSaveFailure`, `TestRefreshAdoptsNewerStoredSession` | Done (no cross-process file lock yet) |
 | TRM-SEC-012 | Trimble Serial PKCE: new challenge on every token and refresh request; previous verifier presented | `identity.Exchange`, `identity.Refresh` | `TestSerialPKCEExchangeAndRefresh` | Done |
 | TRM-SEC-007 | HTTP bearer tokens stored only as SHA-256; constant-time compare | `mcp.StaticTokenAuthenticator` | `TestHTTPAuthChallenge` | Done |
 | TRM-SEC-008 | Prompt-injection text neutralised and labelled | `gateway.cleanUntrusted` | `TestPromptInjectionNamesAreNeutralisedAndLabelled` | Done |

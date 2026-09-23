@@ -177,3 +177,37 @@ func TestDesktopLaunchRateLimited(t *testing.T) {
 		t.Fatalf("launch burst: %+v %d", last.Error, len(*f.opened))
 	}
 }
+
+// Regression: verification must not be an existence oracle for a product the
+// caller was not granted (review finding, desktop.go verifyProject).
+func TestDesktopVerificationRespectsProductGrant(t *testing.T) {
+	f := setupDesktop(t, true)
+	p := localOperator()
+	p.Products = []domain.Product{"trimble-connect-desktop"} // not the mock project API
+	for _, id := range []string{"mock-prj-007", "does-not-exist"} {
+		env := invoke(t, f.g, p, ToolBuildDesktop, `{"product":"trimble-connect-desktop","project_id":"`+id+`"}`)
+		b, _ := json.Marshal(env)
+		if env.Status != "ok" || !strings.Contains(string(b), `"verified":false`) || strings.Contains(string(b), "not found") {
+			t.Fatalf("%s: existence leaked or wrong status: %s", id, b)
+		}
+	}
+	p.Scopes = append(p.Scopes, authz.ScopeDesktopLaunch)
+	env := invoke(t, f.g, p, ToolOpenDesktop, `{"product":"trimble-connect-desktop","project_id":"mock-prj-007","dry_run":false,"reason":"x"}`)
+	if env.Error == nil || env.Error.Code != errs.PolicyDenied || len(*f.opened) != 0 {
+		t.Fatalf("launch without project-API grant: %+v", env.Error)
+	}
+}
+
+func TestDesktopSchemaAcceptsAnyCase(t *testing.T) {
+	f := setupDesktop(t, true)
+	for _, tl := range f.g.tools {
+		if tl.info.Name == ToolBuildDesktop && strings.Contains(string(tl.info.InputSchema), `"enum"`) {
+			t.Fatal("view/panel must not be enum-restricted: upstream values are case-insensitive")
+		}
+	}
+	env := invoke(t, f.g, localOperator(), ToolBuildDesktop, `{"product":"trimble-connect-desktop","project_id":"mock-prj-001","view":"Data","panel":"ToDOs"}`)
+	b, _ := json.Marshal(env.Result)
+	if env.Status != "ok" || !strings.Contains(string(b), "show=data,ToDos") {
+		t.Fatalf("%s", b)
+	}
+}

@@ -116,7 +116,7 @@ func (g *Gateway) buildTools() []*tool {
 					". Panels: " + strings.Join(desktop.Panels(), ", ") + ".",
 				InputSchema:  schema(desktopSchema(false)),
 				OutputSchema: envelopeSchema,
-				Annotations:  mcp.ToolAnnotations{Title: "Build a Trimble Connect for Windows link", ReadOnlyHint: true, IdempotentHint: true},
+				Annotations:  withTitle(readOnly, "Build a Trimble Connect for Windows link"), // verifies the project via the remote API
 			},
 			scope: authz.ScopeProjectsRead, capability: trimble.CapDesktopLink,
 			run: g.buildDesktopLink,
@@ -130,7 +130,7 @@ func (g *Gateway) buildTools() []*tool {
 					"only when the user has asked to open the application. Local operator sessions on Windows only.",
 				InputSchema:  schema(desktopSchema(true)),
 				OutputSchema: envelopeSchema,
-				Annotations:  mcp.ToolAnnotations{Title: "Open in Trimble Connect for Windows", ReadOnlyHint: false, DestructiveHint: false, IdempotentHint: false, OpenWorldHint: false},
+				Annotations:  mcp.ToolAnnotations{Title: "Open in Trimble Connect for Windows", ReadOnlyHint: false, DestructiveHint: false, IdempotentHint: false, OpenWorldHint: true},
 			},
 			scope: authz.ScopeDesktopLaunch, capability: trimble.CapDesktopLaunch, localOnly: true,
 			run: g.openInDesktop,
@@ -139,10 +139,8 @@ func (g *Gateway) buildTools() []*tool {
 }
 
 func desktopSchema(launch bool) string {
-	enum := func(vs []string) string {
-		b, _ := json.Marshal(vs)
-		return string(b)
-	}
+	// No enum for view and panel: upstream values are case-insensitive, so any
+	// casing is valid and the server canonicalizes and rejects unknown values.
 	s := `{"type": "object", "additionalProperties": false, "required": ["product", "project_id"`
 	if launch {
 		s += `, "reason"`
@@ -150,30 +148,14 @@ func desktopSchema(launch bool) string {
 	s += `], "properties": {
     ` + productProp + `,
     "project_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$", "description": "Project ID from trimble_list_projects."},
-    "view": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Views(), ", ") + `", "enum": ` + enum(caseVariants(desktop.Views())) + `},
-    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Give view and panel together, or neither for the documented default ` + desktop.DefaultView + `,` + desktop.DefaultPanel + `.", "enum": ` + enum(caseVariants(desktop.Panels())) + `}`
+    "view": {"type": "string", "maxLength": 16, "description": "Case-insensitive; one of ` + strings.Join(desktop.Views(), ", ") + `."},
+    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Give view and panel together, or neither for the documented default ` + desktop.DefaultView + `,` + desktop.DefaultPanel + `.", "maxLength": 16}`
 	if launch {
 		s += `,
     "dry_run": {"type": "boolean", "default": true, "description": "When true (default) nothing is opened."},
     "reason": {"type": "string", "minLength": 1, "maxLength": 200, "description": "Why the user wants the application opened (recorded in the audit input hash)."}`
 	}
 	return s + `}}`
-}
-
-// caseVariants lists documented spellings plus lower- and upper-case forms,
-// since upstream parameters are case-insensitive.
-func caseVariants(vs []string) []string {
-	var out []string
-	seen := map[string]bool{}
-	for _, v := range vs {
-		for _, x := range []string{v, strings.ToLower(v), strings.ToUpper(v)} {
-			if !seen[x] {
-				seen[x] = true
-				out = append(out, x)
-			}
-		}
-	}
-	return out
 }
 
 func withTitle(a mcp.ToolAnnotations, title string) mcp.ToolAnnotations {

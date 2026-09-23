@@ -293,12 +293,38 @@ type Store interface {
 
 // RefreshingSource returns a valid access token, refreshing and persisting
 // (rotating) the refresh token as needed. It is safe for concurrent use.
+//
+// Serial PKCE makes every refresh consume the stored verifier, so two rules
+// keep a session from being stranded:
+//   - The store is re-read before refreshing, so a refresh already performed
+//     by another process sharing the store (e.g. trimblectl alongside
+//     trimble-mcp) is adopted instead of replayed.
+//   - A refreshed token is kept in memory even when saving it fails; the save
+//     is retried on later calls and the failure reported through Logf.
 type RefreshingSource struct {
 	Client *Client
 	Store  Store
-	mu     sync.Mutex
-	cur    *Token
-	now    func() time.Time
+	// Logf, if set, receives persistence warnings. It never receives tokens.
+	Logf  func(format string, args ...any)
+	mu    sync.Mutex
+	cur   *Token
+	dirty bool
+	now   func() time.Time
+}
+
+func (s *RefreshingSource) logf(format string, args ...any) {
+	if s.Logf != nil {
+		s.Logf(format, args...)
+	}
+}
+
+func (s *RefreshingSource) persist() {
+	if err := s.Store.Save(s.cur); err != nil {
+		s.dirty = true
+		s.logf("trimble identity: refreshed session could not be saved; retrying on next use: %v", err)
+		return
+	}
+	s.dirty = false
 }
 
 // Token implements connect.TokenSource.
@@ -308,6 +334,9 @@ func (s *RefreshingSource) Token(ctx context.Context) (string, error) {
 	now := time.Now()
 	if s.now != nil {
 		now = s.now()
+	}
+	if s.dirty {
+		s.persist()
 	}
 	if s.cur == nil {
 		t, err := s.Store.Load()
@@ -319,6 +348,16 @@ func (s *RefreshingSource) Token(ctx context.Context) (string, error) {
 	if s.cur.Valid(now) {
 		return s.cur.AccessToken.Reveal(), nil
 	}
+	// Adopt a newer session saved by another process, unless we hold an
+	// unsaved newer one ourselves.
+	if !s.dirty {
+		if stored, err := s.Store.Load(); err == nil && stored.NextVerifier != s.cur.NextVerifier {
+			s.cur = stored
+			if s.cur.Valid(now) {
+				return s.cur.AccessToken.Reveal(), nil
+			}
+		}
+	}
 	if s.cur.RefreshToken == "" {
 		return "", errs.Newf(errs.Authentication, "the Trimble Identity session expired; run trimblectl auth login")
 	}
@@ -326,10 +365,8 @@ func (s *RefreshingSource) Token(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := s.Store.Save(t); err != nil {
-		return "", errs.Wrap(errs.Configuration, err)
-	}
 	s.cur = t
+	s.persist()
 	return t.AccessToken.Reveal(), nil
 }
 

@@ -209,3 +209,76 @@ func TestRefreshingSourceRotates(t *testing.T) {
 		t.Fatal("valid token should be reused without refresh")
 	}
 }
+
+type flakyStore struct {
+	t       *Token
+	failing bool
+	saves   int
+}
+
+func (f *flakyStore) Load() (*Token, error) { cp := *f.t; return &cp, nil }
+func (f *flakyStore) Save(t *Token) error {
+	if f.failing {
+		return fmt.Errorf("disk full")
+	}
+	cp := *t
+	f.t = &cp
+	f.saves++
+	return nil
+}
+
+// Regression: a failed save after a successful refresh must not discard the
+// new token and verifier (review finding: Serial PKCE would strand the session).
+func TestRefreshSurvivesSaveFailure(t *testing.T) {
+	var seen []string
+	n := 0
+	c := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		seen = append(seen, r.Form.Get("code_verifier"))
+		n++
+		fmt.Fprintf(w, `{"access_token":"at%d","refresh_token":"rt%d","token_type":"Bearer","expires_in":1}`, n, n)
+	})
+	st := &flakyStore{t: &Token{AccessToken: "old", RefreshToken: "rt0", NextVerifier: "v0", Expiry: time.Now().Add(-time.Hour)}, failing: true}
+	var logs []string
+	src := &RefreshingSource{Client: c, Store: st, Logf: func(f string, a ...any) { logs = append(logs, fmt.Sprintf(f, a...)) }}
+	tok, err := src.Token(context.Background())
+	if err != nil || tok != "at1" || len(logs) == 0 {
+		t.Fatalf("token %q err %v logs %v", tok, err, logs)
+	}
+	for _, l := range logs {
+		if strings.Contains(l, "at1") || strings.Contains(l, "rt1") {
+			t.Fatal("token leaked into log")
+		}
+	}
+	// Store recovers; the next call persists the held token, and the next
+	// refresh uses the NEW verifier, not the consumed v0.
+	st.failing = false
+	if _, err := src.Token(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if st.saves == 0 || st.t.RefreshToken.Reveal() == "rt0" {
+		t.Fatal("held token was not persisted after recovery")
+	}
+	if len(seen) < 2 || seen[1] == "v0" {
+		t.Fatalf("consumed verifier replayed: %v", seen)
+	}
+}
+
+// Regression: a refresh performed by another process sharing the store must
+// be adopted, not replayed with a consumed verifier.
+func TestRefreshAdoptsNewerStoredSession(t *testing.T) {
+	calls := 0
+	c := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.Write([]byte(`{"access_token":"x","token_type":"Bearer","expires_in":3600}`))
+	})
+	st := &flakyStore{t: &Token{AccessToken: "stale", RefreshToken: "rt1", NextVerifier: "v1", Expiry: time.Now().Add(-time.Hour)}}
+	src := &RefreshingSource{Client: c, Store: st}
+	src.cur = &Token{AccessToken: "stale", RefreshToken: "rt1", NextVerifier: "v1", Expiry: time.Now().Add(-time.Hour)}
+	// Another process refreshed and saved a newer session.
+	st.t = &Token{AccessToken: "fresh-from-other-process", RefreshToken: "rt2", NextVerifier: "v2", Expiry: time.Now().Add(time.Hour)}
+	tok, err := src.Token(context.Background())
+	if err != nil || tok != "fresh-from-other-process" || calls != 0 {
+		t.Fatalf("tok %q err %v upstream calls %d", tok, err, calls)
+	}
+}

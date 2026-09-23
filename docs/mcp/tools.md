@@ -4,8 +4,9 @@ All tools except `trimble_open_in_desktop` are read-only (`readOnlyHint: true`, 
 
 A tool is listed only when two things hold:
 
-- the caller holds its scope, and
-- some configured adapter supports it.
+- the caller holds its scope,
+- some configured adapter supports it, and
+- for local-only tools (`trimble_open_in_desktop`), the caller is the local stdio or CLI operator.
 
 | Tool | Scope | Capability | Required input | Notes |
 |---|---|---|---|---|
@@ -15,7 +16,7 @@ A tool is listed only when two things hold:
 | `trimble_list_folder_items` | `trimble:files:read` | `list_folder_items` | `product`, `project_id`, `folder_id` | Covers the brief's `list_folders` and `list_files` |
 | `trimble_get_file_metadata` | `trimble:files:read` | `get_file_metadata` | `product`, `project_id`, `file_id` | No content access |
 | `trimble_build_desktop_link` | `trimble:projects:read` | `build_desktop_link` | `product`, `project_id`; optional `view`, `panel` | Trimble Connect for Windows command-line link; no side effects |
-| `trimble_open_in_desktop` | `trimble:desktop:launch` | `launch_desktop` | `product`, `project_id`, `reason`; optional `view`, `panel`, `dry_run` (default true) | Local operator on Windows only; opt-in; the only tool with `readOnlyHint: false` (still `destructiveHint: false`) |
+| `trimble_open_in_desktop` | `trimble:desktop:launch` | `launch_desktop` | `product`, `project_id`, `reason`; optional `view`, `panel`, `dry_run` (default true) | Local operator on Windows only; opt-in; the only tool with `readOnlyHint: false` (still `destructiveHint: false`); both desktop tools set `openWorldHint: true` because project verification calls the Connect API |
 
 The brief's other tools — upload, download, create folder or version, views, geospatial, fleet, jobs, and audit lookup — are **not exposed**. They need either verified upstream support or the approval framework (ADR-0004).
 

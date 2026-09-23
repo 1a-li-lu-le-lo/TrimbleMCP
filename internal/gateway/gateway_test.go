@@ -68,8 +68,9 @@ func TestNoMutationToolsExist(t *testing.T) {
 			// The only non-read-only tool: it opens a local application,
 			// changes no data, is local-only, and needs its own scope.
 			a := tl.info.Annotations
-			if a.ReadOnlyHint || a.DestructiveHint || a.OpenWorldHint || !tl.localOnly || tl.scope != authz.ScopeDesktopLaunch {
-				t.Errorf("desktop launch tool constraints changed: %+v", tl)
+			// openWorldHint is true because project verification calls the API.
+			if a.ReadOnlyHint || a.DestructiveHint || !a.OpenWorldHint || !tl.localOnly || tl.scope != authz.ScopeDesktopLaunch {
+				t.Errorf("desktop launch tool constraints changed: %s %+v", tl.info.Name, a)
 			}
 			continue
 		}

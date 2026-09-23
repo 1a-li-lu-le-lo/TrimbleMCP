@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/domain"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/errs"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble"
@@ -35,6 +36,14 @@ type verification struct {
 // verifyProject confirms, through the configured project API, that id is a
 // project visible to this tenant. It never trusts the caller's word for it.
 func (g *Gateway) verifyProject(ctx context.Context, c *call, id domain.ProjectID) verification {
+	// Verification reads the project API, so the caller must be allowed to
+	// read projects in that product. Otherwise the result would be an
+	// existence oracle for a product the caller was never granted.
+	if err := authz.Authorize(c.p, authz.Request{
+		Tenant: c.p.Tenant, Product: g.desktopProjects, Scope: authz.ScopeProjectsRead, Project: id,
+	}, g.now()); err != nil {
+		return verification{Detail: fmt.Sprintf("the caller is not authorized to read %s projects, so the project ID was not checked", g.desktopProjects)}
+	}
 	a, err := g.reg.Resolve(c.p.Tenant, g.desktopProjects)
 	if err != nil {
 		return verification{Detail: fmt.Sprintf("%s is not configured, so the project ID could not be confirmed", g.desktopProjects)}

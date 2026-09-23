@@ -4,6 +4,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -106,7 +107,8 @@ func connectTokens(c config.ConnectConfig) (connect.TokenSource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &identity.RefreshingSource{Client: cl, Store: &identity.FileStore{Path: c.TokenStore, KeyPath: c.TokenKeyFile}}, nil
+	return &identity.RefreshingSource{Client: cl, Store: &identity.FileStore{Path: c.TokenStore, KeyPath: c.TokenKeyFile},
+		Logf: func(format string, args ...any) { fmt.Fprintf(os.Stderr, format+"\n", args...) }}, nil
 }
 
 // IdentityClient builds the Trimble Identity client from configuration.
