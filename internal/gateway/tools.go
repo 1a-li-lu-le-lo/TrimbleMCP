@@ -204,7 +204,7 @@ func (g *Gateway) getCapabilities(ctx context.Context, c *call, args json.RawMes
 		Server: "trimble-mcp-bridge", Version: Version,
 		Tenant: c.p.Tenant, Subject: c.p.Subject, Scopes: c.p.Scopes,
 		ProjectsLimited: len(c.p.Projects) > 0,
-		Mutations:       "none: this release exposes read-only tools only",
+		Mutations:       "none: no tool changes Trimble data; trimble_open_in_desktop, when listed, only opens Trimble Connect for Windows locally",
 		Prohibited: []string{
 			"machinery or vehicle control", "survey, engineering, or construction certification",
 			"cross-tenant access", "credential handling in chat", "undocumented or private endpoints",
