@@ -1,0 +1,30 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l .)"
+      - name: vet
+        run: go vet ./...
+      - name: test (race)
+        run: go test -race -count=1 ./...
+      - name: fuzz (short)
+        run: |
+          go test ./internal/domain -run=XXX -fuzz=FuzzIDNeverAllowsPathOrQueryBreakout -fuzztime=20s
+          go test ./internal/mcp -run=XXX -fuzz=FuzzStdioNeverPanicsAndEmitsOnlyJSON -fuzztime=20s
+      - name: skill adapters in sync
+        run: ./scripts/sync-skills.sh && git diff --exit-code
+      - name: smoke (built binaries, stdio + CLI)
+        run: make smoke
+      - name: govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...

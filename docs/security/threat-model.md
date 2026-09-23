@@ -1,0 +1,24 @@
+# Threat model
+
+Scope: this release (read-only, Trimble Connect plus mock, stdio and HTTP).
+
+| ID | Threat | Asset | Entry | L | I | Prevention | Detection | Residual | Test |
+|---|---|---|---|---|---|---|---|---|---|
+| T-01 | Stolen Trimble refresh token | Customer projects | Token store file | M | H | AES-256-GCM at rest; separate 0600 key file; permission checks; revocation via `trimblectl auth logout` | Upstream login alerts (Trimble) | Key and store on the same host | `TestFileStoreRoundTripAndPermissions` |
+| T-02 | Cross-tenant access | All data | Tool args | M | H | Registry keyed by tenant; principal tenant fixed at auth; no tenant tool argument | Audit `denied` | None known | `TestCrossTenantIsolation`, `TestStrictInputValidation` |
+| T-03 | IDOR (foreign file or folder ID) | Project files | `file_id`, `folder_id` | M | H | Project required per call; adapter checks upstream `projectId` | Audit | Empty folders cannot be ownership-checked (no data exposed) | `TestIDORAcrossProjects`, `TestFolderItemsEnforceProject` |
+| T-04 | Path or query injection via IDs | Upstream API | IDs | M | M | Strict ID charset; `url.PathEscape`; UTF-8 validation | Fuzzing | None known | `FuzzIDNeverAllowsPathOrQueryBreakout` |
+| T-05 | SSRF via pagination links | Bearer token | `links.next.href` | L | H | Links never fetched; host must match; only `skipToken` extracted; redirects disabled | Malformed error | None known | `TestPaginationLinkToForeignHostRejected`, `TestRedirectNotFollowed` |
+| T-06 | Prompt injection in names or metadata | Agent behaviour | Upstream text | H | M | Control, bidi, zero-width, and tag characters stripped; length cap; `untrusted_fields`; no mutation tools exist | Evals | Models may still be influenced; server policy is unaffected | `TestPromptInjectionNamesAreNeutralisedAndLabelled`, `evals/safety.yaml` |
+| T-07 | Token or secret leakage in logs or output | Credentials | Errors, logs | M | H | `Secret` type redacts; upstream bodies are private causes; audit stores hashes | Secret-scan test on skills | Operator misconfiguration | `TestSecretNeverPrints`, `TestNoSecretsOrCredentialRequests` |
+| T-08 | Confused deputy or approval forgery | Trimble data | Conversation | M | H | No mutation tools; scopes from configuration only; model output never grants permissions | Audit | Mutations will need signed approvals (ADR-0004) | `TestNoMutationToolsExist` |
+| T-09 | DNS rebinding or cross-site POST to local HTTP | Local server | Browser | L | M | Origin allowlist (403); optional Host allowlist; loopback default bind | 403 logs | None known | `TestHTTPOriginAndMethod` |
+| T-10 | Session hijack | Legacy HTTP session | `Mcp-Session-Id` | L | M | Session bound to subject and tenant; idle expiry; DELETE | 404s | None known | `TestHTTPLegacySessionBinding` |
+| T-11 | Rate-limit abuse or cost amplification | Upstream quota | Tool calls | M | M | Per-caller limiter (gateway and HTTP); per-adapter upstream limiter; page-size cap 100 | 429s | Shared tenant quota | `TestGatewayRateLimit`, `TestHTTPRateLimit` |
+| T-12 | Malformed or poisoned upstream JSON | Integrity | Upstream | L | M | 8 MiB cap; required fields checked; unknown types passed through, not guessed | Malformed errors | Semantic poisoning | `TestOversizedBodyRejected`, `TestMissingItemsIsMalformed` |
+| T-13 | Stale or duplicate mutation | Data integrity | n/a | n/a | n/a | No mutations | n/a | Future: If-Match and idempotency records | n/a |
+| T-14 | Supply-chain compromise | Build | Dependencies | L | H | Zero third-party modules; CI runs govulncheck | CI | Go toolchain trust | CI |
+| T-15 | Audit tampering or loss | Evidence | Audit file | L | H | Hash chain; 0600 append-only open; fail closed if a write fails | `trimblectl audit verify` | Whole-file replacement (ship to WORM storage) | `TestChainAndTamperDetection`, `TestAuditFailureFailsClosed` |
+| T-16 | Machinery or vehicle control | Physical safety | Any | n/a | Critical | No such tools or adapters; skill refuses | Evals | None | `TestNoMutationToolsExist`, `evals/activation.yaml` |
+| T-17 | Unit or CRS confusion | Geospatial correctness | Future geo tools | M | H | Explicit CRS and axis order; distinct foot units; no transform tool | Tests | Future adapters must use `domain` types | `TestCRSMustBeExplicit`, `TestSurveyFootIsNotInternationalFoot` |
+| T-18 | Weak remote auth (static tokens) | Remote access | HTTP | M | H | Hash-only storage; constant-time compare; TLS required; per-token scopes and project lists | Audit | No expiry or rotation automation; OAuth pending | `TestHTTPAuthChallenge` |
