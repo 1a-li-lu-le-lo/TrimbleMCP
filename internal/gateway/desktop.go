@@ -49,6 +49,17 @@ func (g *Gateway) verifyProject(ctx context.Context, c *call, id domain.ProjectI
 		return verification{Detail: fmt.Sprintf("%s is not configured, so the project ID could not be confirmed", g.desktopProjects)}
 	}
 	r, ok := a.(trimble.ProjectReader)
+	if ok && a.Describe().Supports(trimble.CapGetProject) {
+		// One direct lookup when the adapter supports it.
+		if _, _, err := r.GetProject(ctx, id); err != nil {
+			if errs.Is(err, errs.ProjectNotFound) || errs.Is(err, errs.ResourceNotFound) {
+				return verification{Against: string(g.desktopProjects), Detail: "project ID not found among projects visible to this tenant",
+					err: errs.New(errs.ProjectNotFound)}
+			}
+			return verification{Against: string(g.desktopProjects), Detail: "project lookup failed: " + string(errs.As(err).Code), err: err}
+		}
+		return verification{Verified: true, Against: string(g.desktopProjects), Detail: "project ID confirmed via the project API"}
+	}
 	if !ok || !a.Describe().Supports(trimble.CapListProjects) {
 		return verification{Detail: fmt.Sprintf("%s cannot list projects, so the project ID could not be confirmed", g.desktopProjects)}
 	}

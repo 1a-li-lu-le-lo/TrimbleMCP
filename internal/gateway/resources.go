@@ -121,7 +121,7 @@ var prompts = []promptDef{
 		text: func(a map[string]string) string {
 			return fmt.Sprintf(`Find the file named %s in project %s (product %s).
 Walk folders with trimble_list_folder_items starting from the project's root_folder_id. Follow pagination fully. Limit the walk to 10 folder listings; if the file is not found, stop and report where you searched.
-When found, call trimble_get_file_metadata and report ID, size in bytes, version, revision, and UTC timestamps with audit IDs. Do not download content.`,
+When found, call trimble_get_file_metadata and report ID, size in bytes, version (and revision where reported), and UTC timestamps with audit IDs. Do not download content.`,
 				quote(a["file_name"]), quote(a["project_id"]), quote(a["product"]))
 		},
 	},

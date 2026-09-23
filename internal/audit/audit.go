@@ -4,6 +4,7 @@
 package audit
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
@@ -36,7 +37,9 @@ type Record struct {
 	Result            string    `json:"result"` // ok | denied | error
 	ErrorCode         string    `json:"error_code,omitempty"`
 	DurationMS        int64     `json:"duration_ms"`
-	PrevHash          string    `json:"prev_sha256"`
+	// Writer identifies the process instance that appended the record.
+	Writer   string `json:"writer"`
+	PrevHash string `json:"prev_sha256"`
 }
 
 // Sink appends records.
@@ -44,26 +47,73 @@ type Sink interface {
 	Append(r *Record) error
 }
 
-// Log is a file- or writer-backed Sink. Each record includes the SHA-256 of
-// the previous serialized record so truncation or edits are detectable.
+// Log is a file- or writer-backed Sink.
+//
+// Each process appending to a log is a separate writer with its own hash
+// chain: every record carries the SHA-256 of that writer's previous record,
+// and a writer's first record carries the hash of the log's last line when
+// it opened the file (its anchor). Several processes, such as trimble-mcp
+// and trimblectl, can therefore share one log, and restarts do not break
+// verification. Each record is written with a single append.
+//
+// Verify detects edited, reordered, or removed records wherever a later
+// record depends on them. Removing records from the very end of the log (or
+// the final records of a writer that nothing anchors to) cannot be detected
+// from the file alone; ship logs to append-only storage for that.
 type Log struct {
-	mu   sync.Mutex
-	w    io.Writer
-	prev string
+	mu     sync.Mutex
+	w      io.Writer
+	prev   string
+	writer string
 }
 
-// NewLog writes to w.
-func NewLog(w io.Writer) *Log { return &Log{w: w, prev: zeroHash} }
+// NewLog writes a fresh chain to w.
+func NewLog(w io.Writer) *Log { return &Log{w: w, prev: zeroHash, writer: NewID("w")} }
 
 const zeroHash = "0000000000000000000000000000000000000000000000000000000000000000"
 
-// OpenFile opens path for append-only writing with owner-only permissions.
+// OpenFile opens path for append-only writing with owner-only permissions
+// and anchors this writer's chain to the file's current last record.
 func OpenFile(path string) (*Log, *os.File, error) {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0o600)
+	f, err := os.OpenFile(path, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0o600)
 	if err != nil {
 		return nil, nil, err
 	}
-	return NewLog(f), f, nil
+	anchor, err := lastLineHash(f)
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	l := NewLog(f)
+	l.prev = anchor
+	return l, f, nil
+}
+
+// lastLineHash returns the SHA-256 of the last complete line of f, or the
+// zero hash for an empty file.
+func lastLineHash(f *os.File) (string, error) {
+	fi, err := f.Stat()
+	if err != nil {
+		return "", err
+	}
+	size := fi.Size()
+	if size == 0 {
+		return zeroHash, nil
+	}
+	const window = 1 << 20
+	start := max(size-window, 0)
+	buf := make([]byte, size-start)
+	if _, err := f.ReadAt(buf, start); err != nil && err != io.EOF {
+		return "", err
+	}
+	buf = bytes.TrimRight(buf, "\n")
+	if i := bytes.LastIndexByte(buf, '\n'); i >= 0 {
+		buf = buf[i+1:]
+	} else if start > 0 {
+		return "", fmt.Errorf("audit log last record exceeds %d bytes", window)
+	}
+	sum := sha256.Sum256(buf)
+	return hex.EncodeToString(sum[:]), nil
 }
 
 // Append assigns an ID if missing, chains, and writes r as one JSON line.
@@ -76,6 +126,7 @@ func (l *Log) Append(r *Record) error {
 	if r.Time.IsZero() {
 		r.Time = time.Now().UTC()
 	}
+	r.Writer = l.writer
 	r.PrevHash = l.prev
 	b, err := json.Marshal(r)
 	if err != nil {
@@ -89,10 +140,12 @@ func (l *Log) Append(r *Record) error {
 	return nil
 }
 
-// Verify checks the hash chain of a JSON Lines audit stream.
+// Verify checks every writer's hash chain in a JSON Lines audit stream and
+// returns the number of records.
 func Verify(r io.Reader) (int, error) {
 	dec := json.NewDecoder(r)
-	prev := zeroHash
+	seen := map[string]bool{zeroHash: true}
+	last := map[string]string{}
 	n := 0
 	for dec.More() {
 		var raw json.RawMessage
@@ -103,11 +156,17 @@ func Verify(r io.Reader) (int, error) {
 		if err := json.Unmarshal(raw, &rec); err != nil {
 			return n, err
 		}
-		if rec.PrevHash != prev {
-			return n, fmt.Errorf("audit chain broken at record %d (%s)", n+1, rec.ID)
+		if prev, ok := last[rec.Writer]; ok {
+			if rec.PrevHash != prev {
+				return n, fmt.Errorf("audit chain broken at record %d (%s): previous record of writer %s missing or altered", n+1, rec.ID, rec.Writer)
+			}
+		} else if !seen[rec.PrevHash] {
+			return n, fmt.Errorf("audit chain broken at record %d (%s): writer %s is anchored to a missing or altered record", n+1, rec.ID, rec.Writer)
 		}
 		sum := sha256.Sum256(raw)
-		prev = hex.EncodeToString(sum[:])
+		h := hex.EncodeToString(sum[:])
+		seen[h] = true
+		last[rec.Writer] = h
 		n++
 	}
 	return n, nil

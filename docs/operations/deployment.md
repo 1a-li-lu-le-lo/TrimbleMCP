@@ -31,7 +31,7 @@ Health check: `GET /healthz`. The process shuts down gracefully on SIGTERM, with
 
 ## Rollback
 
-- **Kill switch:** set `TRIMBLE_CONNECT_ENABLED=false` and restart. The Connect tools disappear and the mock stays available.
+- **Kill switch:** set `TRIMBLE_CONNECT_ENABLED=false` and restart. The `trimble-connect` product disappears from `trimble_get_capabilities`, and calls naming it fail with `unsupported_product`. The same tool names remain listed while another product, such as the mock, supports them.
 - **Revoke access:**
   - Remote callers: delete tokens-file entries and restart.
   - Upstream: run `trimblectl auth logout`.

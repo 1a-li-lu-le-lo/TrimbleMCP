@@ -30,3 +30,7 @@ All configuration comes from environment variables. Secrets are passed only as p
 | `TRIMBLE_MCP_RESOURCE_METADATA_URL` | — | Advertised in the 401 challenge |
 | `TRIMBLE_MCP_TLS_CERT_FILE` / `_KEY_FILE` | — | TLS for HTTP |
 | `TRIMBLE_MCP_ALLOW_PLAIN_HTTP` | `false` | Allow plain HTTP only behind a TLS-terminating proxy |
+
+## Secret files on Windows
+
+On Unix-like systems the bridge refuses secret files (token store, key, tokens file, access-token file) that are group- or world-accessible. On Windows, Go cannot read NTFS ACLs through file modes, so that check is skipped. Keep these files in a user-private directory such as `%LOCALAPPDATA%\TrimbleMCP`, and do not grant other users access.

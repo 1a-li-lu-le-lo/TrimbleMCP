@@ -20,7 +20,7 @@ Last verified: 2026-09-23. Confidence labels:
 | DEVELOPER PORTAL | https://developer.trimble.com/ ; app registration in the Trimble Developer Console, https://console.developer.trimble.com/ (S) |
 | BASE URL | Regional: `https://{app,app21,app22,app31,app32}.connect.trimble.com/tc/api` for us, eu, eu-gb, ap, ap-au (F, from `/regions`). Staging: `app.stage`, `app21.stage`, `app31.stage` (F, from OpenAPI `servers`) |
 | API VERSION | 2.0, with 2.1 paths for newer collection endpoints (F) |
-| OPENAPI AVAILABLE | Yes: https://api.swaggerhub.com/apis/Trimble-Connect/tcps/2.0 (F; the retrieved copy was truncated after `/folders/fs/...`) |
+| OPENAPI AVAILABLE | Yes: https://api.swaggerhub.com/apis/Trimble-Connect/tcps/2.0 (F; complete, 113 paths, re-checked 2026-09-23). Also https://developer.trimble.com/docs/connect/reference/openapi/core |
 | SDK AVAILABLE | Workspace API (browser JS) and a Windows .NET API; no Go SDK (F) |
 | SUPPORTED LANGUAGES | Any HTTP client; the bridge uses a hand-written Go adapter |
 | PUBLIC ACCESS | Documentation is public. Credentials are not self-service (F) |
@@ -34,8 +34,8 @@ Last verified: 2026-09-23. Confidence labels:
 | ORGANIZATION MODEL | Core Account API exists (F); not used |
 | PROJECT MODEL | Projects live in one region; resources are independent per region (F) |
 | RESOURCE TYPES | Projects, folders, files, versions, users, activities, and more (F) |
-| READ OPERATIONS (used) | `GET /2.1/projects`, `GET /2.1/folders/{folderId}/items`, `GET /2.0/files/{fileId}` (F) |
-| READ OPERATIONS (not used) | `GET /projects/{id}` and `GET /users/me`: shown in guides but not verifiable in the truncated spec. File versions and download URL: verified but deferred |
+| READ OPERATIONS (used) | `GET /2.1/projects`, `GET /2.0/projects/{projectId}`, `GET /2.1/folders/{folderId}/items?fields=size`, `GET /2.0/files/{fileId}` (F) |
+| READ OPERATIONS (not used) | `GET /projects/me`, file versions, and the download URL: documented, deferred |
 | WRITE OPERATIONS | `POST /files/fs/initiate`, `POST /files/fs/commit`, package upload (F). **Not implemented** |
 | DELETE OPERATIONS | Unknown (not reviewed). Not implemented |
 | BULK OPERATIONS | batch-api host listed in `/regions` (F). Not used |
@@ -58,7 +58,7 @@ Last verified: 2026-09-23. Confidence labels:
 | DATA RETENTION | Unknown |
 | LICENSE | Connect Terms: https://www.trimble.com/en/products/trimble-connect/terms-and-conditions ; SDK Internal Use License: https://developer.trimble.com/docs/connect/terms/SDK-IU-license-agreement (F) |
 | LAST VERIFIED | 2026-09-23 |
-| CONFIDENCE | Medium. The used endpoints are confirmed (F); spec truncation left gaps |
+| CONFIDENCE | Medium-high. Every endpoint and field used is in the complete OpenAPI definition (F); not yet exercised against a sandbox |
 | ADOPTION DECISION | **Adopt: first read-only adapter (class A/B/C: public docs, gated credentials)** |
 | BLOCKERS | Need sandbox credentials and a registered callback URL (request from connect-support@trimble.com). Re-verify the full spec for `/projects/{id}` and `/users/me` |
 

@@ -421,3 +421,23 @@ func TestHTTPSpecEdges(t *testing.T) {
 		t.Fatalf("challenge: %q", w.Header().Get("WWW-Authenticate"))
 	}
 }
+
+func TestHTTPPerSubjectSessionCap(t *testing.T) {
+	auth := &mcp.StaticTokenAuthenticator{}
+	for tok, sub := range map[string]string{aliceToken: "alice", bobToken: "bob"} {
+		sum := sha256.Sum256([]byte(tok))
+		_ = auth.AddTokenHash(hex.EncodeToString(sum[:]), authz.Principal{Subject: sub, Tenant: "t1", Scopes: alice.Scopes})
+	}
+	h := mcp.NewHTTPHandler(server(t), mcp.HTTPOptions{Auth: auth, MaxSessionsPerSubject: 2, RatePerSecond: 1000, Burst: 1000})
+	for i := 0; i < 2; i++ {
+		if w := post(h, aliceToken, "", initBody, nil); w.Code != 200 {
+			t.Fatal(w.Code)
+		}
+	}
+	if w := post(h, aliceToken, "", initBody, nil); w.Code != 503 {
+		t.Fatalf("third alice session: %d", w.Code)
+	}
+	if w := post(h, bobToken, "", initBody, nil); w.Code != 200 {
+		t.Fatalf("bob locked out by alice: %d", w.Code)
+	}
+}

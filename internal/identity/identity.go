@@ -1,7 +1,7 @@
 // Package identity is a minimal Trimble Identity (id.trimble.com) OAuth 2.0
 // client: authorization code with PKCE (S256), refresh, and revocation, plus
 // token sources for adapters. Endpoints are from the issuer's published
-// OpenID configuration; see docs/trimble-products/trimble-identity.md.
+// OpenID configuration; see docs/trimble-products/capability-matrix.md (TID).
 package identity
 
 import (
@@ -202,12 +202,18 @@ func (c *Client) Refresh(ctx context.Context, prev *Token) (*Token, error) {
 // token and token_type_hint).
 func (c *Client) Revoke(ctx context.Context, refresh Secret) error {
 	form := url.Values{"token": {refresh.Reveal()}, "token_type_hint": {"refresh_token"}}
+	if c.ClientSecret == "" {
+		// Public (PKCE-only) clients identify themselves in the body.
+		form.Set("client_id", c.ClientID)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.Endpoints.Revoke, strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth(url.QueryEscape(c.ClientID), url.QueryEscape(c.ClientSecret.Reveal()))
+	if c.ClientSecret != "" {
+		req.SetBasicAuth(url.QueryEscape(c.ClientID), url.QueryEscape(c.ClientSecret.Reveal()))
+	}
 	resp, err := c.HTTP.Do(req)
 	if err != nil {
 		return errs.Wrap(errs.UpstreamUnavailable, err)
@@ -291,6 +297,12 @@ type Store interface {
 	Save(*Token) error
 }
 
+// Locker is implemented by stores shared between processes. Lock blocks
+// until the caller holds an exclusive refresh lock or ctx ends.
+type Locker interface {
+	Lock(ctx context.Context) (unlock func(), err error)
+}
+
 // RefreshingSource returns a valid access token, refreshing and persisting
 // (rotating) the refresh token as needed. It is safe for concurrent use.
 //
@@ -360,6 +372,21 @@ func (s *RefreshingSource) Token(ctx context.Context) (string, error) {
 	}
 	if s.cur.RefreshToken == "" {
 		return "", errs.Newf(errs.Authentication, "the Trimble Identity session expired; run trimblectl auth login")
+	}
+	// Serialise refreshes across processes sharing the store: two processes
+	// refreshing at once would present the same single-use verifier.
+	if l, ok := s.Store.(Locker); ok && !s.dirty {
+		unlock, err := l.Lock(ctx)
+		if err != nil {
+			return "", errs.Wrap(errs.Authentication, err)
+		}
+		defer unlock()
+		if stored, err := s.Store.Load(); err == nil && stored.NextVerifier != s.cur.NextVerifier {
+			s.cur = stored // another process refreshed while we waited
+			if s.cur.Valid(now) {
+				return s.cur.AccessToken.Reveal(), nil
+			}
+		}
 	}
 	t, err := s.Client.Refresh(ctx, s.cur)
 	if err != nil {

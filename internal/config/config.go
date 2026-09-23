@@ -13,6 +13,7 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/domain"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/errs"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/fsperm"
 )
 
 // Config is the resolved configuration.
@@ -180,12 +181,8 @@ type TokenEntry struct {
 
 // LoadTokenEntries reads the HTTP tokens file (a JSON array).
 func LoadTokenEntries(path string) ([]TokenEntry, error) {
-	fi, err := os.Stat(path)
-	if err != nil {
+	if err := fsperm.CheckPrivate(path); err != nil {
 		return nil, err
-	}
-	if fi.Mode().Perm()&0o077 != 0 {
-		return nil, fmt.Errorf("tokens file must not be readable by group or others (chmod 600)")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {

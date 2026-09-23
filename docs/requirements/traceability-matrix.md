@@ -10,7 +10,7 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-FR-002 | List projects one page at a time, with an explicit cursor | `gateway/tools.go` `listProjects` | `TestListProjectsPaginatesToCompletion` | Done |
 | TRM-FR-003 | List folder items within an authorized project | `listFolderItems` | `TestFolderItemsEnforceProject`, `TestIDORAcrossProjects` | Done |
 | TRM-FR-004 | Read file metadata within an authorized project | `getFileMetadata` | `TestFileMetadata` | Done |
-| TRM-FR-005 | Get a single project (only where verified) | `getProject` (mock only) | `TestDescriptorDoesNotClaimGetProject` | Done |
+| TRM-FR-005 | Get a single project (Connect `GET /2.0/projects/{projectId}`, mock) | `connect.GetProject`, `getProject` | `TestGetProject`, `TestDescriptor` | Done |
 | TRM-FR-006 | Upload, version, download, delete | none | n/a | Planned (needs approvals) |
 | TRM-CLI-001 | Build documented Trimble Connect for Windows `trimbleconnect:` links | `trimble/desktop.BuildURI` | `TestBuildURIDocumentedExample`, `TestBuildURIVariants` | Done |
 | TRM-CLI-002 | Only documented views and panels, always in the two-value form (default 3D,models); case-insensitive input, documented spelling out | `desktop.canonical` | `TestBuildURIVariants`, `TestBuildURIRejectsInjectionAndUndocumentedValues` | Done |
@@ -52,6 +52,13 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-SEC-006 | PKCE S256 with state check | `identity`, `trimblectl auth login` | `TestPKCEChallengeRFC7636Vector`, `TestNewClientValidation` | Done |
 | TRM-SEC-013 | Desktop project verification requires the caller's grant on the project API product (no existence oracle) | `gateway.verifyProject` | `TestDesktopVerificationRespectsProductGrant` | Done |
 | TRM-SEC-014 | Serial PKCE session never stranded: refreshed token kept when a save fails (retried, logged without secrets); newer stored session from another process adopted | `identity.RefreshingSource` | `TestRefreshSurvivesSaveFailure`, `TestRefreshAdoptsNewerStoredSession` | Done (no cross-process file lock yet) |
+| TRM-SEC-015 | Secret-file privacy check works on Windows (mode bits are synthetic there; ACL guidance documented) | `internal/fsperm` | `TestPrivate`, `TestCheckPrivateFile` | Done |
+| TRM-SEC-016 | Cross-process refresh lock (Serial PKCE verifier never spent twice) | `identity.FileStore.Lock`, `RefreshingSource` | `TestFileStoreLockIsExclusive` | Done |
+| TRM-SEC-017 | Login callback ignores stray or repeated requests and never blocks | `trimblectl auth login` | code review | Done |
+| TRM-SEC-018 | Per-subject HTTP session cap | `mcp.HTTPOptions.MaxSessionsPerSubject` | `TestHTTPPerSubjectSessionCap` | Done |
+| TRM-SEC-019 | Revocation works for public PKCE clients (client_id in the body, no Basic) | `identity.Revoke` | `TestRevokePublicClientSendsClientIDNotBasic` | Done |
+| TRM-OPS-005 | Audit log verifies across restarts and concurrent writers (per-writer anchored chains) | `audit.OpenFile`, `audit.Verify` | `TestReopenAndSharedWriters` | Done |
+| TRM-MCP-009 | Spec conformance: id rules, modern `_meta` validation, version lists, resources/read errors, cursors, ping, discover, stdio cancellation | `internal/mcp` | `TestStdioInvalidIDsAndMethods`, `TestStdioModernStateless`, `TestStdioCancellation`, `TestHTTPSpecEdges` | Done |
 | TRM-SEC-012 | Trimble Serial PKCE: new challenge on every token and refresh request; previous verifier presented | `identity.Exchange`, `identity.Refresh` | `TestSerialPKCEExchangeAndRefresh` | Done |
 | TRM-SEC-007 | HTTP bearer tokens stored only as SHA-256; constant-time compare | `mcp.StaticTokenAuthenticator` | `TestHTTPAuthChallenge` | Done |
 | TRM-SEC-008 | Prompt-injection text neutralised and labelled | `gateway.cleanUntrusted` | `TestPromptInjectionNamesAreNeutralisedAndLabelled` | Done |

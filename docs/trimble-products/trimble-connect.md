@@ -5,8 +5,9 @@ Adapter: `internal/trimble/connect`. Every wire field the adapter reads is liste
 | Bridge operation | Upstream call | Fields read | Source |
 |---|---|---|---|
 | `ListProjects` | `GET {base}/2.1/projects?pageSize=N[&skipToken=T]` | `items[].id`, `name`, `rootId`, `createdAt`, `updatedAt`; `links.next.href` | OpenAPI tcps 2.0 (2.1 path) |
-| `ListFolderItems` | `GET {base}/2.1/folders/{folderId}/items?pageSize=N[&skipToken=T]` | `items[].id`, `name`, `type`, `versionId`, `parentId`, `modifiedOn`, `projectId`; `links.next.href` | OpenAPI tcps 2.0 (2.1 path) |
-| `GetFileMetadata` | `GET {base}/2.0/files/{fileId}` | `id`, `name`, `type`, `versionId`, `parentId`, `createdOn`, `modifiedOn`, `size`, `projectId`, `revision`, `hash` | OpenAPI tcps 2.0 |
+| `ListFolderItems` | `GET {base}/2.1/folders/{folderId}/items?pageSize=N[&skipToken=T]` | `items[].id`, `name`, `type` (FOLDER/FILE), `versionId`, `parentId`, `modifiedOn`, `projectId`, `size` (bytes, via `fields=size`), `hash` (MD5); `links.next.href` | OpenAPI tcps 2.0 (2.1 path) |
+| `GetFileMetadata` | `GET {base}/2.0/files/{fileId}` | `id`, `name`, `type`, `versionId`, `parentId`, `createdOn`, `modifiedOn`, `size`, `projectId` (FileDetailsResponse; it documents no `revision` or `hash`) | OpenAPI tcps 2.0 |
+| `GetProject` | `GET {base}/2.0/projects/{projectId}` | `id`, `name`, `description`, `rootId`, `createdOn`, `modifiedOn`, `access` (ProjectDetailsResponse) | OpenAPI tcps 2.0 |
 
 ## Safety behaviours (tested in `connect_test.go`)
 
@@ -22,6 +23,5 @@ Adapter: `internal/trimble/connect`. Every wire field the adapter reads is liste
 
 | Endpoint | Reason |
 |---|---|
-| `GET /projects/{id}` | Not verifiable in the retrieved spec |
 | `GET /users/me` | Response fields verified only for the Workspace (JS) API |
 | Download URL, upload, versions | Deferred to the Level 1 and Level 3 phases, which need the approval framework |

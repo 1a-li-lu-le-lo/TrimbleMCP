@@ -126,6 +126,8 @@ type Item struct {
 	SizeBytes  *int64     `json:"size_bytes,omitempty"`
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	Checksum   string     `json:"checksum,omitempty"`
+	// ChecksumAlgorithm names the documented algorithm of Checksum.
+	ChecksumAlgorithm string `json:"checksum_algorithm,omitempty"`
 }
 
 // FileMetadata describes one file.

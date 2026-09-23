@@ -37,6 +37,6 @@ Launching is a dry run unless the agent passes `dry_run: false`. The client will
 
 Delete the `[mcp_servers.trimble]` block (or run `codex mcp remove trimble` if your version has it), delete `.agents/skills/trimble`, and run `trimblectl auth logout`.
 
-## Unverified
+## Remote servers
 
-The remote form `codex mcp add <name> --url <url> --bearer-token-env-var ENV` appears in third-party documentation, not on an OpenAI page. Prefer the `config.toml` keys `url` and `bearer_token_env_var`, which the official config reference documents.
+For a remote server, `codex mcp add <name> --url <url> --bearer-token-env-var ENV` is documented on the official MCP page, as are the `config.toml` keys `url` and `bearer_token_env_var`. `codex mcp remove` is not documented there.

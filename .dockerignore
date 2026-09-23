@@ -1,0 +1,8 @@
+.git
+bin/
+*.jsonl
+*.key
+*.token
+.env
+.claude/
+.agents/

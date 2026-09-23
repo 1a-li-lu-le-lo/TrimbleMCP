@@ -12,6 +12,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/fsperm"
 )
 
 // FileStore keeps a token set on disk encrypted with AES-256-GCM. The key is
@@ -33,16 +36,7 @@ type storedToken struct {
 	Next    string `json:"v"`
 }
 
-func checkPrivate(path string) error {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-	if fi.Mode().Perm()&0o077 != 0 {
-		return fmt.Errorf("%s must not be readable by group or others (chmod 600)", filepath.Base(path))
-	}
-	return nil
-}
+func checkPrivate(path string) error { return fsperm.CheckPrivate(path) }
 
 func (s *FileStore) key() ([]byte, error) {
 	if err := checkPrivate(s.KeyPath); err != nil {
@@ -163,3 +157,31 @@ func (f FileTokenSource) Token(context.Context) (string, error) {
 	}
 	return tok, nil
 }
+
+// Lock implements Locker with an exclusive lock file next to the store,
+// created atomically (O_EXCL). A lock older than lockStale is presumed left
+// by a crashed process and removed.
+func (s *FileStore) Lock(ctx context.Context) (func(), error) {
+	path := s.Path + ".lock"
+	for {
+		f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+		if err == nil {
+			f.Close()
+			return func() { os.Remove(path) }, nil
+		}
+		if !errors.Is(err, os.ErrExist) {
+			return nil, err
+		}
+		if fi, serr := os.Stat(path); serr == nil && time.Since(fi.ModTime()) > lockStale {
+			os.Remove(path)
+			continue
+		}
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("waiting for the token refresh lock: %w", ctx.Err())
+		case <-time.After(100 * time.Millisecond):
+		}
+	}
+}
+
+const lockStale = 2 * time.Minute

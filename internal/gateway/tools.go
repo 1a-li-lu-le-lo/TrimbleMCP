@@ -97,7 +97,7 @@ func (g *Gateway) buildTools() []*tool {
 			info: mcp.ToolInfo{
 				Name:         ToolGetFileMetadata,
 				Title:        "Get file metadata",
-				Description:  "Reads metadata (name, size in bytes, version, revision, timestamps) for one file in an authorized project. Does not download content.",
+				Description:  "Reads metadata (name, size in bytes, version, timestamps, and revision where the product reports it) for one file in an authorized project. Does not download content.",
 				InputSchema:  schema(`{"type": "object", "additionalProperties": false, "required": ["product", "project_id", "file_id"], "properties": {` + productProp + `, "project_id": {"type": "string", ` + idPattern + `}, "file_id": {"type": "string", ` + idPattern + `}}}`),
 				OutputSchema: envelopeSchema,
 				Annotations:  withTitle(readOnly, "Get file metadata"),
@@ -450,8 +450,8 @@ func (g *Gateway) getFileMetadata(ctx context.Context, c *call, args json.RawMes
 	}
 	md.Name = cleanUntrusted(md.Name)
 	var warnings []string
-	if md.Checksum != "" {
-		warnings = append(warnings, "checksum is the upstream-reported hash; its algorithm is not documented, so do not use it for integrity verification.")
+	if md.Checksum != "" && md.ChecksumAlgorithm == "" {
+		warnings = append(warnings, "checksum algorithm is not documented for this product; do not use it for integrity verification.")
 	}
 	obs := prov.ObservedAt
 	return &Envelope{

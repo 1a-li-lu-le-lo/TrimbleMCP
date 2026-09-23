@@ -17,12 +17,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/app"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/config"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/fsperm"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/gateway"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/identity"
 )
@@ -225,7 +227,7 @@ func diagnostics(stdout, stderr io.Writer) int {
 			}
 			if fi, err := os.Stat(p.path); err != nil {
 				add(p.name, "missing", "")
-			} else if fi.Mode().Perm()&0o077 != 0 {
+			} else if !fsperm.Private(runtime.GOOS, fi.Mode()) {
 				add(p.name, "insecure_permissions", "chmod 600")
 			} else {
 				add(p.name, "ok", "")
@@ -287,15 +289,24 @@ func authLogin() error {
 			return
 		}
 		q := r.URL.Query()
+		if q.Get("state") != state {
+			// Ignore stray or forged callbacks instead of aborting the
+			// login; only the matching state completes it.
+			http.Error(w, "state mismatch", http.StatusBadRequest)
+			return
+		}
+		var res result
 		switch {
-		case q.Get("state") != state:
-			done <- result{err: errors.New("state mismatch; possible CSRF, login aborted")}
 		case q.Get("error") != "":
-			done <- result{err: fmt.Errorf("authorization denied: %.64s", q.Get("error"))}
+			res = result{err: fmt.Errorf("authorization denied: %.64s", q.Get("error"))}
 		case q.Get("code") == "":
-			done <- result{err: errors.New("no authorization code returned")}
+			res = result{err: errors.New("no authorization code returned")}
 		default:
-			done <- result{code: q.Get("code")}
+			res = result{code: q.Get("code")}
+		}
+		select {
+		case done <- res: // first result wins; repeats never block
+		default:
 		}
 		fmt.Fprintln(w, "Trimble MCP Bridge: you can close this window.")
 	})}

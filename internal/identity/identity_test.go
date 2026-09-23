@@ -282,3 +282,47 @@ func TestRefreshAdoptsNewerStoredSession(t *testing.T) {
 		t.Fatalf("tok %q err %v upstream calls %d", tok, err, calls)
 	}
 }
+
+func TestFileStoreLockIsExclusive(t *testing.T) {
+	st := &FileStore{Path: filepath.Join(t.TempDir(), "tok")}
+	unlock, err := st.Lock(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	defer cancel()
+	if _, err := st.Lock(ctx); err == nil {
+		t.Fatal("second holder acquired the lock")
+	}
+	unlock()
+	u2, err := st.Lock(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	u2()
+	// A stale lock left by a crashed process is reclaimed.
+	os.WriteFile(st.Path+".lock", nil, 0o600)
+	old := time.Now().Add(-10 * time.Minute)
+	os.Chtimes(st.Path+".lock", old, old)
+	u3, err := st.Lock(context.Background())
+	if err != nil {
+		t.Fatal("stale lock not reclaimed")
+	}
+	u3()
+}
+
+func TestRevokePublicClientSendsClientIDNotBasic(t *testing.T) {
+	c := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		if _, _, ok := r.BasicAuth(); ok {
+			t.Error("public client must not send Basic auth")
+		}
+		if r.Form.Get("client_id") != "cid" || r.Form.Get("token") != "rt" {
+			t.Error("client_id and token required")
+		}
+	})
+	c.ClientSecret = ""
+	if err := c.Revoke(context.Background(), "rt"); err != nil {
+		t.Fatal(err)
+	}
+}

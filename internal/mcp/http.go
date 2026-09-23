@@ -92,6 +92,8 @@ type HTTPOptions struct {
 	ResourceMetadataURL string
 	SessionIdleTTL      time.Duration
 	MaxSessions         int
+	// MaxSessionsPerSubject stops one caller from exhausting MaxSessions.
+	MaxSessionsPerSubject int
 	// RatePerSecond and Burst bound requests per authenticated subject.
 	RatePerSecond float64
 	Burst         int
@@ -125,6 +127,9 @@ func NewHTTPHandler(srv *Server, opts HTTPOptions) *HTTPHandler {
 	}
 	if opts.MaxSessions == 0 {
 		opts.MaxSessions = 1000
+	}
+	if opts.MaxSessionsPerSubject == 0 {
+		opts.MaxSessionsPerSubject = 20
 	}
 	if opts.RatePerSecond == 0 {
 		opts.RatePerSecond = 5
@@ -370,6 +375,15 @@ func (h *HTTPHandler) newSession(p *authz.Principal) (*httpSession, error) {
 	h.expireLocked()
 	if len(h.sessions) >= h.opts.MaxSessions {
 		return nil, errors.New("session limit")
+	}
+	mine := 0
+	for _, s := range h.sessions {
+		if s.subject == p.Subject && s.tenant == string(p.Tenant) {
+			mine++
+		}
+	}
+	if mine >= h.opts.MaxSessionsPerSubject {
+		return nil, errors.New("per-subject session limit")
 	}
 	s := &Session{ID: audit.NewID("mcps"), Principal: p}
 	hs := &httpSession{sess: s, subject: p.Subject, tenant: string(p.Tenant), lastSeen: h.now()}

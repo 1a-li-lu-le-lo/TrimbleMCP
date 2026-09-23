@@ -25,6 +25,8 @@ TRIMBLE_CONNECT_ENABLED = "false"
 # TRIMBLE_CONNECT_ENABLED = "true"
 # TRIMBLE_CONNECT_ENV = "stage"
 # TRIMBLE_CONNECT_REGION = "us"
+# TRIMBLE_CLIENT_ID = "<application id from the Trimble Developer Console>"
+# TRIMBLE_SCOPE = "openid <application scope>"
 # TRIMBLE_TOKEN_STORE = "/secure/path/tc-token"
 # TRIMBLE_TOKEN_KEY_FILE = "/secure/path/tc-token.key"
 

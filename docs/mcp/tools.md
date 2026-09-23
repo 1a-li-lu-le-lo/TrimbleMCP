@@ -2,7 +2,7 @@
 
 All tools except `trimble_open_in_desktop` are read-only (`readOnlyHint: true`, `destructiveHint: false`) and return the envelope described under "Output envelope" below.
 
-A tool is listed only when two things hold:
+A tool is listed only when all of these hold:
 
 - the caller holds its scope,
 - some configured adapter supports it, and
@@ -12,7 +12,7 @@ A tool is listed only when two things hold:
 |---|---|---|---|---|
 | `trimble_get_capabilities` | `trimble:capabilities:read` | — | none | Call this first |
 | `trimble_list_projects` | `trimble:projects:read` | `list_projects` | `product` | `page_size` 1–100, `page_token` |
-| `trimble_get_project` | `trimble:projects:read` | `get_project` | `product`, `project_id` | Hidden for Trimble Connect (unverified endpoint) |
+| `trimble_get_project` | `trimble:projects:read` | `get_project` | `product`, `project_id` | Trimble Connect: `GET /2.0/projects/{projectId}` |
 | `trimble_list_folder_items` | `trimble:files:read` | `list_folder_items` | `product`, `project_id`, `folder_id` | Covers the brief's `list_folders` and `list_files` |
 | `trimble_get_file_metadata` | `trimble:files:read` | `get_file_metadata` | `product`, `project_id`, `file_id` | No content access |
 | `trimble_build_desktop_link` | `trimble:projects:read` | `build_desktop_link` | `product`, `project_id`; optional `view`, `panel` | Trimble Connect for Windows command-line link; no side effects |

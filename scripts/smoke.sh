@@ -26,4 +26,6 @@ TRIMBLE_CONNECT_DESKTOP_ENABLED=true "$root/bin/trimblectl" desktop link --produ
   | grep -q '"uri": "trimbleconnect:/projects/rQR1yhTGj9I?show=3D,ToDos"' || { echo "FAIL desktop link"; exit 1; }
 if TRIMBLE_CONNECT_DESKTOP_ENABLED=true "$root/bin/trimblectl" desktop link --product trimble-connect-desktop --project 'x?show=1' >/dev/null 2>&1; then echo "FAIL desktop injection accepted"; exit 1; fi
 if TRIMBLE_CONNECT_DESKTOP_LAUNCH=true "$root/bin/trimblectl" diagnostics >/dev/null 2>&1; then echo "FAIL launch without desktop enabled"; exit 1; fi
+# Several processes have now appended to the same audit log; it must verify.
+"$root/bin/trimblectl" audit verify --file "$tmp/audit.jsonl" | grep -q '"chain": "intact"' || { echo "FAIL audit chain across processes"; exit 1; }
 echo "smoke: OK"

@@ -144,12 +144,15 @@ func TestForeignTokenRejected(t *testing.T) {
 
 func TestFolderItemsEnforceProject(t *testing.T) {
 	a, _ := newTest(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("fields") != "size" {
+			t.Errorf("fields=size must be requested to get documented sizes")
+		}
 		if r.URL.Path != "/tc/api/2.1/folders/f1/items" && r.URL.Path != "/tc/api/2.1/folders/fold:er@x/items" {
 			t.Errorf("path %s (raw %s)", r.URL.Path, r.URL.EscapedPath())
 		}
 		w.Write([]byte(`{"items":[
 		  {"id":"d1","name":"Drawings","type":"FOLDER","parentId":"f1","parentType":"FOLDER","projectId":"p1","hasChildren":true},
-		  {"id":"x1","name":"model.ifc","type":"FILE","versionId":"v1","parentId":"f1","modifiedOn":"2026-03-01T00:00:00Z","projectId":"p1"}],
+		  {"id":"x1","name":"model.ifc","type":"FILE","versionId":"v1","parentId":"f1","modifiedOn":"2026-03-01T00:00:00Z","projectId":"p1","size":42,"hash":"d41d8cd98f00b204e9800998ecf8427e"}],
 		  "links":{}}`))
 	})
 	ctx := context.Background()
@@ -159,6 +162,9 @@ func TestFolderItemsEnforceProject(t *testing.T) {
 	}
 	if len(page.Items) != 2 || page.Items[0].Kind != trimble.KindFolder || page.Items[1].Kind != trimble.KindFile || !page.Page.Complete {
 		t.Fatalf("items: %+v", page)
+	}
+	if f := page.Items[1]; f.SizeBytes == nil || *f.SizeBytes != 42 || f.ChecksumAlgorithm != "md5" {
+		t.Fatalf("size/hash mapping: %+v", f)
 	}
 	if _, err := a.ListFolderItems(ctx, "p1", "fold:er@x", domain.PageRequest{}); err != nil {
 		t.Fatalf("ID with sub-delimiters must be escaped once, not rejected or double-escaped: %v", err)
@@ -183,14 +189,14 @@ func TestFileMetadata(t *testing.T) {
 			t.Errorf("path %s", r.URL.Path)
 		}
 		w.Write([]byte(`{"id":"x1","name":"model.ifc","type":"FILE","versionId":"v3","parentId":"f1","parentType":"FOLDER",
-		  "createdOn":"2026-01-01T00:00:00Z","modifiedOn":"2026-03-01T12:00:00+02:00","size":2048,"projectId":"p1","revision":3,"hash":"abc"}`))
+		  "createdOn":"2026-01-01T00:00:00Z","modifiedOn":"2026-03-01T12:00:00+02:00","size":2048,"projectId":"p1"}`))
 	})
 	ctx := context.Background()
 	md, prov, err := a.GetFileMetadata(ctx, "p1", "x1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if *md.SizeBytes != 2048 || *md.Revision != 3 || md.ModifiedAt.Hour() != 10 || prov.Product != Product {
+	if *md.SizeBytes != 2048 || md.Revision != nil || md.Checksum != "" || md.ModifiedAt.Hour() != 10 || prov.Product != Product {
 		t.Fatalf("metadata: %+v", md)
 	}
 	if _, _, err := a.GetFileMetadata(ctx, "other", "x1"); !errs.Is(err, errs.ResourceNotFound) {
@@ -272,13 +278,34 @@ func TestOversizedBodyRejected(t *testing.T) {
 	}
 }
 
-func TestDescriptorDoesNotClaimGetProject(t *testing.T) {
+func TestGetProject(t *testing.T) {
+	a, _ := newTest(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/tc/api/2.0/projects/p1":
+			w.Write([]byte(`{"id":"p1","name":"Bridge","description":"d","rootId":"f1","createdOn":"2026-01-01T00:00:00Z","modifiedOn":"2026-02-01T00:00:00Z","access":"FULL_ACCESS","location":"northAmerica"}`))
+		case "/tc/api/2.0/projects/p2":
+			w.Write([]byte(`{"id":"other","name":"x","rootId":"f9"}`))
+		default:
+			w.WriteHeader(404)
+		}
+	})
+	ctx := context.Background()
+	p, prov, err := a.GetProject(ctx, "p1")
+	if err != nil || p.RootFolder != "f1" || p.Access != "FULL_ACCESS" || p.UpdatedAt == nil || prov.Source != "GET /2.0/projects/{projectId}" {
+		t.Fatalf("%+v %v", p, err)
+	}
+	if _, _, err := a.GetProject(ctx, "missing"); !errs.Is(err, errs.ProjectNotFound) {
+		t.Fatalf("404 must map to project_not_found: %v", err)
+	}
+	if _, _, err := a.GetProject(ctx, "p2"); !errs.Is(err, errs.UpstreamMalformed) {
+		t.Fatalf("a response for another project must be rejected: %v", err)
+	}
+}
+
+func TestDescriptor(t *testing.T) {
 	a, _ := newTest(t, func(http.ResponseWriter, *http.Request) {})
 	d := a.Describe()
-	if d.Supports(trimble.CapGetProject) {
-		t.Fatal("GET /projects/{id} is unverified and must not be declared")
-	}
-	if !d.ReadOnly || d.Status != trimble.Provisional || len(d.Sources) == 0 {
+	if !d.Supports(trimble.CapGetProject) || !d.ReadOnly || d.Status != trimble.Provisional || len(d.Sources) == 0 {
 		t.Fatalf("descriptor: %+v", d)
 	}
 }

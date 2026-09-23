@@ -35,6 +35,7 @@ var Sources = []string{
 	"https://developer.trimble.com/docs/connect/guides/access",
 	"https://developer.trimble.com/docs/connect/reference",
 	"https://api.swaggerhub.com/apis/Trimble-Connect/tcps/2.0",
+	"https://developer.trimble.com/docs/connect/reference/openapi/core",
 	"https://app.connect.trimble.com/tc/api/2.0/regions",
 	"https://id.trimble.com/.well-known/openid-configuration",
 }
@@ -100,7 +101,7 @@ type Config struct {
 	UserAgent             string
 }
 
-// Adapter implements trimble.ProjectReader (list only) and trimble.FileReader.
+// Adapter implements trimble.ProjectReader and trimble.FileReader.
 type Adapter struct {
 	cfg     Config
 	base    *url.URL
@@ -186,7 +187,7 @@ func (a *Adapter) Describe() trimble.Descriptor {
 		Auth:         "Trimble Identity OAuth 2.0 authorization code with PKCE (client credentials not supported by Connect)",
 		Scopes:       []string{"openid", "<application scope from Trimble Developer Console>"},
 		TenantModel:  "per Trimble Identity user; projects are bound to one region and resources are independent per region",
-		Capabilities: []trimble.Capability{trimble.CapListProjects, trimble.CapListFolder, trimble.CapFileMetadata},
+		Capabilities: []trimble.Capability{trimble.CapListProjects, trimble.CapGetProject, trimble.CapListFolder, trimble.CapFileMetadata},
 		Pagination:   "v2.1 pageSize + skipToken; next page signalled by links.next",
 		RateLimits:   "not published by Trimble; client-side limit " + strconv.FormatFloat(a.cfg.RatePerSecond, 'f', -1, 64) + " req/s",
 		Idempotency:  "read-only adapter; GET only",
@@ -200,8 +201,8 @@ func (a *Adapter) Describe() trimble.Descriptor {
 		Owner:        "trimble-mcp-bridge maintainers",
 		Sources:      Sources,
 		LastVerified: LastVerified,
-		// GET /projects/{id} and /users/me could not be verified in the
-		// published spec and are intentionally not implemented.
+		// Endpoints and fields match the complete OpenAPI definition; the
+		// adapter stays provisional until exercised against a sandbox.
 		Status:        trimble.Provisional,
 		DisableSwitch: "TRIMBLE_CONNECT_ENABLED=false",
 		ReadOnly:      true,
@@ -239,11 +240,24 @@ type wireProjectList struct {
 type wireItem struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
-	Type       string `json:"type"`
+	Type       string `json:"type"` // documented values: FOLDER, FILE
 	VersionID  string `json:"versionId"`
 	ParentID   string `json:"parentId"`
 	ModifiedOn string `json:"modifiedOn"`
 	ProjectID  string `json:"projectId"`
+	Size       *int64 `json:"size"` // bytes; present only with fields=size
+	Hash       string `json:"hash"` // documented: "MD5 hash for the file contents"
+}
+
+// wireProjectDetails is ProjectDetailsResponse (GET /2.0/projects/{id}).
+type wireProjectDetails struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	RootID      string `json:"rootId"`
+	CreatedOn   string `json:"createdOn"`
+	ModifiedOn  string `json:"modifiedOn"`
+	Access      string `json:"access"` // FULL_ACCESS | NO_ACCESS
 }
 
 type wireItemList struct {
@@ -251,6 +265,8 @@ type wireItemList struct {
 	Links wireLinks   `json:"links"`
 }
 
+// wireFile is FileDetailsResponse (GET /2.0/files/{id}). It documents no
+// revision or hash field, so neither is read.
 type wireFile struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
@@ -261,8 +277,6 @@ type wireFile struct {
 	ModifiedOn string `json:"modifiedOn"`
 	Size       *int64 `json:"size"`
 	ProjectID  string `json:"projectId"`
-	Revision   *int   `json:"revision"`
-	Hash       string `json:"hash"`
 }
 
 // ---- operations ----
@@ -312,11 +326,33 @@ func (a *Adapter) ListProjects(ctx context.Context, q trimble.ListProjectsQuery)
 	return trimble.ProjectPage{Projects: out, Page: info, Prov: a.prov("GET /2.1/projects")}, nil
 }
 
-// GetProject is not implemented: the single-project endpoint could not be
-// verified in the published specification. The capability is not declared,
-// so the gateway never routes here.
-func (a *Adapter) GetProject(context.Context, domain.ProjectID) (trimble.Project, domain.Provenance, error) {
-	return trimble.Project{}, domain.Provenance{}, errs.New(errs.UnsupportedCapability)
+// GetProject implements trimble.ProjectReader via GET /2.0/projects/{id}
+// (ProjectDetailsResponse in the Connect OpenAPI definition).
+func (a *Adapter) GetProject(ctx context.Context, id domain.ProjectID) (trimble.Project, domain.Provenance, error) {
+	var w wireProjectDetails
+	if err := a.get(ctx, []string{"2.0", "projects", string(id)}, nil, &w); err != nil {
+		if errs.Is(err, errs.ResourceNotFound) {
+			return trimble.Project{}, domain.Provenance{}, errs.New(errs.ProjectNotFound)
+		}
+		return trimble.Project{}, domain.Provenance{}, err
+	}
+	if w.ID == "" {
+		return trimble.Project{}, domain.Provenance{}, errs.Newf(errs.UpstreamMalformed, "project response has no id")
+	}
+	if domain.ProjectID(w.ID) != id {
+		return trimble.Project{}, domain.Provenance{}, errs.Newf(errs.UpstreamMalformed, "project response is for a different project")
+	}
+	p := trimble.Project{
+		ID: id, Name: w.Name, Description: w.Description, Region: a.cfg.Region,
+		CreatedAt: parseTime(w.CreatedOn), UpdatedAt: parseTime(w.ModifiedOn), Access: w.Access,
+	}
+	if w.RootID != "" {
+		if _, err := domain.ParseFolderID(w.RootID); err != nil {
+			return trimble.Project{}, domain.Provenance{}, errs.Wrap(errs.UpstreamMalformed, err)
+		}
+		p.RootFolder = domain.FolderID(w.RootID)
+	}
+	return p, a.prov("GET /2.0/projects/{projectId}"), nil
 }
 
 // ListFolderItems implements trimble.FileReader via GET /2.1/folders/{id}/items.
@@ -329,7 +365,7 @@ func (a *Adapter) ListFolderItems(ctx context.Context, project domain.ProjectID,
 	if err != nil {
 		return trimble.ItemPage{}, err
 	}
-	v := url.Values{"pageSize": {strconv.Itoa(page.Size)}}
+	v := url.Values{"pageSize": {strconv.Itoa(page.Size)}, "fields": {"size"}}
 	if skip != "" {
 		v.Set("skipToken", skip)
 	}
@@ -352,10 +388,14 @@ func (a *Adapter) ListFolderItems(ctx context.Context, project domain.ProjectID,
 		if w.ID == "" {
 			return trimble.ItemPage{}, errs.Newf(errs.UpstreamMalformed, "folder item has no id")
 		}
-		out = append(out, trimble.Item{
+		it := trimble.Item{
 			ID: w.ID, Kind: kind(w.Type), Name: w.Name, ParentID: w.ParentID,
-			VersionID: w.VersionID, ModifiedAt: parseTime(w.ModifiedOn),
-		})
+			VersionID: w.VersionID, ModifiedAt: parseTime(w.ModifiedOn), SizeBytes: w.Size,
+		}
+		if w.Hash != "" {
+			it.Checksum, it.ChecksumAlgorithm = w.Hash, "md5"
+		}
+		out = append(out, it)
 	}
 	info, err := a.pageInfo(body.Links, skip, page.Size, len(out))
 	if err != nil {
@@ -382,11 +422,10 @@ func (a *Adapter) GetFileMetadata(ctx context.Context, project domain.ProjectID,
 	md := trimble.FileMetadata{
 		Item: trimble.Item{
 			ID: w.ID, Kind: kind(w.Type), Name: w.Name, ParentID: w.ParentID, VersionID: w.VersionID,
-			SizeBytes: w.Size, ModifiedAt: parseTime(w.ModifiedOn), Checksum: w.Hash,
+			SizeBytes: w.Size, ModifiedAt: parseTime(w.ModifiedOn),
 		},
 		ProjectID: domain.ProjectID(w.ProjectID),
 		CreatedAt: parseTime(w.CreatedOn),
-		Revision:  w.Revision,
 	}
 	return md, a.prov("GET /2.0/files/{fileId}"), nil
 }

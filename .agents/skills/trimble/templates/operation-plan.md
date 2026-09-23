@@ -5,7 +5,7 @@
 - **Product:** <product ID from trimble_get_capabilities>
 - **Project:** <name> (<project_id from trimble_list_projects>)
 - **Resources:** <IDs, each from a tool result>
-- **Expected current state:** <what trimble_get_file_metadata / trimble_list_folder_items returned, with version_id and revision>
+- **Expected current state:** <what trimble_get_file_metadata / trimble_list_folder_items returned, with version_id, and revision where reported>
 - **Desired state:** <exact change>
 - **Units / CRS:** <explicit, or "none">
 - **Side effects:** <who sees it, notifications, processing jobs>

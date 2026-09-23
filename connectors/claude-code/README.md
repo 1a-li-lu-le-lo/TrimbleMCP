@@ -16,6 +16,7 @@ go install github.com/1a-li-lu-le-lo/trimblemcp/cmd/trimble-mcp@latest
 claude mcp add --transport stdio --scope project trimble \
   --env TRIMBLE_MCP_ENABLE_MOCK=false --env TRIMBLE_CONNECT_ENABLED=true \
   --env TRIMBLE_CONNECT_ENV=stage --env TRIMBLE_CONNECT_REGION=us \
+  --env TRIMBLE_CLIENT_ID=<application id> --env 'TRIMBLE_SCOPE=openid <application scope>' \
   --env TRIMBLE_TOKEN_STORE=/secure/path/tc-token --env TRIMBLE_TOKEN_KEY_FILE=/secure/path/tc-token.key \
   -- trimble-mcp -transport stdio
 cp -R skills/canonical/trimble <other-repo>/.claude/skills/trimble   # omit evals/ if you like
@@ -34,8 +35,10 @@ User-level install (`--scope user`, `~/.claude/skills/`) is only justified for a
 
 ```sh
 claude mcp add --transport http --scope project trimble https://mcp.example.com/mcp \
-  --header "Authorization: Bearer ${TRIMBLE_MCP_TOKEN}"
+  --header 'Authorization: Bearer ${TRIMBLE_MCP_TOKEN}'
 ```
+
+Keep the single quotes. They store the `${TRIMBLE_MCP_TOKEN}` placeholder in the shared `.mcp.json`, which Claude Code expands at runtime, instead of the token itself. Alternatively, use `--scope local`.
 
 ## Activation test
 

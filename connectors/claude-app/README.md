@@ -27,7 +27,7 @@ Sources (checked 2026-09-23):
    - Leave every tool on per-call approval, or "Always allow" only `trimble_get_capabilities`.
    - Block any tool you do not need.
 
-All tools declare `readOnlyHint: true` and `destructiveHint: false`. There are no upload, folder, version, view, delete, webhook, or bulk-export tools. When mutation tools are added, each must require explicit confirmation plus a server-issued approval reference.
+All tools declare `destructiveHint: false`, and every tool except `trimble_open_in_desktop` declares `readOnlyHint: true`. That tool is never listed for remote connectors. There are no upload, folder, version, view, delete, webhook, or bulk-export tools. When mutation tools are added, each must require explicit confirmation plus a server-issued approval reference.
 
 ## OAuth (production)
 
