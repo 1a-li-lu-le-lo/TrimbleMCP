@@ -60,37 +60,42 @@ func canonical(v string, allowed []string) (string, bool) {
 	return "", false
 }
 
-// BuildURI validates inputs and returns the launch URI. view and panel are
-// optional; a panel requires a view because the documented form is
-// "show=[view],[panel]" and a panel-only form is not documented.
+// Default view and panel. The documented example says show=3D,ToDos opens
+// "the ToDos tab instead of the models tab", so 3D with models is the
+// application's documented default.
+const (
+	DefaultView  = "3D"
+	DefaultPanel = "models"
+)
+
+// BuildURI validates inputs and returns the launch URI. Only the documented
+// two-value form "show=[view],[panel]" is ever emitted: when both are
+// omitted the documented default (3D, models) is used, and supplying only
+// one of them is rejected because single-value forms are undocumented.
 func BuildURI(project domain.ProjectID, view, panel string) (trimble.DesktopLink, error) {
 	if !projectID.MatchString(string(project)) {
 		return trimble.DesktopLink{}, errs.Newf(errs.Validation,
 			"project_id must be 1-64 letters, digits, '-' or '_' for the desktop launch URI")
 	}
-	link := trimble.DesktopLink{Project: project, URI: schemePrefix + string(project)}
-	if view == "" && panel == "" {
-		return link, nil
-	}
-	if view == "" {
-		return trimble.DesktopLink{}, errs.Newf(errs.Validation, "panel requires a view (documented form is show=[view],[panel])")
+	switch {
+	case view == "" && panel == "":
+		view, panel = DefaultView, DefaultPanel
+	case view == "" || panel == "":
+		return trimble.DesktopLink{}, errs.Newf(errs.Validation,
+			"give both view and panel, or neither (default %s,%s); the documented form is show=[view],[panel]", DefaultView, DefaultPanel)
 	}
 	v, ok := canonical(view, views)
 	if !ok {
 		return trimble.DesktopLink{}, errs.Newf(errs.Validation, "view must be one of %s", strings.Join(views, ", "))
 	}
-	link.View = v
-	show := v
-	if panel != "" {
-		pn, ok := canonical(panel, panels)
-		if !ok {
-			return trimble.DesktopLink{}, errs.Newf(errs.Validation, "panel must be one of %s", strings.Join(panels, ", "))
-		}
-		link.Panel = pn
-		show += "," + pn
+	pn, ok := canonical(panel, panels)
+	if !ok {
+		return trimble.DesktopLink{}, errs.Newf(errs.Validation, "panel must be one of %s", strings.Join(panels, ", "))
 	}
-	link.URI += "?show=" + show
-	return link, nil
+	return trimble.DesktopLink{
+		Project: project, View: v, Panel: pn,
+		URI: schemePrefix + string(project) + "?show=" + v + "," + pn,
+	}, nil
 }
 
 // OpenFunc hands a validated URI to the operating system.

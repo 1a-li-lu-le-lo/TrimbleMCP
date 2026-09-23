@@ -38,3 +38,7 @@ Claude's OAuth flow requires the bridge to return 401 with `resource_metadata`. 
 1. Disconnect or remove the connector in Claude settings.
 2. Delete the token's hash from the tokens file and restart the server.
 3. Review `trimble-mcp-audit.jsonl` for that subject, and run `trimblectl audit verify --file trimble-mcp-audit.jsonl`.
+
+## Trimble Connect for Windows command line
+
+Remote connectors can call `trimble_build_desktop_link` and hand the `trimbleconnect:` link to the user, who opens it on their own Windows machine. `trimble_open_in_desktop` is never available remotely: it would open the app on the server, not on the user's machine. The server refuses to start if a remote token is given `trimble:desktop:launch`.

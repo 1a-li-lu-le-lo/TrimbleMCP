@@ -92,6 +92,10 @@ type Token struct {
 	TokenType    string    `json:"token_type"`
 	Expiry       time.Time `json:"expiry"`
 	Scope        string    `json:"scope,omitempty"`
+	// NextVerifier is the PKCE code_verifier whose challenge was sent with
+	// the request that produced this token. Trimble Identity requires Serial
+	// PKCE: the next refresh must present it along with a new challenge.
+	NextVerifier Secret `json:"next_verifier,omitempty"`
 }
 
 // Valid reports whether the access token is present and not about to expire.
@@ -139,26 +143,58 @@ func (c *Client) AuthorizeURL(state string, p PKCE) string {
 	return c.Endpoints.Authorize + "?" + v.Encode()
 }
 
-// Exchange trades an authorization code for tokens.
+// Exchange trades an authorization code for tokens. Per Trimble's Serial
+// PKCE rule it also sends a new code_challenge, whose verifier is kept in the
+// returned token for the first refresh.
 func (c *Client) Exchange(ctx context.Context, code string, p PKCE) (*Token, error) {
-	return c.tokenRequest(ctx, url.Values{
-		"grant_type":    {"authorization_code"},
-		"code":          {code},
-		"redirect_uri":  {c.RedirectURI},
-		"code_verifier": {p.Verifier.Reveal()},
+	next, err := NewPKCE()
+	if err != nil {
+		return nil, err
+	}
+	t, err := c.tokenRequest(ctx, url.Values{
+		"grant_type":            {"authorization_code"},
+		"code":                  {code},
+		"redirect_uri":          {c.RedirectURI},
+		"code_verifier":         {p.Verifier.Reveal()},
+		"code_challenge":        {next.Challenge},
+		"code_challenge_method": {"S256"},
 	})
+	if err != nil {
+		return nil, err
+	}
+	t.NextVerifier = next.Verifier
+	return t, nil
 }
 
-// Refresh obtains a new token set from a refresh token.
-func (c *Client) Refresh(ctx context.Context, refresh Secret) (*Token, error) {
-	t, err := c.tokenRequest(ctx, url.Values{"grant_type": {"refresh_token"}, "refresh_token": {refresh.Reveal()}})
+// Refresh obtains a new token set using Serial PKCE: it presents the verifier
+// for the challenge sent with the previous token request, plus a new
+// challenge whose verifier is kept in the returned token.
+func (c *Client) Refresh(ctx context.Context, prev *Token) (*Token, error) {
+	if prev == nil || prev.RefreshToken == "" {
+		return nil, errs.Newf(errs.Authentication, "no refresh token; run trimblectl auth login")
+	}
+	if prev.NextVerifier == "" {
+		return nil, errs.Newf(errs.Authentication, "the stored session predates Serial PKCE support; run trimblectl auth login")
+	}
+	next, err := NewPKCE()
+	if err != nil {
+		return nil, err
+	}
+	t, err := c.tokenRequest(ctx, url.Values{
+		"grant_type":            {"refresh_token"},
+		"refresh_token":         {prev.RefreshToken.Reveal()},
+		"code_verifier":         {prev.NextVerifier.Reveal()},
+		"code_challenge":        {next.Challenge},
+		"code_challenge_method": {"S256"},
+	})
 	if err != nil {
 		return nil, err
 	}
 	if t.RefreshToken == "" {
 		// Some issuers do not rotate; keep the existing refresh token.
-		t.RefreshToken = refresh
+		t.RefreshToken = prev.RefreshToken
 	}
+	t.NextVerifier = next.Verifier
 	return t, nil
 }
 
@@ -185,9 +221,8 @@ func (c *Client) Revoke(ctx context.Context, refresh Secret) error {
 }
 
 func (c *Client) tokenRequest(ctx context.Context, form url.Values) (*Token, error) {
-	if c.ClientSecret == "" {
-		form.Set("client_id", c.ClientID)
-	}
+	// Trimble documents client_id on both token and refresh requests.
+	form.Set("client_id", c.ClientID)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.Endpoints.Token, strings.NewReader(form.Encode()))
 	if err != nil {
 		return nil, err
@@ -287,7 +322,7 @@ func (s *RefreshingSource) Token(ctx context.Context) (string, error) {
 	if s.cur.RefreshToken == "" {
 		return "", errs.Newf(errs.Authentication, "the Trimble Identity session expired; run trimblectl auth login")
 	}
-	t, err := s.Client.Refresh(ctx, s.cur.RefreshToken)
+	t, err := s.Client.Refresh(ctx, s.cur)
 	if err != nil {
 		return "", err
 	}

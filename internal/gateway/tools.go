@@ -111,7 +111,8 @@ func (g *Gateway) buildTools() []*tool {
 				Title: "Build a Trimble Connect for Windows link",
 				Description: "Builds the documented Trimble Connect for Windows command-line link " +
 					"(trimbleconnect:/projects/<id>?show=<view>,<panel>) for a project resolved through trimble_list_projects. " +
-					"No side effects: nothing is opened. Views: " + strings.Join(desktop.Views(), ", ") +
+					"Source: " + desktop.Source + ". No side effects: nothing is opened. " +
+					"The link's project ID is assumed to equal the REST API project ID (not documented by Trimble). Views: " + strings.Join(desktop.Views(), ", ") +
 					". Panels: " + strings.Join(desktop.Panels(), ", ") + ".",
 				InputSchema:  schema(desktopSchema(false)),
 				OutputSchema: envelopeSchema,
@@ -150,7 +151,7 @@ func desktopSchema(launch bool) string {
     ` + productProp + `,
     "project_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$", "description": "Project ID from trimble_list_projects."},
     "view": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Views(), ", ") + `", "enum": ` + enum(caseVariants(desktop.Views())) + `},
-    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Requires view.", "enum": ` + enum(caseVariants(desktop.Panels())) + `}`
+    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Give view and panel together, or neither for the documented default ` + desktop.DefaultView + `,` + desktop.DefaultPanel + `.", "enum": ` + enum(caseVariants(desktop.Panels())) + `}`
 	if launch {
 		s += `,
     "dry_run": {"type": "boolean", "default": true, "description": "When true (default) nothing is opened."},

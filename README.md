@@ -42,8 +42,10 @@ make build test smoke
 - `trimble_get_project` (listed only where the upstream endpoint is verified)
 - `trimble_list_folder_items`
 - `trimble_get_file_metadata`
+- `trimble_build_desktop_link`: the [Trimble Connect for Windows command line](https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line), `trimbleconnect:/projects/<id>?show=<view>,<panel>`.
+- `trimble_open_in_desktop`: opens that link locally. Windows and the local operator only, opt-in, dry run by default.
 
-There are no mutation, download, shell, HTTP-proxy, or machinery tools. See [docs/mcp/tools.md](docs/mcp/tools.md).
+There are no data-mutation, download, shell, HTTP-proxy, or machinery tools. See [docs/mcp/tools.md](docs/mcp/tools.md).
 
 ## Safety properties
 

@@ -134,7 +134,8 @@ func TestDesktopLaunchRefusals(t *testing.T) {
 		"blank reason":       {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001","dry_run":false,"reason":"  "}`, errs.Validation},
 		"fabricated project": {`{"product":"trimble-connect-desktop","project_id":"made-up","dry_run":false,"reason":"x"}`, errs.ProjectNotFound},
 		"injection":          {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001?show=3D","dry_run":false,"reason":"x"}`, errs.Validation},
-		"bad view":           {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001","view":"4D","dry_run":false,"reason":"x"}`, errs.Validation},
+		"bad view":           {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001","view":"4D","panel":"models","dry_run":false,"reason":"x"}`, errs.Validation},
+		"view only":          {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001","view":"3D","dry_run":false,"reason":"x"}`, errs.Validation},
 		"extra arg":          {`{"product":"trimble-connect-desktop","project_id":"mock-prj-001","uri":"file:///c:/x","dry_run":false,"reason":"x"}`, errs.Validation},
 	}
 	for name, c := range cases {

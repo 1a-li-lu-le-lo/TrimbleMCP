@@ -9,11 +9,17 @@
   - Tools:
     - `trimble_build_desktop_link`: scope `trimble:projects:read`.
     - `trimble_open_in_desktop`: new scope `trimble:desktop:launch`. It is listed only for the local operator principal (stdio or CLI), only when `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`, and only on a Windows host. It is a dry run by default, needs a `reason`, is rate-limited (6 per minute per caller, burst 2), and is audited.
-  - The URI is built only from a fixed prefix, a project ID matching `^[A-Za-z0-9_-]{1,64}$`, and enumerated view and panel values. Output is emitted in the documented spelling. A panel requires a view, because a panel-only form is undocumented.
+  - The URI is built only from a fixed prefix, a project ID matching `^[A-Za-z0-9_-]{1,64}$`, and enumerated view and panel values. Output is emitted in the documented spelling. Only the documented two-value form `show=[view],[panel]` is emitted: omitting both gives the documented default `3D,models`, and a single value is rejected.
   - The project ID is verified through `trimble-connect` `ListProjects` (up to 20 pages of 100) before a link is returned as verified. Launching refuses unverified projects, and a project that is absent from a complete listing is rejected as `project_not_found`.
-  - On Windows the link is opened with `ShellExecuteW` (shell32, "open"). No command interpreter is used, so shell metacharacters are inert. Off Windows, launching is unavailable and the capability is not declared.
+  - On Windows the link is opened with `ShellExecuteW` ("open", NULL parameters and directory), after `CoInitializeEx(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)` as Microsoft recommends. Return code 31 is reported as "no handler registered". No command interpreter is used.
+  - Rejected launch mechanisms:
+    - `cmd /c start`: cmd metacharacters and AutoRun apply, and the MCP security best practices say not to open URLs with shell commands.
+    - `rundll32 url.dll,FileProtocolHandler`: undocumented by Microsoft and catalogued by LOLBAS as T1218.011.
+    - `explorer.exe <uri>`: not documented as a launch contract.
+  - Off Windows, launching is unavailable and the capability is not declared.
   - The HTTP transport rejects `trimble:desktop:launch` in the tokens file. Remote principals are never `Local`, so a remote caller can never open an application on the server host.
 - **Consequences:**
   - The command line only navigates the application. It exposes no data, and the bridge cannot observe the result.
   - Assumption A-8: the scheme's project ID equals the REST API project ID. Until that is confirmed, the adapter is Provisional.
-  - Installer and uninstaller command lines are out of scope, because they modify the host.
+  - Other official command lines are out of scope because they modify the host: the enterprise extraction command `TrimbleConnectSetup-<version>-x64.exe /ad:\preq` and MSI deployment. Trimble Connect Sync documents no command line. No official "Trimble Connect CLI" or PowerShell module exists; the Windows .NET API is an in-process C# API documented only in a locally installed CHM.
+  - Research sources for all of the above: the research workflow of 2026-09-23 (three independent agents plus a critic). Only facts marked VERIFIED against official pages were used.

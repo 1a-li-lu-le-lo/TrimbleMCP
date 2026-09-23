@@ -13,7 +13,7 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-FR-005 | Get a single project (only where verified) | `getProject` (mock only) | `TestDescriptorDoesNotClaimGetProject` | Done |
 | TRM-FR-006 | Upload, version, download, delete | none | n/a | Planned (needs approvals) |
 | TRM-CLI-001 | Build documented Trimble Connect for Windows `trimbleconnect:` links | `trimble/desktop.BuildURI` | `TestBuildURIDocumentedExample`, `TestBuildURIVariants` | Done |
-| TRM-CLI-002 | Only documented views and panels; case-insensitive input, documented spelling out | `desktop.canonical` | `TestBuildURIVariants`, `TestBuildURIRejectsInjectionAndUndocumentedValues` | Done |
+| TRM-CLI-002 | Only documented views and panels, always in the two-value form (default 3D,models); case-insensitive input, documented spelling out | `desktop.canonical` | `TestBuildURIVariants`, `TestBuildURIRejectsInjectionAndUndocumentedValues` | Done |
 | TRM-CLI-003 | URI contains only safe characters (no injection into the protocol handler) | `desktop.projectID` regexp | `FuzzBuildURIOnlyEmitsSafeURIs` | Done |
 | TRM-CLI-004 | Project ID verified via the Connect API; fabricated IDs rejected | `gateway.verifyProject` | `TestDesktopLinkBuiltAndVerified`, `TestDesktopLinkUnknownProjectRejected`, `TestDesktopLaunchUnverifiedRefused` | Done |
 | TRM-CLI-005 | Launch is opt-in, Windows-only, local-operator-only, dry run by default, reason required, rate-limited, audited | `desktop.Launch`, `gateway.openInDesktop` | `TestLaunchGating`, `TestDesktopLaunchVisibility`, `TestDesktopLaunchDryRunThenLaunch`, `TestDesktopLaunchRefusals`, `TestDesktopLaunchRateLimited` | Done |
@@ -50,6 +50,7 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-SEC-004 | Secrets never logged, printed, or returned | `identity.Secret`, `errs` | `TestSecretNeverPrints`, `TestTokenErrorDoesNotEchoBody`, `TestUpstreamFaultsMapToSafeErrors` | Done |
 | TRM-SEC-005 | Refresh tokens encrypted at rest; private file permissions enforced | `identity.FileStore` | `TestFileStoreRoundTripAndPermissions` | Done |
 | TRM-SEC-006 | PKCE S256 with state check | `identity`, `trimblectl auth login` | `TestPKCEChallengeRFC7636Vector`, `TestNewClientValidation` | Done |
+| TRM-SEC-012 | Trimble Serial PKCE: new challenge on every token and refresh request; previous verifier presented | `identity.Exchange`, `identity.Refresh` | `TestSerialPKCEExchangeAndRefresh` | Done |
 | TRM-SEC-007 | HTTP bearer tokens stored only as SHA-256; constant-time compare | `mcp.StaticTokenAuthenticator` | `TestHTTPAuthChallenge` | Done |
 | TRM-SEC-008 | Prompt-injection text neutralised and labelled | `gateway.cleanUntrusted` | `TestPromptInjectionNamesAreNeutralisedAndLabelled` | Done |
 | TRM-SEC-009 | Session IDs bound to subject and tenant | `mcp/http.go` `lookup` | `TestHTTPLegacySessionBinding` | Done |

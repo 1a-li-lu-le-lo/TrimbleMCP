@@ -20,10 +20,10 @@ func TestBuildURIDocumentedExample(t *testing.T) {
 
 func TestBuildURIVariants(t *testing.T) {
 	cases := []struct{ view, panel, want string }{
-		{"", "", "trimbleconnect:/projects/p1"},
-		{"data", "", "trimbleconnect:/projects/p1?show=data"},
+		{"", "", "trimbleconnect:/projects/p1?show=3D,models"}, // documented default
+		{"data", "objects", "trimbleconnect:/projects/p1?show=data,objects"},
 		{"3d", "todos", "trimbleconnect:/projects/p1?show=3D,ToDos"}, // case-insensitive, documented spelling out
-		{"PROJECTS", "", "trimbleconnect:/projects/p1?show=projects"},
+		{"PROJECTS", "VIEWS", "trimbleconnect:/projects/p1?show=projects,views"},
 		{"3D", "Clashes", "trimbleconnect:/projects/p1?show=3D,clashes"},
 	}
 	for _, c := range cases {
@@ -50,7 +50,8 @@ func TestBuildURIRejectsInjectionAndUndocumentedValues(t *testing.T) {
 		{"p1", "4D", ""},
 		{"p1", "3D", "clash"},
 		{"p1", "3D,ToDos", ""},
-		{"p1", "", "ToDos"}, // panel without view is undocumented
+		{"p1", "", "ToDos"}, // single-value forms are undocumented
+		{"p1", "data", ""},
 		{"p1", "3D", "ToDos&cmd"},
 	}
 	for _, b := range bad {
@@ -81,6 +82,9 @@ func TestLaunchGating(t *testing.T) {
 	var opened []string
 	open := func(_ context.Context, uri string) error { opened = append(opened, uri); return nil }
 	link, _ := BuildURI("p1", "3D", "views")
+	if link.URI != "trimbleconnect:/projects/p1?show=3D,views" {
+		t.Fatal(link.URI)
+	}
 
 	off := New(Config{LaunchEnabled: false, GOOS: "windows", Open: open})
 	if off.Describe().Supports(trimble.CapDesktopLaunch) || off.Launch(context.Background(), link) == nil {

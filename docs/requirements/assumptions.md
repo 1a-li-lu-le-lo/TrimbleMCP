@@ -10,4 +10,4 @@
 | A-6 | One tenant per bridge process (single Trimble Identity session) | Multi-tenant hosting needs a per-tenant registry config | The registry already keys adapters by tenant |
 | A-7 | MCP revision 2026-07-28 is current, per the research report | Modern-mode details may drift | Legacy mode is the primary path; modern mode is marked Partial |
 | A-8 | The `[project-id]` in `trimbleconnect:` links equals the REST API project `id` | The desktop app opens the wrong project or none | Adapter marked Provisional; every result carries a warning; confirm with Trimble or on a real install |
-| A-9 | A panel without a view is not a valid `show=` form (only `[view],[panel]` is documented) | Slightly over-strict | Panel-only input is rejected rather than guessed |
+| A-9 | Only the two-value `show=[view],[panel]` form is valid; `3D,models` is the default (the doc's example opens ToDos "instead of the models tab") | Over-strict if single values also work | Single-value input is rejected rather than guessed; omitting both uses the documented default |

@@ -49,6 +49,15 @@ It may build adapters, generate typed clients, write tests, inspect authorized p
 
 It must not receive production secrets in prompts, mutate production projects (no mutation tools exist), bypass authorization, operate machinery, or certify field data.
 
+## Trimble Connect for Windows command line (local only)
+
+To build `trimbleconnect:` links, set `TRIMBLE_CONNECT_DESKTOP_ENABLED=true`. To let the agent open the app on this Windows machine, also set:
+
+- `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`
+- `TRIMBLE_MCP_LOCAL_SCOPES=trimble:capabilities:read,trimble:projects:read,trimble:files:read,trimble:desktop:launch`
+
+Launching is a dry run unless the agent passes `dry_run: false`. The client will also ask you to approve the tool, because it is not read-only.
+
 ## Removal
 
 ```sh

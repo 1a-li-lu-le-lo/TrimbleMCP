@@ -75,6 +75,25 @@ Last verified: 2026-09-23. Confidence labels:
 | REVOCATION | Basic client auth; `token` and `token_type_hint` (F) |
 | ADOPTION DECISION | Adopt for TC-CORE |
 
+### TC-WIN-CLI: Trimble Connect for Windows command line
+
+| Field | Value |
+|---|---|
+| OFFICIAL DOCUMENTATION | https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line (F) |
+| INTERFACE | URL scheme `"trimbleconnect:/projects/[project-id]?show=[view parameter],[panel parameter]"`, one slash after the colon. It can be started from a command line or a browser (F) |
+| VALUES | Views: projects, data, 3D. Panels: clashes, models, objects, ToDos, views. Case-insensitive (F) |
+| EXAMPLE | `trimbleconnect:/projects/rQR1yhTGj9I?show=3D,ToDos` opens the ToDos tab "instead of the models tab" (F) |
+| PLATFORM | Windows, where Trimble Connect for Windows registers the protocol |
+| DATA ACCESS | None; it only navigates the desktop UI |
+| UNDOCUMENTED | Single-value `show`, omitted `show`, behaviour when the app is not installed or not signed in, supported versions, and whether the project ID equals the REST API ID |
+| OTHER COMMAND LINES | Enterprise extraction `TrimbleConnectSetup-VersionNumber-x64.exe /ad:\preq` (F; changes the system, excluded). Connect Sync: no documented CLI (F). No official Connect CLI or PowerShell module found |
+| RELATED | Windows .NET API (C#, in-process; docs only in the local CHM) (F). Web viewer path `https://web.connect.trimble.com/projects/:projectId/viewer/3d` (F, Workspace API docs); not used |
+| ADOPTION DECISION | **Adopt (provisional)**: link builder plus opt-in local launch (ADR-0006) |
+
+### Identity update (2026-09-23)
+
+Trimble Identity requires **Serial PKCE**: "a new (`code_verifier`, `code_challenge`) pair must be provided on each token or token refresh request" (F: https://developer.trimble.com/docs/authentication/guides/authorization-code-pkce/). Implemented in `internal/identity`.
+
 ## Product-to-capability classification
 
 Classes:
@@ -92,6 +111,9 @@ Classes:
 | Trimble Connect Core REST | A/C (public docs, licensed credentials) | F | **Adopted (read-only)** |
 | Trimble Connect Model / Topics / Organizer / Property Set APIs | A/C | F (listed on portal) | Deferred |
 | Trimble Connect Workspace API | D (browser JS) | S | Not applicable to a server |
+| Trimble Connect for Windows command line (`trimbleconnect:`) | D/F (documented local launcher) | F | **Adopted (link builder plus opt-in local launch)** |
+| Connect for Windows installer and MSI command lines | G for this bridge (host changes) | F | Never |
+| Trimble Connect Sync | F (GUI only; no documented CLI) | F | Not implemented |
 | Trimble Maps / PC*MILER REST | A (API key) | S | Candidate for routing and geocoding; needs verification |
 | Trimble Agriculture (Ag Developer Network) | B | S | Deferred |
 | Viewpoint Vista / Spectrum / Trimble Construction One | C (App Xchange add-on) | S | Deferred |

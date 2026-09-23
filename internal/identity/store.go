@@ -30,6 +30,7 @@ type storedToken struct {
 	Type    string `json:"t"`
 	Expiry  string `json:"e"`
 	Scope   string `json:"s"`
+	Next    string `json:"v"`
 }
 
 func checkPrivate(path string) error {
@@ -79,6 +80,7 @@ func (s *FileStore) Save(t *Token) error {
 	pt, err := json.Marshal(storedToken{
 		Access: t.AccessToken.Reveal(), Refresh: t.RefreshToken.Reveal(), Type: t.TokenType,
 		Expiry: t.Expiry.UTC().Format("2006-01-02T15:04:05Z07:00"), Scope: t.Scope,
+		Next: t.NextVerifier.Reveal(),
 	})
 	if err != nil {
 		return err
@@ -132,7 +134,8 @@ func (s *FileStore) Load() (*Token, error) {
 	if err := json.Unmarshal(pt, &st); err != nil {
 		return nil, errors.New("token store is corrupt")
 	}
-	t := &Token{AccessToken: Secret(st.Access), RefreshToken: Secret(st.Refresh), TokenType: st.Type, Scope: st.Scope}
+	t := &Token{AccessToken: Secret(st.Access), RefreshToken: Secret(st.Refresh), TokenType: st.Type, Scope: st.Scope,
+		NextVerifier: Secret(st.Next)}
 	if err := t.Expiry.UnmarshalText([]byte(st.Expiry)); err != nil {
 		return nil, errors.New("token store is corrupt")
 	}
