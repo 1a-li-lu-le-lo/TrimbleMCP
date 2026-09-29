@@ -5,7 +5,7 @@ All tools except `trimble_open_in_desktop` are read-only (`readOnlyHint: true`, 
 A tool is listed only when all of these hold:
 
 - the caller holds its scope,
-- some configured adapter supports it, and
+- some configured adapter supports it (the catalogue search and `trimble_api_plan` need no adapter), and
 - for local-only tools (`trimble_open_in_desktop`), the caller is the local stdio or CLI operator.
 
 | Tool | Scope | Capability | Required input | Notes |
@@ -17,12 +17,21 @@ A tool is listed only when all of these hold:
 | `trimble_get_file_metadata` | `trimble:files:read` | `get_file_metadata` | `product`, `project_id`, `file_id` | No content access |
 | `trimble_build_desktop_link` | `trimble:projects:read` | `build_desktop_link` | `product`, `project_id`; optional `view`, `panel` | Trimble Connect for Windows command-line link; no side effects |
 | `trimble_open_in_desktop` | `trimble:desktop:launch` | `launch_desktop` | `product`, `project_id`, `reason`; optional `view`, `panel`, `dry_run` (default true) | Local operator on Windows only; opt-in; the only tool with `readOnlyHint: false` (still `destructiveHint: false`); both desktop tools set `openWorldHint: true` because project verification calls the Connect API |
+| `trimble_api_operations` | `trimble:capabilities:read` | none (catalogue) | optional `api`, `family`, `disposition`, `query`, `key` | Searches all 7,016 catalogued operations of every product; no upstream call. Without `api`, it also lists the APIs with their kind, family and (for reference APIs) requirements |
+| `trimble_api_read` | `trimble:api:read` | `api_read` | `product`, `key`; `path_params`, `query_params`, `header_params` | Any catalogued Trimble Connect production read (disposition `read`); see ADR-0007. Refuses `reference` operations with `unsupported_capability` |
+| `trimble_api_plan` | `trimble:api:plan` | none | `key`, `reason`; `product` for Trimble Connect keys only; parameters and `body` | Dry-run plan for a Trimble Connect change (`plan`) or another product's operation (`reference`); never sent. See ADR-0008 |
 
-| `trimble_api_operations` | `trimble:capabilities:read` | none (catalogue) | optional `api`, `disposition`, `query`, `key` | Searches all 1,747 catalogued operations; no upstream call |
-| `trimble_api_read` | `trimble:api:read` | `api_read` | `product`, `key`; `path_params`, `query_params`, `header_params` | Any catalogued production read; see ADR-0007 |
-| `trimble_api_plan` | `trimble:api:plan` | `api_plan` | `product`, `key`, `reason`; parameters and `body` | Dry-run plan for any catalogued production change; never sent |
+Every operation with a public definition, for Trimble Connect and every other product, is accounted for in [../trimble-products/endpoints/README.md](../trimble-products/endpoints/README.md).
 
-Every Trimble Connect API operation is accounted for in [../trimble-products/endpoints/README.md](../trimble-products/endpoints/README.md).
+### Catalogue dispositions
+
+| Disposition | `trimble_api_read` | `trimble_api_plan` |
+|---|---|---|
+| `read` (Trimble Connect production GET) | Executes against the documented regional host | Refused: use `trimble_api_read` |
+| `plan` (Trimble Connect production change) | Refused | Plan with the URL on the configured region's host; approval level L3, or L4 for DELETE |
+| `reference` (another product) | Refused: the bridge never calls other products | Plan with the rendered path, the documented servers verbatim, the authentication and what calling it would need. L1 for reads, L3 for changes, L4 for DELETE. Callers restricted to specific projects are refused |
+| `variant` | Refused: use the `covered_by` key | Refused: use the `covered_by` key |
+| `excluded` (including `safety:` exclusions) | Refused with the reason | Refused with the reason |
 
 The brief's other tools — upload, download, create folder or version, views, geospatial, fleet, jobs, and audit lookup — are **not exposed**. They need either verified upstream support or the approval framework (ADR-0004).
 

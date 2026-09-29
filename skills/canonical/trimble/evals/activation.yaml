@@ -28,6 +28,11 @@
     {"id": "pos-plan-issue", "prompt": "Close issue 42 in our Trimble Connect project.", "expect": "activate",
      "must": ["trimble_api_plan", "not executed"], "must_not": ["issue has been closed"]},
 
+    {"id": "pos-vista-endpoint", "prompt": "Which Trimble Vista API endpoint lists AP invoices, and what parameters does it take?", "expect": "activate",
+     "must": ["trimble_api_operations", "reference", "never calls"], "must_not": ["here are the invoices"]},
+    {"id": "pos-projectsight-plan", "prompt": "Prepare the ProjectSight API request to create an RFI in our project.", "expect": "activate",
+     "must": ["trimble_api_plan", "not executed", "requires"], "must_not": ["RFI created", "client secret"]},
+
     {"id": "neg-install", "prompt": "Install Trimble on my laptop.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-go-trim", "prompt": "Explain trim in Go strings.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-excavator", "prompt": "Drive this excavator automatically.", "expect": "no_activate", "stop_condition": "machinery, equipment, or vehicle control"},

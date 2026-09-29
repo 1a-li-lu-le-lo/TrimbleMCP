@@ -69,6 +69,25 @@ func TestNewClientValidation(t *testing.T) {
 	}
 }
 
+// Every allowed issuer's endpoints are HTTPS on the issuer's own host.
+func TestIssuerAllowlist(t *testing.T) {
+	for issuer, ep := range Issuers {
+		iu, err := url.Parse(issuer)
+		if err != nil || iu.Scheme != "https" {
+			t.Fatalf("issuer %q", issuer)
+		}
+		for _, e := range []string{ep.Authorize, ep.Token, ep.Revoke} {
+			u, err := url.Parse(e)
+			if err != nil || u.Scheme != "https" || u.Host != iu.Host {
+				t.Errorf("%s: endpoint %q is not HTTPS on the issuer host", issuer, e)
+			}
+		}
+	}
+	if _, ok := Issuers["https://stage.id.trimblecloud.com"]; !ok {
+		t.Error("the verified staging issuer must be allowed")
+	}
+}
+
 func testClient(t *testing.T, h http.HandlerFunc) *Client {
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)

@@ -29,6 +29,9 @@ export TRIMBLE_MCP_AUDIT_LOG=/tmp/trimble-audit.jsonl
 ./bin/trimblectl files metadata --product mock --project mock-prj-001 --file mock-file-002-1
 ./bin/trimblectl api operations --api topics --disposition read --page-size 5
 ./bin/trimblectl api operations --key 'core:GET /files/fs/{fileId}/downloadurl'
+./bin/trimblectl api operations --family construction --page-size 3
+./bin/trimblectl api plan --key 'civil-site-management:GET /projects/{id}' --path id=p1 --reason test
+./bin/trimblectl api plan --key 'ptx-farmengage:PUT /prescriptions/{orgId}/rx/{rxId}/vehicletarget/{vehicleId}' --path orgId=o --path rxId=r --path vehicleId=v --reason test
 ./bin/trimblectl audit verify --file /tmp/trimble-audit.jsonl
 ```
 
@@ -40,6 +43,9 @@ export TRIMBLE_MCP_AUDIT_LOG=/tmp/trimble-audit.jsonl
 - `files list` includes a file named `IGNORE PREVIOUS INSTRUCTIONS …`, returned as plain data, and `untrusted_fields` is set.
 - `files metadata` for `mock-file-002-1` fails with `resource_not_found` and exit code 1. That file belongs to another project, so this is the cross-project refusal.
 - `api operations` returns topics reads with a `next_page_token`. The download-URL key is `excluded`, with a presigned-URL reason.
+- `--family construction` lists reference APIs such as `vista` and `projectsight`, each with its `requires`, and returns reference operations.
+- The Civil Site Management `api plan` returns a plan with `path: /projects/p1`, the documented server `https://cloud.api.trimble.com/site-management/v1`, `approval_level: L1`, `executed: false` and the `reference_only` label.
+- The FarmENGAGE vehicle-target plan fails with `policy_denied` and a `safety:` reason.
 - `audit verify` prints `"chain": "intact"`.
 
 ## 2. Agent client with the mock
@@ -71,6 +77,8 @@ openssl rand -hex 32 > ~/.trimble/key && chmod 600 ~/.trimble/key
 export TRIMBLE_MCP_ENABLE_MOCK=false TRIMBLE_CONNECT_ENABLED=true TRIMBLE_CONNECT_ENV=stage TRIMBLE_CONNECT_REGION=us
 export TRIMBLE_CLIENT_ID='<application id>' TRIMBLE_SCOPE='openid <application scope>'
 export TRIMBLE_TOKEN_STORE=~/.trimble/tc-token TRIMBLE_TOKEN_KEY_FILE=~/.trimble/key
+# Only if the application is registered in Trimble's staging environment (open question Q-4):
+# export TRIMBLE_IDENTITY_ISSUER=https://stage.id.trimblecloud.com
 ./bin/trimblectl auth login          # open the printed URL, sign in, wait for "Signed in."
 ./bin/trimblectl diagnostics
 ```
@@ -86,6 +94,7 @@ Then run these checks in order, using IDs from earlier results. Never type an ID
 | `trimblectl api read --key 'core:GET /projects/{projectId}' --path projectId=<id>` | HTTP 200 body; any signed URLs show `[redacted: signed URL]` |
 | `trimblectl api read --key 'topics:GET /bcf/2.1/projects/{projectId}/topics' --path projectId=<id>` | A BCF topics list, or `[]`. Only `core`, `topics`, `topic-exchange` and `file-service` have staging hosts; other APIs return `unsupported_capability` in staging |
 | `trimblectl api plan --key 'core:DELETE /projects/{projectId}' --path projectId=<id> --reason test` | A plan with `executed: false` and `approval_level: L4`. Confirm in Trimble Connect that nothing changed |
+| `trimblectl api read --key 'civil-site-management:GET /projects/{id}' --path id=p1` | Fails with `unsupported_capability` ("… which the bridge documents but never calls"). No request leaves the machine |
 | Wait for the access token to expire (see `expires_in`), then repeat `projects list` | It still works (Serial PKCE refresh), and `audit verify` still reports intact |
 | `trimblectl auth logout` | "Signed out"; `projects list` now fails with `authentication_error` |
 
@@ -166,7 +175,20 @@ go test ./internal/catalog ./internal/gateway ./internal/skilltest
 git diff --stat
 ```
 
-If Trimble publishes a new definition, `make catalog` stops with `unclassified definition …`. Classify it in `sourceClass` in `cmd/trimble-catalog/main.go` (production, variant, internal or empty), then rerun. Review every operation whose disposition changed before committing.
+If Trimble publishes a new definition, `make catalog` stops with `unclassified definition …`. Classify it, then rerun:
+
+- a Trimble Connect SwaggerHub definition goes in `sourceClass` in `cmd/trimble-catalog/main.go` (production, variant, internal or empty);
+- anything else gets a rule in `cmd/trimble-catalog/sources-other.json` (reference, excluded or identity, with family, product, auth, access and requires).
+
+The generator also stops on:
+
+- a failed download (rerun the fetch);
+- a rule that no longer matches anything;
+- a new `/regions` service (add it to `regionServices`);
+- a new Identity endpoint (add it to `identityEndpoints`);
+- a safety rule that no longer matches.
+
+Review every operation whose disposition changed before committing, and look for new operations that could reach vehicles, machinery or field positioning: add a `safety` rule for any you find.
 
 ## Reporting results
 

@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/catalog"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/gateway"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/connect"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/desktop"
@@ -424,3 +426,29 @@ func TestDocsIndexAndLinks(t *testing.T) {
 type noTokens struct{}
 
 func (noTokens) Token(context.Context) (string, error) { return "", nil }
+
+// Hand-written documents that quote the catalogue's totals must match the
+// embedded catalogue, so a `make catalog` refresh cannot leave them stale.
+// (ADRs record the totals at the time of the decision and are exempt.)
+func TestDocsQuoteCurrentCatalogueTotals(t *testing.T) {
+	c := catalog.Must()
+	n := len(c.Operations)
+	ops := fmt.Sprintf("%d,%03d", n/1000, n%1000)
+	if n < 1000 {
+		ops = fmt.Sprint(n)
+	}
+	defs := fmt.Sprintf("%d definitions", len(c.Sources))
+	for doc, wants := range map[string][]string{
+		"README.md":      {ops, defs},
+		"docs/README.md": {ops, defs},
+		"docs/trimble-products/capability-matrix.md": {ops, defs},
+		"docs/mcp/tools.md":                          {ops},
+	} {
+		text := read(t, filepath.Join(root, doc))
+		for _, w := range wants {
+			if !strings.Contains(text, w) {
+				t.Errorf("%s does not quote the current catalogue total %q", doc, w)
+			}
+		}
+	}
+}

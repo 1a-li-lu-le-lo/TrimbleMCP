@@ -1,9 +1,9 @@
 # ADR-0007: Catalogue-driven coverage of every Trimble Connect API operation
 
-- **Status:** Accepted, 2026-09-29.
+- **Status:** Accepted, 2026-09-29. Extended by ADR-0008, which adds every other published Trimble API as `reference`.
 - **Context:** The owner asked that the MCP cover all of Trimble's APIs and leave no endpoint unaccounted for. Trimble publishes 34 API definitions (1,747 operations) in its official SwaggerHub organisation. They span 11 production APIs and many staging, integration, QA, test, draft and internal copies. Hand-writing typed tools for roughly 480 production operations is not maintainable. The original brief also forbids a generic, arbitrary Trimble proxy.
 - **Decision:**
-  - `cmd/trimble-catalog` turns every definition into a pinned catalogue (`internal/catalog/catalog.json`, embedded). It records each source's URL and SHA-256, and gives every operation exactly one disposition:
+  - `cmd/trimble-catalog` turns every definition into a pinned catalogue (`internal/catalog/catalog.json.gz`, embedded). It records each source's URL and SHA-256, and gives every operation exactly one disposition:
     - `read`: production GET;
     - `plan`: production POST, PUT, PATCH or DELETE;
     - `variant`: the same method and path as a production operation;

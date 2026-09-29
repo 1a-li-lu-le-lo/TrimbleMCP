@@ -15,6 +15,8 @@ openssl rand -hex 32 > ~/.trimble/key && chmod 600 ~/.trimble/key
 export TRIMBLE_CONNECT_ENABLED=true TRIMBLE_CONNECT_ENV=stage TRIMBLE_CONNECT_REGION=us
 export TRIMBLE_CLIENT_ID=<id> TRIMBLE_SCOPE="openid <app-scope>"
 export TRIMBLE_TOKEN_STORE=~/.trimble/tc-token TRIMBLE_TOKEN_KEY_FILE=~/.trimble/key
+# Only if the application is registered in Trimble's staging environment:
+# export TRIMBLE_IDENTITY_ISSUER=https://stage.id.trimblecloud.com
 trimblectl auth login
 trimblectl projects list --product trimble-connect
 ```

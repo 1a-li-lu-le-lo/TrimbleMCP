@@ -4,6 +4,14 @@ A Go MCP server and cross-agent skill that give AI agents narrow, audited, **rea
 
 The first adapter is the **Trimble Connect** REST API: projects, folder items, and file metadata. A simulated `mock` adapter lets everything run without credentials.
 
+**Coverage:** every Trimble API operation with a public definition is accounted for: **7,016 operations in 230 definitions**.
+
+- **Trimble Connect** (11 APIs): reads are executable, and changes are dry-run plans.
+- **14 other products** (Vista, ProjectSight, Unity Construct, Unity Maintain/Permit, Accubid Anywhere, Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, Trimble Maps Places, PTx FarmENGAGE): documented and plannable, never called.
+- **Trimble Identity:** every endpoint is catalogued and excluded for agents.
+
+Every Trimble command-line tool is accounted for as well. See [docs/trimble-products/capability-matrix.md](docs/trimble-products/capability-matrix.md) and [docs/trimble-products/cli-coverage.md](docs/trimble-products/cli-coverage.md).
+
 > "Trimble API" is not one API. Each product is researched, verified, and adapted separately. See [docs/trimble-products/capability-matrix.md](docs/trimble-products/capability-matrix.md).
 
 **Documentation:** start at [docs/README.md](docs/README.md), which indexes every document. To deploy and test, follow [docs/operations/testing-guide.md](docs/operations/testing-guide.md).
@@ -35,7 +43,7 @@ make build test smoke
 | `skills/canonical/trimble` | Canonical `SKILL.md`, references, templates, and evals |
 | `.claude/skills/trimble`, `.agents/skills/trimble` | Claude Code and Codex installs (synced by `scripts/sync-skills.sh`) |
 | `connectors/` | Client setup: Claude Code, Codex, Perplexity, Claude app |
-| `cmd/trimble-catalog`, `internal/catalog` | Generator and embedded catalogue of every Trimble Connect API operation (`make catalog`) |
+| `cmd/trimble-catalog`, `internal/catalog` | Generator and embedded catalogue of every published Trimble API operation (`make catalog`); `scripts/fetch-trimble-*` retrieve the definitions |
 | `docs/` | Capability matrix, requirements traceability, ADRs, threat model, privacy, operations |
 
 ## Tools
@@ -45,7 +53,12 @@ make build test smoke
 - `trimble_get_project` (listed only where the upstream endpoint is verified)
 - `trimble_list_folder_items`
 - `trimble_get_file_metadata`
-- `trimble_api_operations`, `trimble_api_read`, `trimble_api_plan`: every operation of the 11 official Trimble Connect APIs (1,747 catalogued operations across 34 definitions). Production reads are executable, changes are dry-run planned, and everything else is excluded with a reason. See [docs/trimble-products/endpoints](docs/trimble-products/endpoints/README.md).
+- `trimble_api_operations`, `trimble_api_read`, `trimble_api_plan`: every catalogued operation (7,016 in 230 definitions).
+  - **Trimble Connect:** production reads are executable, and changes are dry-run planned.
+  - **Other products:** operations are `reference`, which means searchable and dry-run planned, never called.
+  - **Everything else:** excluded with a reason, including safety exclusions for anything that could reach vehicles, machinery or field positioning.
+
+  See [docs/trimble-products/endpoints](docs/trimble-products/endpoints/README.md).
 - `trimble_build_desktop_link`: the [Trimble Connect for Windows command line](https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line), `trimbleconnect:/projects/<id>?show=<view>,<panel>`.
 - `trimble_open_in_desktop`: opens that link locally. Windows and the local operator only, opt-in, dry run by default.
 

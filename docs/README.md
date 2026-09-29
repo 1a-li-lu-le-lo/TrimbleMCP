@@ -26,9 +26,9 @@ Start here. Every document in the repository is listed below. `internal/skilltes
 | Document | What it covers |
 |---|---|
 | [mcp/tools.md](mcp/tools.md) | Every MCP tool, resource and prompt; output envelope; protocol revisions |
-| [trimble-products/capability-matrix.md](trimble-products/capability-matrix.md) | Every Trimble product family with its API access class and disposition |
-| [trimble-products/endpoints/README.md](trimble-products/endpoints/README.md) | Every Trimble Connect API operation (all 34 official definitions) with its disposition; per-API references are linked from there |
-| [trimble-products/cli-coverage.md](trimble-products/cli-coverage.md) | Every Trimble command-line surface and every `trimblectl` command |
+| [trimble-products/capability-matrix.md](trimble-products/capability-matrix.md) | Every Trimble product: its API access class, how it is covered, and the products with no machine-readable definition |
+| [trimble-products/endpoints/README.md](trimble-products/endpoints/README.md) | Every Trimble API operation with a public definition (7,016 operations in 230 definitions: Trimble Connect, 14 other products, Trimble Identity) with its disposition; the generated per-API references are linked from there |
+| [trimble-products/cli-coverage.md](trimble-products/cli-coverage.md) | Every Trimble command-line tool and switch (Trimble Connect for Windows, installers, `xchange`, `teklaenv`, Tekla Structures, SketchUp) and every `trimblectl` command |
 | [trimble-products/trimble-connect.md](trimble-products/trimble-connect.md) | Field-level trace of the typed Trimble Connect tools to the OpenAPI definition |
 
 ## Agent skill
@@ -59,6 +59,7 @@ Start here. Every document in the repository is listed below. `internal/skilltes
 | [architecture/decisions/0005-typesafe-skill-evaluated-not-adopted.md](architecture/decisions/0005-typesafe-skill-evaluated-not-adopted.md) | ADR-0005: TypeSafe evaluated |
 | [architecture/decisions/0006-trimble-connect-windows-command-line.md](architecture/decisions/0006-trimble-connect-windows-command-line.md) | ADR-0006: Trimble Connect for Windows command line |
 | [architecture/decisions/0007-api-catalogue-coverage.md](architecture/decisions/0007-api-catalogue-coverage.md) | ADR-0007: catalogue coverage of every Connect API operation |
+| [architecture/decisions/0008-all-trimble-apis-reference-coverage.md](architecture/decisions/0008-all-trimble-apis-reference-coverage.md) | ADR-0008: every other published Trimble API as `reference`; safety exclusions |
 
 ## Security and privacy
 

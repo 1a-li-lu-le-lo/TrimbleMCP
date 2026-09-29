@@ -1,6 +1,6 @@
 # Trimble capability matrix
 
-Last verified: 2026-09-23. Confidence labels:
+Last verified: 2026-09-23 (Trimble Connect and Identity); 2026-09-29 (every other product). Confidence labels:
 
 - **F:** fetched from an official page during verification.
 - **S:** seen only in a search excerpt of an official page, or in a third-party page.
@@ -8,9 +8,17 @@ Last verified: 2026-09-23. Confidence labels:
 
 ## Coverage at a glance
 
-- **Trimble Connect (all 11 production APIs):** every operation in all 34 definitions Trimble publishes on SwaggerHub is catalogued with a disposition. The per-operation list is in [endpoints/README.md](endpoints/README.md): 254 executable reads, 223 dry-run plans, 919 non-production variants, and 351 exclusions with reasons.
-- **Trimble Connect command line:** every documented form is covered or excluded; see [cli-coverage.md](cli-coverage.md).
-- **Other Trimble product families:** classified below. Endpoint-level coverage depends on a public machine-readable definition; see "Other Trimble products".
+The bridge accounts for every Trimble API operation that has a public machine-readable definition: **7,016 operations in 230 definitions**. Each has exactly one disposition; the per-operation lists are in [endpoints/README.md](endpoints/README.md), and ADR-0007 and ADR-0008 explain the approach.
+
+| Scope | How it is covered | Disposition |
+|---|---|---|
+| Trimble Connect: 11 production APIs and every staging, integration, QA, test, draft and internal copy (34 SwaggerHub definitions) | Executable reads against the documented regional hosts; changes as dry-run plans | `read`, `plan`, `variant`, `excluded` |
+| 14 other Trimble products and services with a public definition (24 APIs, 190 definitions) | Searchable and plannable as a dry run; never called, because the bridge has no credentials or host for them | `reference` (with 6 safety exclusions) |
+| Trimble Identity | Every endpoint in the OpenID Connect discovery document | `excluded` (used only by the bridge's own sign-in) |
+| Publicly reachable definitions that Trimble does not link, and placeholders | Catalogued, never used | `excluded` |
+| Trimble Connect services named by `/regions` with no definition | Listed with a note | not callable |
+| Products with no machine-readable definition (SDKs, desktop APIs, prose-only or Postman-only APIs) | Classified below, with the reason | not applicable |
+| Command-line tools (Trimble Connect for Windows, its installer, the App Xchange `xchange` CLI, `teklaenv`, Tekla Structures and SketchUp start-up switches) | Every documented command or switch; see [cli-coverage.md](cli-coverage.md) | supported or excluded |
 
 ## Adopted API families
 
@@ -117,22 +125,77 @@ Classes:
 | Trimble Connect Core REST | A/C (public docs, licensed credentials) | F | **Adopted (read-only)** |
 | Trimble Connect Model, Model Feature, Org (Account/Organizer), Property Set, Topics (BCF), Topics Exchange, Issues, Support, Drive (beta), File Service (preview) | A/C | F (official SwaggerHub definitions) | **Adopted via the catalogue** (reads executable, changes planned); see [endpoints/README.md](endpoints/README.md) |
 | Trimble Connect internal API (`tcps.internal`) | G | F | Excluded: Trimble-internal, not offered to integrators |
-| Trimble Connect Workspace API | D (browser JS) | S | Not applicable to a server |
+| Trimble Connect regional services without a definition (`batch-api`, `objects-sync-api`, `projects-api`, `user-api`, `wopi-api`) | G (no definition) | F (`/regions`) | Listed in [endpoints/README.md](endpoints/README.md); not callable |
+| Trimble Connect Workspace API | D (browser JS, npm `trimble-connect-workspace-api`) | F | Not applicable to a server |
+| Trimble Connect Windows .NET API | D (in-process C#) | F | Not applicable to a server |
 | Trimble Connect for Windows command line (`trimbleconnect:`) | D/F (documented local launcher) | F | **Adopted (link builder plus opt-in local launch)** |
 | Connect for Windows installer and MSI command lines | G for this bridge (host changes) | F | Never |
 | Trimble Connect Sync | F (GUI only; no documented CLI) | F | Not implemented |
-| Trimble Maps / PC*MILER REST | A (API key) | S | Candidate for routing and geocoding; needs verification |
-| Trimble Agriculture (Ag Developer Network) | B | S | Deferred |
-| Viewpoint Vista / Spectrum / Trimble Construction One | C (App Xchange add-on) | S | Deferred |
-| ProjectSight | C (OpenAPI v1, Trimble Identity) | S | Candidate |
-| e-Builder / Trimble Unity Construct | C | S | Deferred |
-| Cityworks / Unity Maintain | C (per-deployment) | S | Deferred |
-| Trimble Unity (webhooks via Action Manager) | C | S | Deferred |
-| Tekla Structures Open API | D (.NET desktop) | S | Not applicable |
-| SketchUp Ruby / C SDK | D | S | Not applicable |
-| Trimble Transportation / PeopleNet fleet | B; telematics units reportedly being divested | S | Deferred; re-verify ownership |
-| GNSS / RTX corrections | G for this bridge (device correction streams) | S | Not implemented |
-| Machinery or vehicle control of any kind | G (prohibited) | n/a | **Never** |
+| Trimble Identity | A (OpenID Connect provider) | F | Used by the bridge's own sign-in; every endpoint catalogued and `excluded` for agents |
+| All other products with a public definition | see the next section | F | **Catalogued as `reference`** |
+
+## Other Trimble products
+
+### With a public machine-readable definition (catalogued as `reference`)
+
+Discovery method: every developer.trimble.com product section's sitemap was crawled for pages that embed an OpenAPI viewer (24 sections), plus the definitions that products publish directly and Vista's per-operation definitions. The discovery and classification are repeatable: `make catalog` reruns them and fails on anything new or unclassified (`cmd/trimble-catalog/sources-other.json`).
+
+`reference` means that the operations are searchable with `trimble_api_operations`, and `trimble_api_plan` validates them into a dry-run request for a person or a separately authorised integration. The bridge never calls these products. It holds no credentials for them, and several are single-tenant or on-premises with a customer-specific host. Executing any of them would need a new adapter, credentials, and an ADR.
+
+| Product | Family | API ids (endpoint pages) | Definitions | Operations | Authentication (from the definition or docs) | What calling it would need |
+|---|---|---|---|---|---|---|
+| Trimble Construction One: Vista (App Xchange Direct API) | construction | [`vista`](endpoints/vista.md) | 18 modules (per-operation fragments from https://direct-api.xchange.trimble.com) | 1,970 (17 are the same shared endpoint, marked `variant`) | `X-Application-Key` header; 2,000 requests per minute per key | Vista API application key and subscriber code |
+| ProjectSight | construction | [`projectsight`](endpoints/projectsight.md) | 1 | 537 | OAuth 2.0 via Trimble Identity | ProjectSight subscription, a Trimble Identity application, and the API host (not in the definition) |
+| Trimble Unity Construct (e-Builder) | construction | [`unity-construct`](endpoints/unity-construct.md) | 1 | 184 | OAuth 2.0 password grant (`/api/v2/Authenticate`) | e-Builder account; regional host |
+| Trimble Unity Maintain / Permit (Cityworks) | construction | [`unity-maintain-permit`](endpoints/unity-maintain-permit.md) | 150 controller definitions | 1,223 | HTTP bearer | Tenant host (`https://{unityMpHost}/services`) and a token for it |
+| Accubid Anywhere | construction | [`accubid-changeorder`](endpoints/accubid-changeorder.md), [`accubid-closeout`](endpoints/accubid-closeout.md), [`accubid-database`](endpoints/accubid-database.md), [`accubid-estimate`](endpoints/accubid-estimate.md), [`accubid-estimate-v2`](endpoints/accubid-estimate-v2.md), [`accubid-project`](endpoints/accubid-project.md), [`accubid-project-v2`](endpoints/accubid-project-v2.md) | 7 | 32 | Trimble Identity bearer; the user needs "API Data Access" | Entitlement and the service host (definitions give relative servers only) |
+| Trimble Civil Site Management | construction | [`civil-site-management`](endpoints/civil-site-management.md) | 1 | 19 (reads only) | Not declared in the definition | Subscription and credentials for `cloud.api.trimble.com/site-management/v1` |
+| Trimble Geospatial Field Configuration | geospatial | [`geospatial-field-configuration`](endpoints/geospatial-field-configuration.md) | 1 | 12 | OAuth 2.0 (Trimble Identity) | Token with the service scope |
+| Trimble Geospatial Field Data (Jobs) | geospatial | [`geospatial-field-data`](endpoints/geospatial-field-data.md) | 1 | 29 | OAuth 2.0 (Trimble Identity) | Token with the service scope |
+| Trimble Mobile Manager | geospatial | [`mobile-manager`](endpoints/mobile-manager.md) | 1 | 11 (4 configuration changes **safety-excluded**) | None declared; local device API | Running on the field device |
+| TMT Fleet Maintenance (Integration Toolkit) | transportation | [`tmt`](endpoints/tmt.md) | 1 (Swagger 2.0) | 66 | HTTP basic or OAuth 2.0 password | Integration Toolkit licence and tenant host |
+| TMWSuite | transportation | [`tmwsuite-cloudhub`](endpoints/tmwsuite-cloudhub.md), [`tmwsuite-odata`](endpoints/tmwsuite-odata.md), [`tmwsuite-ordercreate`](endpoints/tmwsuite-ordercreate.md) | 3 | 282 | OAuth 2.0 client credentials (Trimble Transportation identity) | Licence, Transportation Cloud credentials, connector host |
+| TruckMate | transportation | [`truckmate`](endpoints/truckmate.md), [`truckmate-finance`](endpoints/truckmate-finance.md), [`truckmate-master-data`](endpoints/truckmate-master-data.md) | 3 | 596 | HTTP bearer (Trimble Identity JWT, web user or API key) | REST licence and the customer's TruckMate host |
+| Trimble Maps Places API | maps | [`trimble-maps-places`](endpoints/trimble-maps-places.md) | 1 | 43 | API key | Trimble Maps API key |
+| PTx Trimble FarmENGAGE Data API | agriculture | [`ptx-farmengage`](endpoints/ptx-farmengage.md) | 1 | 209 (2 that send data to in-cab vehicle devices **safety-excluded**) | Not declared; see the developer guide | PTx Trimble API credentials |
+
+Plans for transportation and agriculture operations carry a warning that a qualified person must review and perform them.
+
+### Publicly reachable but not documented (catalogued as `excluded`)
+
+| Definition | Why it is excluded |
+|---|---|
+| Trimble Maps RouteReporter (`routereporterservice.trimblemaps.com`) | Not linked from any Trimble documentation. The bridge does not use undocumented endpoints |
+| Trimble Maps Content API (beta) (`contentapi.trimblemaps.com`) | Same |
+| Tekla support API `tsupport-v3-dev` (SwaggerHub org "Tekla") | A development support-ticket API not linked from Tekla documentation |
+| SwaggerHub `trimble-analytics/trimble-identity` | An empty stub (0 paths); Identity is covered from the discovery document |
+| App Xchange "Example API" (served from a personal GitHub Pages site) | A placeholder, not a Trimble API |
+
+### Without a public machine-readable definition
+
+These products were checked on 2026-09-29. None publishes an OpenAPI or Swagger definition that could be catalogued, so there are no operations to list; each is classified here instead.
+
+| Product | What Trimble publishes | Class | Decision |
+|---|---|---|---|
+| Trimble Identity reference docs | Prose and a Postman collection; the endpoints are in the discovery document (catalogued) | A | Covered through the discovery document |
+| PC*MILER Web Services | A WCF HTML help page (https://pcmiler.alk.com/apis/rest/v1.0/Service.svc/help), not OpenAPI | A (API key) | Not catalogued: no machine-readable definition. Candidate for a future adapter |
+| Trimble Maps REST APIs other than Places | Prose documentation on developer.trimblemaps.com | A (API key) | Not catalogued, same reason |
+| Trimble Maps Account Manager API | Its linked Swagger page returns HTTP 404 (checked 2026-09-29) | A | Not catalogued; re-check on the next refresh |
+| CoPilot | SDK and CPIK libraries; the portal's example OpenAPI page has no definition | D | Not applicable |
+| Trimble Maps SDKs (JavaScript, mobile) | SDK references | D | Not applicable |
+| Spectrum | Help-site web-service docs (help.trimble.com) | C | Not catalogued: prose only |
+| Jobpac Connect | Prose help | C | Not catalogued: prose only |
+| TAP Store | A Postman collection only | C | Not catalogued: no OpenAPI |
+| Trimble Access (Survey Core plug-in API) | Native SDK | D | Not applicable |
+| Precision, Catalyst, Trimble Precision SDK | Native SDKs | D | Not applicable |
+| SketchUp | Ruby API and C SDK; no REST API | D | Not applicable |
+| Tekla Structures, Structural Designer, Tedds, PowerFab | .NET/COM "Open API" SDKs (the name does not mean the OpenAPI format) | D | Not applicable |
+| Tekla Environment Service | The `teklaenv` CLI's API (`https://cloud.api.trimble.com/tekla/environments/v1`); no published definition | C | Not catalogued; the CLI is in [cli-coverage.md](cli-coverage.md) |
+| App Xchange platform | SDK and the `xchange` CLI; only a placeholder definition | D | CLI in [cli-coverage.md](cli-coverage.md) |
+| Trimble Unity webhooks (Action Manager) | Outbound callbacks, not an API the bridge calls | C | Deferred |
+| Trimble Transportation / PeopleNet telematics | No public definition found; ownership reportedly changing | S | Deferred; re-verify ownership |
+| GNSS / RTX corrections | Device correction streams | G for this bridge | Not implemented |
+| Machinery or vehicle control of any kind | n/a | G (prohibited) | **Never** |
 
 ## Workflow matrix
 
@@ -144,5 +207,6 @@ Classes:
 | File metadata | Connect | `GET /2.0/files/{id}` | Connect licence | metadata | none | none | low | L0 | Done |
 | Download file | Connect | `GET /files/fs/{id}/downloadurl` | Connect licence | content | none | document content | medium | L1 | Not started |
 | Upload new version | Connect | `/files/fs/initiate` + `commit` | Connect licence | none | file | none | medium | L3/L4 | Not started |
-| Route or geocode | Trimble Maps | Unknown | API key | n/a | n/a | locations | medium | L1 | Not verified |
+| Route or geocode | Trimble Maps | Places API catalogued as `reference`; PC*MILER has no definition | API key | n/a | n/a | locations | medium | L1 | Reference only |
+| Find another product's operation and plan it | Vista, ProjectSight, Unity, TMWSuite, TruckMate and others | `trimble_api_operations`, `trimble_api_plan` | none (dry run) | definitions | none | none | low | L0 (plan); L1 to L4 to perform | Done (dry run only) |
 | Vehicle position | fleet | Unknown | partner | n/a | n/a | driver location | high | L4 | Not verified |

@@ -21,20 +21,21 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/errs"
 )
 
-// Issuers the bridge will talk to. Production values are verified against
-// https://id.trimble.com/.well-known/openid-configuration. The staging issuer
-// is referenced in Trimble's docs but its discovery document could not be
-// fetched during verification; it is allowed for sandbox use only.
+// Issuers the bridge will talk to, each verified against its discovery
+// document (/.well-known/openid-configuration) on 2026-09-29. The staging
+// issuer is the one Trimble's developer docs use for staging tokens
+// (developer.trimble.com/docs/tap-store/guides/postman); it is for sandbox
+// use only.
 var Issuers = map[string]Endpoints{
 	"https://id.trimble.com": {
 		Authorize: "https://id.trimble.com/oauth/authorize",
 		Token:     "https://id.trimble.com/oauth/token",
 		Revoke:    "https://id.trimble.com/oauth/revoke",
 	},
-	"https://stage.id.trimble.com": {
-		Authorize: "https://stage.id.trimble.com/oauth/authorize",
-		Token:     "https://stage.id.trimble.com/oauth/token",
-		Revoke:    "https://stage.id.trimble.com/oauth/revoke",
+	"https://stage.id.trimblecloud.com": {
+		Authorize: "https://stage.id.trimblecloud.com/oauth/authorize",
+		Token:     "https://stage.id.trimblecloud.com/oauth/token",
+		Revoke:    "https://stage.id.trimblecloud.com/oauth/revoke",
 	},
 }
 
