@@ -33,8 +33,8 @@ func TestEveryOperationHasADisposition(t *testing.T) {
 		}
 		switch o.Disposition {
 		case Read:
-			if o.Method != "GET" && o.Method != "HEAD" {
-				t.Errorf("%s: only GET/HEAD may be executable reads", o.Key)
+			if o.Method != "GET" {
+				t.Errorf("%s: only GET may be an executable read", o.Key)
 			}
 		case Plan:
 			if o.Method == "GET" || o.Method == "HEAD" {
@@ -78,7 +78,7 @@ func TestProductionHostsAreDocumentedTrimbleHTTPS(t *testing.T) {
 
 func TestNoMutationIsExecutable(t *testing.T) {
 	for _, o := range Must().Operations {
-		if o.Disposition == Read && o.Method != "GET" && o.Method != "HEAD" {
+		if o.Disposition == Read && o.Method != "GET" {
 			t.Fatalf("%s would execute a %s", o.Key, o.Method)
 		}
 	}

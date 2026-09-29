@@ -408,7 +408,9 @@ func main() {
 					switch {
 					case excludedReads[o.Key] != "":
 						o.Disposition, o.Reason = "excluded", excludedReads[o.Key]
-					case M == "GET" || M == "HEAD":
+					case M == "HEAD":
+						o.Disposition, o.Reason = "excluded", "HEAD returns no body; use the GET operation on the same path"
+					case M == "GET":
 						o.Disposition, o.Reason = "read", "production read; executable through trimble_api_read"
 					case M == "OPTIONS":
 						o.Disposition, o.Reason = "excluded", "CORS preflight; not an API operation"
