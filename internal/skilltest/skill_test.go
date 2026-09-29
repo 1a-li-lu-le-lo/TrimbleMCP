@@ -355,6 +355,63 @@ func TestCLICoverageDocIsComplete(t *testing.T) {
 	}
 }
 
+var mdLink = regexp.MustCompile(`\]\(([^)\s]+)\)`)
+
+// Every Markdown document must be listed in docs/README.md (generated
+// per-API endpoint pages are listed by docs/trimble-products/endpoints/
+// README.md instead), and every relative link in every document must
+// resolve to an existing file.
+func TestDocsIndexAndLinks(t *testing.T) {
+	linked := func(doc string) map[string]bool {
+		out := map[string]bool{}
+		for _, m := range mdLink.FindAllStringSubmatch(read(t, doc), -1) {
+			target := strings.SplitN(m[1], "#", 2)[0]
+			if target == "" || strings.Contains(target, "://") || strings.HasPrefix(target, "mailto:") {
+				continue
+			}
+			out[filepath.Clean(filepath.Join(filepath.Dir(doc), target))] = true
+		}
+		return out
+	}
+	index := filepath.Join(root, "docs/README.md")
+	endpoints := filepath.Join(root, "docs/trimble-products/endpoints/README.md")
+	inIndex, inEndpoints := linked(index), linked(endpoints)
+	err := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(root, p)
+		if d.IsDir() {
+			if rel == ".git" || rel == ".claude" || rel == ".agents" || rel == "bin" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(p, ".md") {
+			return nil
+		}
+		for target := range linked(p) {
+			if _, err := os.Stat(target); err != nil {
+				t.Errorf("%s links missing file %s", rel, target)
+			}
+		}
+		p = filepath.Clean(p)
+		switch {
+		case p == index:
+		case filepath.Dir(p) == filepath.Dir(endpoints) && p != endpoints:
+			if !inEndpoints[p] {
+				t.Errorf("%s is not linked from the endpoint index", rel)
+			}
+		case !inIndex[p]:
+			t.Errorf("%s is not listed in docs/README.md", rel)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 type noTokens struct{}
 
 func (noTokens) Token(context.Context) (string, error) { return "", nil }

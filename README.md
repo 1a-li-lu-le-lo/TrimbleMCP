@@ -6,6 +6,8 @@ The first adapter is the **Trimble Connect** REST API: projects, folder items, a
 
 > "Trimble API" is not one API. Each product is researched, verified, and adapted separately. See [docs/trimble-products/capability-matrix.md](docs/trimble-products/capability-matrix.md).
 
+**Documentation:** start at [docs/README.md](docs/README.md), which indexes every document. To deploy and test, follow [docs/operations/testing-guide.md](docs/operations/testing-guide.md).
+
 ## Quick start (no credentials)
 
 ```sh
