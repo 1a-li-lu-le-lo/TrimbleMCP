@@ -2,7 +2,7 @@
 # Downloads every API definition in Trimble's official SwaggerHub organisation
 # (Trimble-Connect) plus the /regions document, into $1 (default
 # /tmp/trimble-specs). The raw definitions are not committed; `make catalog`
-# regenerates internal/catalog/catalog.json and docs/trimble-products/endpoints
+# regenerates internal/catalog/catalog.json.gz and docs/trimble-products/endpoints
 # from them, and fails on any definition that has not been classified.
 set -eu
 out=${1:-/tmp/trimble-specs}

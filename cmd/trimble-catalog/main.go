@@ -1,25 +1,38 @@
 // Command trimble-catalog regenerates the Trimble API operation catalogue
-// (internal/catalog/catalog.json) and its reference documentation from the
-// official Trimble Connect OpenAPI definitions published on SwaggerHub.
+// (internal/catalog/catalog.json.gz) and its reference documentation from:
+//
+//   - every definition in the official Trimble-Connect SwaggerHub
+//     organisation (scripts/fetch-trimble-specs.sh);
+//   - every definition linked from the Trimble Developer Portal, the
+//     directly published product definitions, Vista's per-operation
+//     fragments and the Trimble Identity discovery document
+//     (scripts/fetch-trimble-other-specs.py, classified by sources-other.json).
 //
 // Every operation in every retrieved definition receives exactly one
 // disposition, so no endpoint is left unaccounted for:
 //
-//	read      production GET, executable through trimble_api_read
-//	plan      production POST/PUT/PATCH/DELETE, dry-run through trimble_api_plan
-//	variant   same method and path as a production operation (stage/int/qa/test copy)
-//	excluded  not callable by the bridge, with the reason recorded
+//	read       Trimble Connect production GET, executable through trimble_api_read
+//	plan       Trimble Connect production change, dry-run through trimble_api_plan
+//	reference  another Trimble product's documented operation; searchable and
+//	           plannable, never executed (the bridge holds no credentials for it)
+//	variant    the same call as the operation named in covered_by
+//	excluded   not callable by the bridge, with the reason recorded
+//
+// A definition that matches no classification, a download that failed, or a
+// classification that no longer matches anything fails the build.
 //
 // Usage (network required to refresh the inputs):
 //
 //	make catalog
-//	# or: go run ./cmd/trimble-catalog -specs DIR -index FILE -regions FILE
+//	# or: go run ./cmd/trimble-catalog -specs DIR -index FILE -regions FILE -other DIR -retrieved YYYY-MM-DD
 //
 // The raw definitions are not committed; the catalogue records each source's
 // URL and SHA-256 so a refresh can be diffed.
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -148,118 +161,14 @@ func classifyServer(raw string) (env, region string, ok bool) {
 	return "", "", false
 }
 
-type spec struct {
-	raw  map[string]any
-	info struct{ title, version string }
-}
-
-func str(m map[string]any, k string) string {
-	s, _ := m[k].(string)
-	return s
-}
-
-func obj(v any) map[string]any {
-	m, _ := v.(map[string]any)
-	return m
-}
-
-func (s *spec) resolve(v any) map[string]any {
-	m := obj(v)
-	for i := 0; i < 8 && m != nil; i++ {
-		ref := str(m, "$ref")
-		if ref == "" {
-			return m
-		}
-		var cur any = s.raw
-		for _, part := range strings.Split(strings.TrimPrefix(ref, "#/"), "/") {
-			part = strings.ReplaceAll(strings.ReplaceAll(part, "~1", "/"), "~0", "~")
-			cur = obj(cur)[part]
-		}
-		m = obj(cur)
-	}
-	return m
-}
-
-func clip(s string, n int) string {
-	s = strings.Join(strings.Fields(s), " ")
-	if len([]rune(s)) > n {
-		return string([]rune(s)[:n-1]) + "…"
-	}
-	return s
-}
-
-func (s *spec) params(pathItem, op map[string]any) []Param {
-	seen := map[string]int{}
-	var out []Param
-	add := func(list any) {
-		arr, _ := list.([]any)
-		for _, p := range arr {
-			pm := s.resolve(p)
-			if pm == nil {
-				continue
-			}
-			pr := Param{Name: str(pm, "name"), In: str(pm, "in"), Desc: clip(str(pm, "description"), 160)}
-			pr.Required, _ = pm["required"].(bool)
-			if pr.In == "path" {
-				pr.Required = true
-			}
-			if sch := s.resolve(pm["schema"]); sch != nil {
-				pr.Type, pr.Format = str(sch, "type"), str(sch, "format")
-				if it := s.resolve(sch["items"]); pr.Type == "array" && it != nil {
-					pr.Type = "array:" + str(it, "type")
-				}
-				if e, ok := sch["enum"].([]any); ok {
-					for _, x := range e {
-						pr.Enum = append(pr.Enum, fmt.Sprint(x))
-					}
-				}
-			}
-			k := pr.In + "\x00" + pr.Name
-			if i, ok := seen[k]; ok {
-				out[i] = pr // operation-level overrides path-level
-				continue
-			}
-			seen[k] = len(out)
-			out = append(out, pr)
-		}
-	}
-	add(pathItem["parameters"])
-	add(op["parameters"])
-	sort.SliceStable(out, func(i, j int) bool {
-		order := map[string]int{"path": 0, "query": 1, "header": 2, "cookie": 3}
-		return order[out[i].In] < order[out[j].In]
-	})
-	return out
-}
-
-func (s *spec) body(op map[string]any) (types, req []string) {
-	rb := s.resolve(op["requestBody"])
-	if rb == nil {
-		return nil, nil
-	}
-	for ct, v := range obj(rb["content"]) {
-		types = append(types, ct)
-		if sch := s.resolve(obj(v)["schema"]); sch != nil && req == nil {
-			if r, ok := sch["required"].([]any); ok {
-				for _, x := range r {
-					req = append(req, fmt.Sprint(x))
-				}
-			}
-		}
-	}
-	sort.Strings(types)
-	sort.Strings(req)
-	return types, req
-}
-
-var methods = []string{"get", "head", "post", "put", "patch", "delete", "options"}
-
 func main() {
 	specDir := flag.String("specs", "/tmp/specs", "directory of <slug>.json definitions")
 	index := flag.String("index", "/tmp/sh-org.json", "SwaggerHub organisation listing JSON")
 	regions := flag.String("regions", "/tmp/regions.json", "response of GET /tc/api/2.0/regions")
-	out := flag.String("out", "internal/catalog/catalog.json", "catalogue output")
+	out := flag.String("out", "internal/catalog/catalog.json.gz", "catalogue output (gzip-compressed JSON)")
 	docs := flag.String("docs", "docs/trimble-products/endpoints", "reference docs output directory")
+	other := flag.String("other", "/tmp/trimble-specs/other", "directory written by scripts/fetch-trimble-other-specs.py")
+	manifest := flag.String("manifest", "cmd/trimble-catalog/sources-other.json", "classification of non-Connect definitions")
 	retrieved := flag.String("retrieved", "", "retrieval date (YYYY-MM-DD)")
 	flag.Parse()
 	if *retrieved == "" {
@@ -280,9 +189,8 @@ func main() {
 	var regionList []map[string]any
 	mustJSON(*regions, &regionList)
 
-	cat := Catalog{Retrieved: *retrieved, Index: "https://api.swaggerhub.com/apis/Trimble-Connect"}
+	cat := Catalog{Retrieved: *retrieved, Index: "https://api.swaggerhub.com/apis/Trimble-Connect", Portal: "https://developer.trimble.com"}
 	specs := map[string]*spec{}
-	srcURL := map[string]string{}
 	for _, a := range idx.APIs {
 		var u string
 		for _, p := range a.Properties {
@@ -298,19 +206,22 @@ func main() {
 		if err != nil {
 			fail("read %s: %v", slug, err)
 		}
-		sp := &spec{}
+		sp := &spec{id: slug}
 		if err := json.Unmarshal(b, &sp.raw); err != nil {
 			fail("parse %s: %v", slug, err)
 		}
 		sum := sha256.Sum256(b)
-		info := obj(sp.raw["info"])
+		title, version := sp.info()
 		c := sourceClass[slug]
 		specs[slug] = sp
-		srcURL[slug] = u
-		cat.Sources = append(cat.Sources, Source{
-			ID: slug, Title: str(info, "title"), Version: str(info, "version"), URL: u,
+		src := Source{
+			ID: slug, Title: title, Version: version, URL: u, Kind: "swaggerhub",
 			SHA256: hex.EncodeToString(sum[:]), Class: c.class, VariantOf: c.of, API: c.api, Note: c.note,
-		})
+		}
+		if c.class == "production" {
+			src.Family, src.Product = "connect", "Trimble Connect"
+		}
+		cat.Sources = append(cat.Sources, src)
 	}
 	for slug := range sourceClass {
 		if specs[slug] == nil {
@@ -327,9 +238,9 @@ func main() {
 		}
 		sp := specs[src.ID]
 		m := apiMeta[src.API]
-		a := API{ID: src.API, Title: m.title, Source: src.ID, Status: m.status, DocURL: m.doc, Hosts: map[string]map[string]string{}}
-		for _, sv := range sp.raw["servers"].([]any) {
-			raw := str(obj(sv), "url")
+		a := API{ID: src.API, Kind: catalog.KindConnect, Title: m.title, Family: "connect", Product: "Trimble Connect",
+			Source: src.ID, Status: m.status, DocURL: m.doc, Hosts: map[string]map[string]string{}, Security: sp.security()}
+		for _, raw := range sp.servers() {
 			env, region, ok := classifyServer(raw)
 			if !ok {
 				continue
@@ -349,10 +260,6 @@ func main() {
 			a.Regions = append(a.Regions, r)
 		}
 		sort.Strings(a.Regions)
-		for name := range obj(obj(sp.raw["components"])["securitySchemes"]) {
-			a.Security = append(a.Security, name)
-		}
-		sort.Strings(a.Security)
 		cat.APIs = append(cat.APIs, a)
 	}
 	sort.Slice(cat.APIs, func(i, j int) bool { return cat.APIs[i].ID < cat.APIs[j].ID })
@@ -369,77 +276,51 @@ func main() {
 	sort.SliceStable(order, func(i, j int) bool { return order[i].Class == "production" && order[j].Class != "production" })
 	for si := range order {
 		src := order[si]
-		sp := specs[src.ID]
-		paths := obj(sp.raw["paths"])
-		pkeys := make([]string, 0, len(paths))
-		for p := range paths {
-			pkeys = append(pkeys, p)
-		}
-		sort.Strings(pkeys)
-		n := 0
-		for _, p := range pkeys {
-			item := obj(paths[p])
-			for _, m := range methods {
-				opv, ok := item[m]
-				if !ok {
-					continue
+		ops := specs[src.ID].operations()
+		for _, o := range ops {
+			M, p := o.Method, o.Path
+			switch src.Class {
+			case "production":
+				o.API = src.API
+				o.Key = src.API + ":" + M + " " + p
+				if prodKey[src.ID] == nil {
+					prodKey[src.ID] = map[string]string{}
 				}
-				op := obj(opv)
-				n++
-				M := strings.ToUpper(m)
-				o := Operation{
-					Source: src.ID, Method: M, Path: p, OperationID: str(op, "operationId"),
-					Summary: clip(firstNonEmpty(str(op, "summary"), str(op, "description")), 200),
-					Params:  sp.params(item, op),
-				}
-				o.Deprecated, _ = op["deprecated"].(bool)
-				for _, t := range asSlice(op["tags"]) {
-					o.Tags = append(o.Tags, fmt.Sprint(t))
-				}
-				o.BodyTypes, o.BodyReq = sp.body(op)
-				switch src.Class {
-				case "production":
-					o.API = src.API
-					o.Key = src.API + ":" + M + " " + p
-					if prodKey[src.ID] == nil {
-						prodKey[src.ID] = map[string]string{}
-					}
-					prodKey[src.ID][M+" "+p] = o.Key
-					switch {
-					case excludedReads[o.Key] != "":
-						o.Disposition, o.Reason = "excluded", excludedReads[o.Key]
-					case M == "HEAD":
-						o.Disposition, o.Reason = "excluded", "HEAD returns no body; use the GET operation on the same path"
-					case M == "GET":
-						o.Disposition, o.Reason = "read", "production read; executable through trimble_api_read"
-					case M == "OPTIONS":
-						o.Disposition, o.Reason = "excluded", "CORS preflight; not an API operation"
-					default:
-						o.Disposition, o.Reason = "plan", "production change; dry-run plan through trimble_api_plan (execution requires the approval framework, ADR-0004)"
-					}
-					if t := curatedTools[o.Key]; t != "" {
-						o.Tool = t
-					}
-				case "variant":
-					o.API = apiOf[src.VariantOf]
-					o.Key = src.ID + ":" + M + " " + p
-					if k, ok := prodKey[src.VariantOf][M+" "+p]; ok {
-						o.Disposition, o.CoveredBy = "variant", k
-						o.Reason = fmt.Sprintf("%s of %s; same operation as %s", src.Note, src.VariantOf, k)
-					} else {
-						o.Disposition = "excluded"
-						o.Reason = fmt.Sprintf("only in %s (%s); not published for production", src.ID, src.Note)
-					}
+				prodKey[src.ID][M+" "+p] = o.Key
+				switch {
+				case excludedReads[o.Key] != "":
+					o.Disposition, o.Reason = catalog.Excluded, excludedReads[o.Key]
+				case M == "HEAD":
+					o.Disposition, o.Reason = catalog.Excluded, "HEAD returns no body; use the GET operation on the same path"
+				case M == "GET":
+					o.Disposition, o.Reason = catalog.Read, "production read; executable through trimble_api_read"
+				case M == "OPTIONS" || M == "TRACE":
+					o.Disposition, o.Reason = catalog.Excluded, "CORS preflight or diagnostic method; not an API operation"
 				default:
-					o.Key = src.ID + ":" + M + " " + p
-					o.Disposition, o.Reason = "excluded", src.Note
+					o.Disposition, o.Reason = catalog.Plan, "production change; dry-run plan through trimble_api_plan (execution requires the approval framework, ADR-0004)"
 				}
-				cat.Operations = append(cat.Operations, o)
+				if t := curatedTools[o.Key]; t != "" {
+					o.Tool = t
+				}
+			case "variant":
+				o.API = apiOf[src.VariantOf]
+				o.Key = src.ID + ":" + M + " " + p
+				if k, ok := prodKey[src.VariantOf][M+" "+p]; ok {
+					o.Disposition, o.CoveredBy = catalog.Variant, k
+					o.Reason = fmt.Sprintf("%s of %s; same operation as %s", src.Note, src.VariantOf, k)
+				} else {
+					o.Disposition = catalog.Excluded
+					o.Reason = fmt.Sprintf("only in %s (%s); not published for production", src.ID, src.Note)
+				}
+			default:
+				o.Key = src.ID + ":" + M + " " + p
+				o.Disposition, o.Reason = catalog.Excluded, src.Note
 			}
+			cat.Operations = append(cat.Operations, o)
 		}
 		for i := range cat.Sources {
 			if cat.Sources[i].ID == src.ID {
-				cat.Sources[i].Ops = n
+				cat.Sources[i].Ops = len(ops)
 			}
 		}
 	}
@@ -453,14 +334,31 @@ func main() {
 			fail("curatedTools entry %s no longer exists", k)
 		}
 	}
+	cat.Undefined = undefinedServices(regionList)
+	addOther(&cat, *other, *manifest)
+	seen := map[string]bool{}
+	for _, o := range cat.Operations {
+		if seen[o.Key] {
+			fail("duplicate operation key %s", o.Key)
+		}
+		seen[o.Key] = true
+	}
+	sort.Slice(cat.Sources, func(i, j int) bool { return cat.Sources[i].ID < cat.Sources[j].ID })
+	sort.Slice(cat.APIs, func(i, j int) bool {
+		if cat.APIs[i].Kind != cat.APIs[j].Kind {
+			return cat.APIs[i].Kind == catalog.KindConnect
+		}
+		return cat.APIs[i].ID < cat.APIs[j].ID
+	})
 	sort.SliceStable(cat.Operations, func(i, j int) bool { return cat.Operations[i].Key < cat.Operations[j].Key })
 
-	b, _ := json.MarshalIndent(cat, "", " ")
-	if err := os.WriteFile(*out, append(b, '\n'), 0o644); err != nil {
-		fail("%v", err)
-	}
+	writeCatalog(*out, &cat)
 	writeDocs(*docs, &cat)
-	fmt.Fprintf(os.Stderr, "catalogue: %d sources, %d APIs, %d operations\n", len(cat.Sources), len(cat.APIs), len(cat.Operations))
+	byDisp := map[string]int{}
+	for _, o := range cat.Operations {
+		byDisp[o.Disposition]++
+	}
+	fmt.Fprintf(os.Stderr, "catalogue: %d sources, %d APIs, %d operations %v\n", len(cat.Sources), len(cat.APIs), len(cat.Operations), byDisp)
 }
 
 // crossCheckRegions verifies derived production hosts against the official
@@ -488,6 +386,67 @@ func crossCheckRegions(apis []API, regions []map[string]any) {
 	}
 }
 
+// regionServices maps the service keys of the /regions response to catalogue
+// APIs, or explains why a service has no catalogued operations. A service key
+// missing here fails the build.
+var regionServices = map[string]struct{ api, note string }{
+	"tc-api":            {"core", ""},
+	"model-api":         {"model", ""},
+	"model-feature-api": {"model-feature", ""},
+	"org-api":           {"org", ""},
+	"pset-api":          {"pset", ""},
+	"topic-api":         {"topics", ""},
+	"issues-api":        {"issues", ""},
+	"projects-api":      {"", "listed by /regions, but Trimble publishes no API definition for it; project operations are in the Core API"},
+	"user-api":          {"", "listed by /regions, but Trimble publishes no API definition for it; user operations are in the Core API"},
+	"batch-api":         {"", "listed by /regions, but Trimble publishes no API definition for it"},
+	"objects-sync-api":  {"", "listed by /regions, but Trimble publishes no API definition for it"},
+	"wopi-api":          {"", "WOPI host (the protocol Microsoft Office for the web uses to open files); a protocol endpoint for Office, not an integrator API, and no definition is published"},
+}
+
+// regionFields are the non-service fields of a /regions entry.
+var regionFields = map[string]bool{"awsRegion": true, "isMaster": true, "location": true, "map-bbox": true, "origin": true, "region": true, "serviceRegion": true, "trnRegion": true}
+
+func undefinedServices(regions []map[string]any) []catalog.Service {
+	seen := map[string]bool{}
+	var out []catalog.Service
+	for _, r := range regions {
+		for k := range r {
+			if regionFields[k] || seen[k] {
+				continue
+			}
+			seen[k] = true
+			rs, ok := regionServices[k]
+			if !ok {
+				fail("/regions names service %q, which is not classified in regionServices", k)
+			}
+			if rs.api == "" {
+				out = append(out, catalog.Service{Name: k, Note: rs.note})
+			}
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out
+}
+
+// writeCatalog writes the catalogue as deterministic gzip-compressed JSON:
+// indented JSON inside, so `zcat catalog.json.gz | diff` reviews well.
+func writeCatalog(path string, cat *Catalog) {
+	b, err := json.MarshalIndent(cat, "", " ")
+	if err != nil {
+		fail("%v", err)
+	}
+	var buf bytes.Buffer
+	zw, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression) // zero header: no name or mtime
+	zw.Write(append(b, '\n'))
+	if err := zw.Close(); err != nil {
+		fail("%v", err)
+	}
+	if err := os.WriteFile(path, buf.Bytes(), 0o644); err != nil {
+		fail("%v", err)
+	}
+}
+
 func hasKey(ops []Operation, k string) bool {
 	for _, o := range ops {
 		if o.Key == k {
@@ -495,17 +454,6 @@ func hasKey(ops []Operation, k string) bool {
 		}
 	}
 	return false
-}
-
-func asSlice(v any) []any { s, _ := v.([]any); return s }
-
-func firstNonEmpty(a ...string) string {
-	for _, s := range a {
-		if strings.TrimSpace(s) != "" {
-			return s
-		}
-	}
-	return ""
 }
 
 func mustJSON(path string, v any) {

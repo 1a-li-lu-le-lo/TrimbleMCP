@@ -18,9 +18,11 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble"
 )
 
-// Catalogue tools: every operation of every official Trimble Connect API
-// definition is discoverable; production reads are executable; production
-// changes are rendered as dry-run plans. See docs/trimble-products/endpoints.
+// Catalogue tools: every operation of every Trimble API definition the
+// catalogue holds is discoverable. Trimble Connect production reads are
+// executable; Trimble Connect changes and other products' operations
+// (reference) are rendered as dry-run plans and never sent. See
+// docs/trimble-products/endpoints.
 const (
 	ToolAPIOperations = "trimble_api_operations"
 	ToolAPIRead       = "trimble_api_read"
@@ -233,15 +235,19 @@ func bindProject(c *call, op *catalog.Operation, path map[string]string, query u
 	return nil
 }
 
-func lookupOperation(key string, want string) (*catalog.Operation, error) {
+func lookupOperation(key string, want ...string) (*catalog.Operation, error) {
 	op, ok := catalog.Lookup(key)
 	if !ok {
 		return nil, errs.Newf(errs.Validation, "unknown operation key %q; search with %s", cleanUntrusted(key), ToolAPIOperations)
 	}
-	if op.Disposition == want {
+	if slices.Contains(want, op.Disposition) {
 		return op, nil
 	}
 	switch op.Disposition {
+	case catalog.Reference:
+		a, _ := catalog.APIByID(op.API)
+		return nil, errs.Newf(errs.UnsupportedCapability, "%s belongs to %s, which the bridge documents but never calls (it needs %s); use %s to prepare a dry-run request",
+			op.Key, a.Product, a.Requires, ToolAPIPlan)
 	case catalog.Variant:
 		return nil, errs.Newf(errs.Validation, "%s is a non-production copy; use %s", op.Key, op.CoveredBy)
 	case catalog.Excluded:
@@ -259,6 +265,7 @@ func lookupOperation(key string, want string) (*catalog.Operation, error) {
 type operationSummary struct {
 	Key         string          `json:"key"`
 	API         string          `json:"api"`
+	Product     string          `json:"product,omitempty"`
 	Method      string          `json:"method"`
 	Path        string          `json:"path"`
 	OperationID string          `json:"operation_id,omitempty"`
@@ -271,11 +278,13 @@ type operationSummary struct {
 	Params      []catalog.Param `json:"params,omitempty"`
 	Body        []string        `json:"body_content_types,omitempty"`
 	BodyReq     []string        `json:"body_required,omitempty"`
+	Requires    string          `json:"requires,omitempty"`
 }
 
 func (g *Gateway) apiOperations(_ context.Context, c *call, args json.RawMessage) (*Envelope, error) {
 	var in struct {
 		API         string `json:"api"`
+		Family      string `json:"family"`
 		Disposition string `json:"disposition"`
 		Query       string `json:"query"`
 		Key         string `json:"key"`
@@ -297,8 +306,16 @@ func (g *Gateway) apiOperations(_ context.Context, c *call, args json.RawMessage
 		return &Envelope{Status: "ok", Operation: ToolAPIOperations, Result: map[string]any{"operation": summarize(*op, true)},
 			DataLabels: []string{"catalogue"}, Source: catalogProv(cat), NextAction: nextFor(op)}, nil
 	}
-	if in.Disposition != "" && !slices.Contains([]string{catalog.Read, catalog.Plan, catalog.Variant, catalog.Excluded}, in.Disposition) {
-		return nil, errs.Newf(errs.Validation, "disposition must be read, plan, variant or excluded")
+	if in.Disposition != "" && !slices.Contains(catalog.Dispositions, in.Disposition) {
+		return nil, errs.Newf(errs.Validation, "disposition must be one of %s", strings.Join(catalog.Dispositions, ", "))
+	}
+	if in.Family != "" && !slices.Contains(catalog.Families(), in.Family) {
+		return nil, errs.Newf(errs.Validation, "family must be one of %s", strings.Join(catalog.Families(), ", "))
+	}
+	if in.API != "" {
+		if _, ok := catalog.APIByID(in.API); !ok {
+			return nil, errs.Newf(errs.Validation, "unknown api %q; call %s without api to list them", cleanUntrusted(in.API), ToolAPIOperations)
+		}
 	}
 	if len(in.Query) > 200 {
 		return nil, errs.Newf(errs.Validation, "query is too long")
@@ -320,7 +337,7 @@ func (g *Gateway) apiOperations(_ context.Context, c *call, args json.RawMessage
 			return nil, errs.Newf(errs.Validation, "page_token is not valid")
 		}
 	}
-	ops := catalog.Filter(in.API, in.Disposition, in.Query)
+	ops := catalog.Filter(catalog.Query{API: in.API, Family: in.Family, Disposition: in.Disposition, Text: in.Query})
 	total := len(ops)
 	end := min(off+size, total)
 	if off > total {
@@ -337,14 +354,23 @@ func (g *Gateway) apiOperations(_ context.Context, c *call, args json.RawMessage
 	var apis []map[string]any
 	if in.API == "" && off == 0 {
 		for _, a := range cat.APIs {
-			apis = append(apis, map[string]any{"id": a.ID, "title": a.Title, "status": a.Status, "regions": a.Regions, "definition": a.Source})
+			if in.Family != "" && a.Family != in.Family {
+				continue
+			}
+			m := map[string]any{"id": a.ID, "kind": a.Kind, "family": a.Family, "title": a.Title, "status": a.Status}
+			if a.Kind == catalog.KindConnect {
+				m["regions"] = a.Regions
+			} else {
+				m["requires"] = a.Requires
+			}
+			apis = append(apis, m)
 		}
 	}
 	return &Envelope{
 		Status: "ok", Operation: ToolAPIOperations,
 		Result:     map[string]any{"operations": out, "apis": apis},
 		Pagination: &info, Source: catalogProv(cat), DataLabels: []string{"catalogue"},
-		NextAction: "Call " + ToolAPIOperations + " with key for full parameters, then " + ToolAPIRead + " (read) or " + ToolAPIPlan + " (plan).",
+		NextAction: "Call " + ToolAPIOperations + " with key for full parameters, then " + ToolAPIRead + " (read) or " + ToolAPIPlan + " (plan or reference).",
 	}, nil
 }
 
@@ -353,6 +379,12 @@ func summarize(o catalog.Operation, full bool) operationSummary {
 		Summary: o.Summary, Disposition: o.Disposition, CoveredBy: o.CoveredBy, Tool: o.Tool, Deprecated: o.Deprecated}
 	if o.Disposition == catalog.Excluded {
 		s.Reason = o.Reason
+	}
+	if a, ok := catalog.APIByID(o.API); ok {
+		s.Product = a.Product
+		if full && a.Kind == catalog.KindReference {
+			s.Requires = a.Requires
+		}
 	}
 	if full {
 		s.Params, s.Body, s.BodyReq, s.Reason = o.Params, o.BodyTypes, o.BodyReq, o.Reason
@@ -369,6 +401,8 @@ func nextFor(o *catalog.Operation) string {
 		return "Call " + ToolAPIRead + " with this key."
 	case catalog.Plan:
 		return "Call " + ToolAPIPlan + " with this key to prepare a dry-run plan; it is never executed."
+	case catalog.Reference:
+		return "The bridge never calls this product. Call " + ToolAPIPlan + " with this key and no product to prepare a validated dry-run request for a person or a separately authorised integration."
 	case catalog.Variant:
 		return "Use the production operation " + o.CoveredBy + "."
 	}
@@ -376,7 +410,7 @@ func nextFor(o *catalog.Operation) string {
 }
 
 func catalogProv(cat *catalog.Catalog) *domain.Provenance {
-	return &domain.Provenance{Product: "trimble-connect", APIVersion: "catalogue " + cat.Retrieved, Source: cat.Index}
+	return &domain.Provenance{Product: "trimble-api-catalogue", APIVersion: "catalogue " + cat.Retrieved, Source: cat.Index + " and " + cat.Portal}
 }
 
 // ---- trimble_api_read ----
@@ -503,16 +537,32 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	if strings.TrimSpace(in.Reason) == "" || len(in.Reason) > 500 {
 		return nil, errs.Newf(errs.Validation, "reason is required (1-500 characters)")
 	}
-	op, err := lookupOperation(in.Key, catalog.Plan)
+	op, err := lookupOperation(in.Key, catalog.Plan, catalog.Reference)
 	if err != nil {
 		return nil, err
 	}
 	c.resource = op.Key
+	reference := op.Disposition == catalog.Reference
+	if reference {
+		if in.Product != "" {
+			return nil, errs.Newf(errs.Validation, "omit product for reference operations: %s is not a configured product; the key names the API", op.Key)
+		}
+		if err := g.authorize(c); err != nil {
+			return nil, err
+		}
+	}
 	path, query, headers, err := validateOperationArgs(op, in)
 	if err != nil {
 		return nil, err
 	}
-	if err := bindProject(c, op, path, query); err != nil {
+	if reference {
+		// Project grants name Trimble Connect projects; another product's
+		// project IDs cannot be checked against them, so a restricted
+		// caller cannot plan other products' operations (fail closed).
+		if len(c.p.Projects) > 0 {
+			return nil, errs.Newf(errs.PolicyDenied, "this caller is limited to specific Trimble Connect projects and cannot plan other products' operations")
+		}
+	} else if err := bindProject(c, op, path, query); err != nil {
 		return nil, err
 	}
 	var body any
@@ -539,6 +589,9 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 		}
 	} else if len(op.BodyReq) > 0 {
 		return nil, errs.Newf(errs.Validation, "%s requires a body with: %s", op.Key, strings.Join(op.BodyReq, ", "))
+	}
+	if reference {
+		return referencePlan(op, path, query, headers, body, in.Reason)
 	}
 	cc, err := g.catalogClient(c, in.Product)
 	if err != nil {
@@ -571,6 +624,60 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	}, nil
 }
 
+// referencePlan renders a dry-run request for another product's operation.
+// The bridge has no host or credentials for it, so the plan names the
+// documented servers verbatim instead of choosing one.
+func referencePlan(op *catalog.Operation, path map[string]string, query url.Values, headers map[string]string, body any, reason string) (*Envelope, error) {
+	a, ok := catalog.APIByID(op.API)
+	if !ok {
+		return nil, errs.New(errs.Internal)
+	}
+	var missing []string
+	p := pathParam.ReplaceAllStringFunc(op.Path, func(m string) string {
+		v, ok := path[m[1:len(m)-1]]
+		if !ok {
+			missing = append(missing, m)
+			return m
+		}
+		return url.PathEscape(v)
+	})
+	if len(missing) > 0 {
+		return nil, errs.Newf(errs.Validation, "missing path parameter(s): %s", strings.Join(missing, ", "))
+	}
+	if len(query) > 0 {
+		p += "?" + query.Encode()
+	}
+	level, approval := "L1", "a read in another product; it still needs that product's credentials and the user's authorisation"
+	switch op.Method {
+	case "GET", "HEAD":
+	case "DELETE":
+		level, approval = "L4", "case-specific approval (deletion)"
+	default:
+		level, approval = "L3", "a change in another product; needs approval under that product's own policy"
+	}
+	var warnings []string
+	if op.Deprecated {
+		warnings = append(warnings, "Trimble marks this operation as deprecated.")
+	}
+	if a.Family == "transportation" || a.Family == "agriculture" {
+		warnings = append(warnings, "This product manages vehicles, drivers or field operations. A qualified person must review and perform the request; the bridge never operates vehicles or machinery.")
+	}
+	plan := map[string]any{
+		"key": op.Key, "product": a.Product, "method": op.Method, "path": p, "headers": headers,
+		"documented_servers": a.Servers, "authentication": a.Auth, "access": a.Access, "requires": a.Requires,
+		"content_type": firstOr(op.BodyTypes, ""), "body": body, "reason": reason,
+		"approval_level": level, "approval": approval,
+		"executed": false,
+		"rollback": rollbackFor(op.Method),
+		"note":     "Reference only. The bridge has no credentials or host for " + a.Product + " and never calls it; a person or a separately authorised integration must perform this request.",
+	}
+	return &Envelope{
+		Status: "ok", Operation: ToolAPIPlan, Resource: op.Key,
+		Result: map[string]any{"plan": plan}, DataLabels: []string{"dry_run", "planning_aid", "not_executed", "reference_only"},
+		Warnings: warnings, NextAction: "Present the plan for human review. Nothing was sent to any Trimble product.",
+	}, nil
+}
+
 func rollbackFor(method string) string {
 	switch method {
 	case "POST":
@@ -579,6 +686,8 @@ func rollbackFor(method string) string {
 		return "Re-apply the previous values captured with trimble_api_read before the change."
 	case "DELETE":
 		return "Usually not reversible; confirm backups or the product's recycle-bin behaviour before approving."
+	case "GET", "HEAD":
+		return "Not applicable: a read changes nothing."
 	}
 	return "Review manually."
 }

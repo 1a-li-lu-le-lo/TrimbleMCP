@@ -14,6 +14,9 @@ sync-skills:
 	./scripts/sync-skills.sh
 smoke: build
 	./scripts/smoke.sh
+# Needs network access, Python 3 and PyYAML (pip install pyyaml).
 catalog:
 	./scripts/fetch-trimble-specs.sh /tmp/trimble-specs
-	go run ./cmd/trimble-catalog -specs /tmp/trimble-specs -index /tmp/trimble-specs/index.json -regions /tmp/trimble-specs/regions.json -retrieved $$(date -u +%Y-%m-%d)
+	python3 ./scripts/fetch-trimble-other-specs.py /tmp/trimble-specs/other
+	go run ./cmd/trimble-catalog -specs /tmp/trimble-specs -index /tmp/trimble-specs/index.json -regions /tmp/trimble-specs/regions.json \
+		-other /tmp/trimble-specs/other -retrieved $$(date -u +%Y-%m-%d)

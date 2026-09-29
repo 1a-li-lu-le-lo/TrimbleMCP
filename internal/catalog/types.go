@@ -1,40 +1,73 @@
 // Package catalog embeds the generated catalogue of every operation in every
-// official Trimble Connect API definition, with the disposition that decides
-// how the bridge handles it (read, plan, variant, excluded). Regenerate with
-// `make catalog`; see cmd/trimble-catalog.
+// Trimble API definition the bridge could find: the official Trimble Connect
+// definitions (SwaggerHub organisation), every definition linked from the
+// Trimble Developer Portal, directly published product definitions, and the
+// Trimble Identity discovery document. Each operation carries the
+// disposition that decides how the bridge handles it (read, plan, reference,
+// variant, excluded). Regenerate with `make catalog`; see cmd/trimble-catalog.
 package catalog
 
-// Catalog is the generated artefact (catalog.json).
+// Catalog is the generated artefact (catalog.json.gz).
 type Catalog struct {
 	Retrieved  string      `json:"retrieved"`
 	Index      string      `json:"index"`
+	Portal     string      `json:"portal"`
 	Sources    []Source    `json:"sources"`
 	APIs       []API       `json:"apis"`
 	Operations []Operation `json:"operations"`
+	// Services named by the Trimble Connect /regions response that publish
+	// no API definition, so they have no catalogued operations.
+	Undefined []Service `json:"services_without_definitions"`
 }
 
+// Source is one retrieved API definition.
 type Source struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Version   string `json:"version"`
-	URL       string `json:"url"`
-	SHA256    string `json:"sha256"`
-	Class     string `json:"class"` // production | variant | internal | empty
-	VariantOf string `json:"variant_of,omitempty"`
-	API       string `json:"api,omitempty"`
-	Note      string `json:"note,omitempty"`
-	Ops       int    `json:"operations"`
+	ID        string   `json:"id"`
+	Title     string   `json:"title"`
+	Version   string   `json:"version"`
+	URL       string   `json:"url"`
+	DocURLs   []string `json:"doc_urls,omitempty"`
+	Kind      string   `json:"kind"` // swaggerhub | portal | direct | vista | oidc
+	SHA256    string   `json:"sha256"`
+	Class     string   `json:"class"` // production | variant | internal | empty | reference | excluded | identity
+	VariantOf string   `json:"variant_of,omitempty"`
+	API       string   `json:"api,omitempty"`
+	Family    string   `json:"family,omitempty"`
+	Product   string   `json:"product,omitempty"`
+	Note      string   `json:"note,omitempty"`
+	Ops       int      `json:"operations"`
 }
+
+// API kinds.
+const (
+	KindConnect   = "connect"   // executable reads against documented Trimble Connect hosts
+	KindReference = "reference" // documented and plannable, never executed by the bridge
+)
 
 type API struct {
 	ID       string                       `json:"id"`
+	Kind     string                       `json:"kind"`
 	Title    string                       `json:"title"`
+	Family   string                       `json:"family"`
+	Product  string                       `json:"product"`
 	Source   string                       `json:"source"`
-	Status   string                       `json:"status"` // ga | preview | beta
+	Sources  []string                     `json:"sources,omitempty"`
+	Status   string                       `json:"status"` // ga | preview | beta | reference
 	DocURL   string                       `json:"doc_url"`
-	Hosts    map[string]map[string]string `json:"hosts"` // environment -> region -> base URL
-	Regions  []string                     `json:"regions"`
+	Hosts    map[string]map[string]string `json:"hosts,omitempty"` // environment -> region -> base URL (connect only)
+	Regions  []string                     `json:"regions,omitempty"`
+	Servers  []string                     `json:"servers,omitempty"` // documented server URLs, verbatim (reference only)
 	Security []string                     `json:"security"`
+	Auth     string                       `json:"auth,omitempty"`
+	Access   string                       `json:"access,omitempty"`
+	Requires string                       `json:"requires,omitempty"`
+}
+
+// Service is a Trimble Connect regional service without a published
+// definition.
+type Service struct {
+	Name string `json:"name"`
+	Note string `json:"note"`
 }
 
 type Param struct {

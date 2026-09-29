@@ -359,8 +359,8 @@ var mdLink = regexp.MustCompile(`\]\(([^)\s]+)\)`)
 
 // Every Markdown document must be listed in docs/README.md (generated
 // per-API endpoint pages are listed by docs/trimble-products/endpoints/
-// README.md instead), and every relative link in every document must
-// resolve to an existing file.
+// README.md instead, and per-definition pages by their API page), and every
+// relative link in every document must resolve to an existing file.
 func TestDocsIndexAndLinks(t *testing.T) {
 	linked := func(doc string) map[string]bool {
 		out := map[string]bool{}
@@ -399,7 +399,16 @@ func TestDocsIndexAndLinks(t *testing.T) {
 		switch {
 		case p == index:
 		case filepath.Dir(p) == filepath.Dir(endpoints) && p != endpoints:
-			if !inEndpoints[p] {
+			// A large API's per-definition page (<api>--<definition>.md)
+			// is linked from its API page, which the index links.
+			parent := p
+			if i := strings.Index(filepath.Base(p), "--"); i > 0 {
+				parent = filepath.Join(filepath.Dir(p), filepath.Base(p)[:i]+".md")
+				if !linked(parent)[p] {
+					t.Errorf("%s is not linked from %s", rel, filepath.Base(parent))
+				}
+			}
+			if !inEndpoints[parent] {
 				t.Errorf("%s is not linked from the endpoint index", rel)
 			}
 		case !inIndex[p]:

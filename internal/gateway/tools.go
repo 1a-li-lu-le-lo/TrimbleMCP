@@ -28,6 +28,7 @@ const (
 var readOnly = mcp.ToolAnnotations{ReadOnlyHint: true, DestructiveHint: false, IdempotentHint: true, OpenWorldHint: true}
 
 const productProp = `"product": {"type": "string", "pattern": "^[a-z0-9_-]{1,64}$", "description": "Configured product identifier from trimble_get_capabilities, e.g. trimble-connect. Required; never assumed."}`
+const planProductProp = `"product": {"type": "string", "pattern": "^[a-z0-9_-]{1,64}$", "description": "Configured product identifier, e.g. trimble-connect. Required for Trimble Connect operations; omit it for reference operations, whose key names the product."}`
 const pageProps = `"page_size": {"type": "integer", "minimum": 1, "maximum": 100, "description": "Items per page (default 50)."},
     "page_token": {"type": "string", "maxLength": 512, "description": "Opaque next_page_token from a previous call."}`
 const idPattern = `"minLength": 1, "maxLength": 256, "pattern": "^[^\\s/\\\\?#%&=+;\"'<>{}|^` + "`" + `]+$"`
@@ -139,13 +140,18 @@ func (g *Gateway) buildTools() []*tool {
 			info: mcp.ToolInfo{
 				Name:  ToolAPIOperations,
 				Title: "Search the Trimble API catalogue",
-				Description: "Searches every operation in every official Trimble Connect API definition (Core, Model, Model Feature, Org, " +
-					"Property Set, Topics/BCF, Topics Exchange, Issues, Support, Drive, File Service), with its disposition: read " +
-					"(executable with trimble_api_read), plan (dry-run with trimble_api_plan), variant (non-production copy) or excluded " +
-					"(with the reason). Pass key to get one operation's full parameter list. No upstream call.",
+				Description: "Searches every operation in every published Trimble API definition: the Trimble Connect APIs (Core, Model, " +
+					"Model Feature, Org, Property Set, Topics/BCF, Topics Exchange, Issues, Support, Drive, File Service) and the other " +
+					"products with public definitions (Vista, ProjectSight, Unity Construct, Unity Maintain/Permit, Accubid Anywhere, " +
+					"Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, Trimble Maps Places, " +
+					"PTx FarmENGAGE). Each has a disposition: read (Trimble Connect, executable with trimble_api_read), plan (Trimble " +
+					"Connect change, dry-run with trimble_api_plan), reference (another product: documented and plannable, never " +
+					"called), variant (same call as covered_by) or excluded (with the reason). Pass key for one operation's full " +
+					"parameters. No upstream call.",
 				InputSchema: schema(`{"type": "object", "additionalProperties": false, "properties": {
-    "api": {"type": "string", "maxLength": 32, "description": "Catalogue API id, e.g. core, model, topics, pset, org, issues."},
-    "disposition": {"type": "string", "enum": ["read", "plan", "variant", "excluded"]},
+    "api": {"type": "string", "maxLength": 40, "description": "Catalogue API id, e.g. core, topics, vista, projectsight, unity-construct. Omit to list the APIs."},
+    "family": {"type": "string", "maxLength": 32, "description": "API family: connect, construction, geospatial, transportation, maps, agriculture."},
+    "disposition": {"type": "string", "enum": ["read", "plan", "reference", "variant", "excluded"]},
     "query": {"type": "string", "maxLength": 200, "description": "Words to match in key, summary, operationId or tags."},
     "key": {"type": "string", "maxLength": 512, "description": "Exact operation key; returns full parameters."},
     ` + pageProps + `}}`),
@@ -179,12 +185,13 @@ func (g *Gateway) buildTools() []*tool {
 			info: mcp.ToolInfo{
 				Name:  ToolAPIPlan,
 				Title: "Plan a Trimble API change (dry run)",
-				Description: "Validates a catalogued production change (POST, PUT, PATCH or DELETE) against the official definition and " +
-					"returns the exact request that would be sent, with the approval level it needs. Nothing is sent to Trimble; there is " +
-					"no execution path for changes in this release.",
-				InputSchema: schema(`{"type": "object", "additionalProperties": false, "required": ["product", "key", "reason"], "properties": {
-    ` + productProp + `,
-    "key": {"type": "string", "maxLength": 512},
+				Description: "Validates a catalogued Trimble Connect change (plan) or another product's operation (reference) against " +
+					"the official definition and returns the exact request, with the approval level it needs. Nothing is sent to any " +
+					"Trimble product; there is no execution path for changes or for other products in this release. Give product for " +
+					"Trimble Connect operations and omit it for reference operations.",
+				InputSchema: schema(`{"type": "object", "additionalProperties": false, "required": ["key", "reason"], "properties": {
+    ` + planProductProp + `,
+    "key": {"type": "string", "maxLength": 512, "description": "Operation key from trimble_api_operations (disposition plan or reference)."},
     "path_params": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 1024}},
     "query_params": {"type": "object", "additionalProperties": {"type": ["string", "number", "boolean", "array"]}},
     "header_params": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 1024}},
@@ -193,8 +200,10 @@ func (g *Gateway) buildTools() []*tool {
 				OutputSchema: envelopeSchema,
 				Annotations:  mcp.ToolAnnotations{Title: "Plan a Trimble API change (dry run)", ReadOnlyHint: true, IdempotentHint: true},
 			},
-			scope: authz.ScopeAPIPlan, capability: trimble.CapAPIPlan,
-			run: g.apiPlan,
+			// No adapter capability: reference plans need no configured
+			// product, and Trimble Connect plans fail closed without one.
+			scope: authz.ScopeAPIPlan,
+			run:   g.apiPlan,
 		},
 	}
 }

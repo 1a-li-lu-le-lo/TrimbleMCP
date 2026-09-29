@@ -29,8 +29,8 @@ func (a *Adapter) CatalogBase(api string) (string, error) {
 		return b, nil
 	}
 	ap, ok := catalog.APIByID(api)
-	if !ok {
-		return "", errs.Newf(errs.UnsupportedCapability, "unknown Trimble Connect API %q", api)
+	if !ok || ap.Kind != catalog.KindConnect {
+		return "", errs.Newf(errs.UnsupportedCapability, "%q is not a Trimble Connect API", api)
 	}
 	env := a.catalogEnv()
 	if b, ok := ap.BaseURL(env, string(a.cfg.Region)); ok {

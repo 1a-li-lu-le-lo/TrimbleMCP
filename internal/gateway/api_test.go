@@ -195,3 +195,84 @@ func TestAPIPlanNeverSends(t *testing.T) {
 func lookupKey(k string) (string, bool) {
 	return k, slices.Contains(catalogKeys(), k)
 }
+
+func TestAPIOperationsCoversOtherProducts(t *testing.T) {
+	f := setupAPI(t, func(http.ResponseWriter, *http.Request) {})
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIOperations, `{"family":"construction","disposition":"reference","page_size":3}`)
+	if env.Status != "ok" || *env.Pagination.Total < 1000 {
+		t.Fatalf("%+v %+v", env.Error, env.Pagination)
+	}
+	b, _ := json.Marshal(env.Result)
+	if !strings.Contains(string(b), `"kind":"reference"`) || strings.Contains(string(b), `"kind":"connect"`) {
+		t.Fatalf("API list not filtered to the family: %s", b)
+	}
+	env = invoke(t, f.g, apiPrincipal(), ToolAPIOperations, `{"key":"civil-site-management:GET /projects/{id}"}`)
+	b, _ = json.Marshal(env.Result)
+	if !strings.Contains(string(b), `"disposition":"reference"`) || !strings.Contains(string(b), `"requires"`) {
+		t.Fatalf("%s", b)
+	}
+	for name, args := range map[string]string{
+		"unknown family": `{"family":"space"}`,
+		"unknown api":    `{"api":"nope"}`,
+	} {
+		if env := invoke(t, f.g, apiPrincipal(), ToolAPIOperations, args); env.Error == nil || env.Error.Code != errs.Validation {
+			t.Errorf("%s: %+v", name, env.Error)
+		}
+	}
+}
+
+func TestReferenceOperationsAreNeverCalled(t *testing.T) {
+	f := setupAPI(t, func(http.ResponseWriter, *http.Request) {})
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIRead, `{"product":"trimble-connect","key":"civil-site-management:GET /projects/{id}","path_params":{"id":"p1"}}`)
+	if env.Error == nil || env.Error.Code != errs.UnsupportedCapability || !strings.Contains(env.Error.Message, "never calls") {
+		t.Fatalf("read of a reference operation: %+v", env.Error)
+	}
+	env = invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"key":"civil-site-management:GET /accounts/{accountId}/devices","path_params":{"accountId":"a1"},"query_params":{"pageSize":10},"reason":"inventory"}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+	b, _ := json.Marshal(env.Result)
+	s := string(b)
+	for _, want := range []string{`"executed":false`, `"path":"/accounts/a1/devices?pageSize=10"`, `"documented_servers":["https://cloud.api.trimble.com/site-management/v1"]`, `"approval_level":"L1"`, `"requires"`} {
+		if !strings.Contains(s, want) {
+			t.Errorf("plan lacks %s: %s", want, s)
+		}
+	}
+	for name, c := range map[string]struct {
+		args string
+		code errs.Code
+	}{
+		"product given":         {`{"product":"trimble-connect","key":"civil-site-management:GET /projects/{id}","path_params":{"id":"p1"},"reason":"x"}`, errs.Validation},
+		"undocumented query":    {`{"key":"civil-site-management:GET /projects/{id}","path_params":{"id":"p1"},"query_params":{"evil":1},"reason":"x"}`, errs.Validation},
+		"safety excluded":       {`{"key":"ptx-farmengage:PUT /prescriptions/{orgId}/rx/{rxId}/vehicletarget/{vehicleId}","path_params":{"orgId":"o","rxId":"r","vehicleId":"v"},"reason":"x"}`, errs.PolicyDenied},
+		"connect needs product": {`{"key":"core:DELETE /projects/{projectId}","path_params":{"projectId":"p1"},"reason":"x"}`, errs.Validation},
+	} {
+		if env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, c.args); env.Error == nil || env.Error.Code != c.code {
+			t.Errorf("%s: %+v", name, env.Error)
+		}
+	}
+	p := apiPrincipal()
+	p.Projects = []domain.ProjectID{"p1"}
+	if env := invoke(t, f.g, p, ToolAPIPlan, `{"key":"civil-site-management:GET /projects/{id}","path_params":{"id":"p1"},"reason":"x"}`); env.Error == nil || env.Error.Code != errs.PolicyDenied {
+		t.Errorf("project-restricted caller planned another product's operation: %+v", env.Error)
+	}
+	if f.calls.Load() != 0 {
+		t.Fatal("a reference operation reached upstream")
+	}
+}
+
+func TestPlanToolNeedsNoConfiguredProduct(t *testing.T) {
+	g, _, _ := setup(t) // mock adapter only
+	p := principal(authz.ScopeCapabilitiesRead, authz.ScopeAPIPlan)
+	if names := toolNames(g, p); !slices.Contains(names, ToolAPIPlan) || slices.Contains(names, ToolAPIRead) {
+		t.Fatalf("got %v", names)
+	}
+	env := invoke(t, g, p, ToolAPIPlan, `{"key":"vista:GET /direct/actions/{action_key_value}","path_params":{"action_key_value":"k"},"reason":"x"}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+	env = invoke(t, g, p, ToolAPIPlan, `{"product":"mock","key":"core:DELETE /projects/{projectId}","path_params":{"projectId":"p1"},"reason":"x"}`)
+	if env.Error == nil || env.Error.Code != errs.UnsupportedCapability {
+		t.Fatalf("a Trimble Connect plan without the Connect adapter must fail closed: %+v", env.Error)
+	}
+}

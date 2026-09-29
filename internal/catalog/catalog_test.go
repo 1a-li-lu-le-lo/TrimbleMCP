@@ -25,43 +25,70 @@ func TestEveryOperationHasADisposition(t *testing.T) {
 		}
 		seen[o.Key] = true
 		perSource[o.Source]++
-		if !slices.Contains([]string{Read, Plan, Variant, Excluded}, o.Disposition) {
+		if !slices.Contains(Dispositions, o.Disposition) {
 			t.Errorf("%s: invalid disposition %q", o.Key, o.Disposition)
 		}
 		if strings.TrimSpace(o.Reason) == "" {
 			t.Errorf("%s: no reason", o.Key)
 		}
+		api, hasAPI := APIByID(o.API)
 		switch o.Disposition {
 		case Read:
 			if o.Method != "GET" {
 				t.Errorf("%s: only GET may be an executable read", o.Key)
 			}
+			if !hasAPI || api.Kind != KindConnect {
+				t.Errorf("%s: executable reads must belong to a Trimble Connect API", o.Key)
+			}
 		case Plan:
 			if o.Method == "GET" || o.Method == "HEAD" {
 				t.Errorf("%s: reads must not be plan-only", o.Key)
 			}
+			if !hasAPI || api.Kind != KindConnect {
+				t.Errorf("%s: plan operations must belong to a Trimble Connect API", o.Key)
+			}
+		case Reference:
+			if !hasAPI || api.Kind != KindReference {
+				t.Errorf("%s: reference operations must belong to a reference API", o.Key)
+			}
 		case Variant:
 			p, ok := Lookup(o.CoveredBy)
-			if !ok || p.Method != o.Method || p.Path != o.Path || p.Disposition == Variant {
-				t.Errorf("%s: covered_by %q is not the matching production operation", o.Key, o.CoveredBy)
+			if !ok || p.Method != o.Method || p.Path != o.Path || p.Disposition == Variant || p.API != o.API {
+				t.Errorf("%s: covered_by %q is not the matching operation", o.Key, o.CoveredBy)
 			}
+		}
+		if hasAPI && api.Kind == KindReference && o.Disposition != Reference && o.Disposition != Variant &&
+			!(o.Disposition == Excluded && strings.HasPrefix(o.Reason, "safety: ")) {
+			t.Errorf("%s: an operation of reference API %s must be reference, variant or safety-excluded", o.Key, api.ID)
 		}
 	}
 	for _, s := range c.Sources {
 		if perSource[s.ID] != s.Ops {
 			t.Errorf("source %s declares %d operations, catalogue has %d", s.ID, s.Ops, perSource[s.ID])
 		}
-		if !slices.Contains([]string{"production", "variant", "internal", "empty"}, s.Class) {
+		if !slices.Contains([]string{"production", "variant", "internal", "empty", "reference", "excluded", "identity"}, s.Class) {
 			t.Errorf("source %s: class %q", s.ID, s.Class)
 		}
-		if s.SHA256 == "" || !strings.HasPrefix(s.URL, "https://api.swaggerhub.com/apis/Trimble-Connect/") {
+		if !slices.Contains([]string{"swaggerhub", "portal", "direct", "vista", "oidc"}, s.Kind) {
+			t.Errorf("source %s: kind %q", s.ID, s.Kind)
+		}
+		if s.SHA256 == "" || !strings.HasPrefix(s.URL, "https://") {
 			t.Errorf("source %s: provenance missing", s.ID)
+		}
+		if s.Kind == "swaggerhub" && !strings.HasPrefix(s.URL, "https://api.swaggerhub.com/apis/Trimble-Connect/") {
+			t.Errorf("source %s: SwaggerHub source outside the Trimble-Connect organisation", s.ID)
+		}
+		if (s.Class == "excluded" || s.Class == "internal" || s.Class == "empty") && strings.TrimSpace(s.Note) == "" {
+			t.Errorf("source %s: excluded without a reason", s.ID)
 		}
 	}
 }
 
 func TestProductionHostsAreDocumentedTrimbleHTTPS(t *testing.T) {
 	for _, a := range Must().APIs {
+		if a.Kind != KindConnect {
+			continue
+		}
 		if len(a.Hosts["production"]) == 0 {
 			t.Errorf("%s: no production host", a.ID)
 		}
@@ -72,6 +99,80 @@ func TestProductionHostsAreDocumentedTrimbleHTTPS(t *testing.T) {
 					t.Errorf("%s %s/%s: %q is not an https trimble.com host", a.ID, env, region, h)
 				}
 			}
+		}
+	}
+}
+
+// Reference APIs are never executable: no hosts, and they state what a
+// deployment would need.
+func TestReferenceAPIsAreNotExecutable(t *testing.T) {
+	n := 0
+	for _, a := range Must().APIs {
+		if a.Family == "" || a.Product == "" {
+			t.Errorf("%s: family and product are required", a.ID)
+		}
+		switch a.Kind {
+		case KindConnect:
+		case KindReference:
+			n++
+			if len(a.Hosts) > 0 || len(a.Regions) > 0 {
+				t.Errorf("%s: reference API must not carry executable hosts", a.ID)
+			}
+			if _, ok := a.BaseURL("production", "us"); ok {
+				t.Errorf("%s: BaseURL must refuse reference APIs", a.ID)
+			}
+			if a.Auth == "" || a.Access == "" || a.Requires == "" {
+				t.Errorf("%s: auth, access and requires must be documented", a.ID)
+			}
+		default:
+			t.Errorf("%s: kind %q", a.ID, a.Kind)
+		}
+	}
+	if n == 0 {
+		t.Fatal("no reference APIs: the non-Connect definitions were not catalogued")
+	}
+}
+
+// Trimble Identity endpoints carry credentials: all are catalogued, none is
+// callable.
+func TestIdentityEndpointsExcluded(t *testing.T) {
+	var n int
+	for _, o := range Must().Operations {
+		if strings.HasPrefix(o.Key, "trimble-identity") {
+			n++
+			if o.Disposition != Excluded {
+				t.Errorf("%s must be excluded", o.Key)
+			}
+		}
+	}
+	if _, ok := Lookup("trimble-identity:POST /oauth/token"); !ok || n < 5 {
+		t.Errorf("identity endpoints missing (%d found)", n)
+	}
+}
+
+func TestServicesWithoutDefinitionsExplained(t *testing.T) {
+	c := Must()
+	if len(c.Undefined) == 0 {
+		t.Fatal("expected the /regions services without definitions to be recorded")
+	}
+	for _, s := range c.Undefined {
+		if s.Name == "" || s.Note == "" {
+			t.Errorf("service %+v lacks a note", s)
+		}
+	}
+}
+
+// Operations that could reach machinery, vehicles or field positioning are
+// never plannable.
+func TestSafetyExclusions(t *testing.T) {
+	for _, k := range []string{
+		"ptx-farmengage:PUT /prescriptions/{orgId}/rx/{rxId}/vehicletarget/{vehicleId}",
+		"ptx-farmengage:PUT /operations/{orgId}/workorders/{workOrderId}/vehicletarget/{vehicleId}",
+		"mobile-manager:PUT /api/v1/correctionSource/",
+	} {
+		o, ok := Lookup(k)
+		if !ok || o.Disposition != Excluded || !strings.HasPrefix(o.Reason, "safety: ") {
+			t.Errorf("%s must be safety-excluded, got %+v", k, o)
 		}
 	}
 }
@@ -114,8 +215,21 @@ func TestGeneratedDocsListEveryOperation(t *testing.T) {
 			t.Fatal(err)
 		}
 		doc := string(b)
+		// Large APIs are split into one page per definition.
+		subs, _ := filepath.Glob(filepath.Join(dir, a.ID+"--*.md"))
+		for _, f := range subs {
+			sb, err := os.ReadFile(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+			doc += string(sb)
+		}
+		srcs := map[string]bool{a.Source: true}
+		for _, s := range a.Sources {
+			srcs[s] = true
+		}
 		for _, o := range c.Operations {
-			if o.Source == a.Source && !strings.Contains(doc, "| `"+o.Method+"` | `"+o.Path+"` |") {
+			if srcs[o.Source] && !strings.Contains(doc, "| `"+o.Method+"` | `"+o.Path+"` |") {
 				t.Errorf("%s.md does not list %s", a.ID, o.Key)
 			}
 		}
@@ -125,13 +239,13 @@ func TestGeneratedDocsListEveryOperation(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, s := range c.Sources {
-		if s.Class != "production" && !strings.Contains(string(nb), "## "+s.ID+" ") {
+		if s.Class != "production" && s.Class != "reference" && !strings.Contains(string(nb), "## "+s.ID+" ") {
 			t.Errorf("non-production.md does not account for %s", s.ID)
 		}
 	}
 }
 
-var keyShape = regexp.MustCompile(`^[A-Za-z0-9@._-]+:(GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS) /`)
+var keyShape = regexp.MustCompile(`^[A-Za-z0-9@._/-]+:(GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE) /`)
 
 func TestKeyShape(t *testing.T) {
 	for _, o := range Must().Operations {

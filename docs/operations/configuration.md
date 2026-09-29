@@ -7,7 +7,7 @@ All configuration comes from environment variables. Secrets are passed only as p
 | `TRIMBLE_MCP_TENANT` | `local` | Tenant this process serves |
 | `TRIMBLE_MCP_AUDIT_LOG` | `trimble-mcp-audit.jsonl` | Append-only audit file (created 0600) |
 | `TRIMBLE_MCP_LOCAL_SUBJECT` | `local-operator` | stdio and CLI principal |
-| `TRIMBLE_MCP_LOCAL_SCOPES` | capabilities, projects, files and API read | Comma-separated; write and delete are rejected |
+| `TRIMBLE_MCP_LOCAL_SCOPES` | capabilities, projects, files, API read and API plan | Comma-separated; write and delete are rejected |
 | `TRIMBLE_MCP_LOCAL_PROJECTS` | (all) | Comma-separated project grant |
 | `TRIMBLE_MCP_ENABLE_MOCK` | `true` | Simulated adapter |
 | `TRIMBLE_CONNECT_ENABLED` | `false` | Trimble Connect adapter; `false` is the kill switch |
@@ -43,7 +43,7 @@ On Unix-like systems the bridge refuses secret files (token store, key, tokens f
 | `trimble:projects:read` | Project tools and `trimble_build_desktop_link` |
 | `trimble:files:read` | Folder and file metadata tools |
 | `trimble:api:read` | `trimble_api_read`: every catalogued production read of the Trimble Connect APIs |
-| `trimble:api:plan` | `trimble_api_plan`: dry-run plans for catalogued changes; not a default scope |
+| `trimble:api:plan` | `trimble_api_plan`: dry-run plans for catalogued Trimble Connect changes and for other products' reference operations. Nothing is sent. A default local scope; grant it to remote callers explicitly |
 | `trimble:desktop:launch` | `trimble_open_in_desktop`; local operator only |
 | `trimble:audit:read` | Reserved |
 | `trimble:files:write`, `trimble:files:delete` | Reserved; rejected in this release |

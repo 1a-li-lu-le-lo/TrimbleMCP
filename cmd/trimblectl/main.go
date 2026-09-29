@@ -23,6 +23,7 @@ import (
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/app"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/catalog"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/config"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/fsperm"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/gateway"
@@ -40,9 +41,9 @@ Usage:
   trimblectl desktop link    --product trimble-connect-desktop --project ID [--view V] [--panel P]
   trimblectl desktop open    --product trimble-connect-desktop --project ID [--view V] [--panel P] --reason R [--launch]
                              (Trimble Connect for Windows command line; dry run unless --launch)
-  trimblectl api operations  [--api A] [--disposition read|plan|variant|excluded] [--query Q] [--key K] [--page-size N] [--page-token T]
+  trimblectl api operations  [--api A] [--family F] [--disposition read|plan|reference|variant|excluded] [--query Q] [--key K] [--page-size N] [--page-token T]
   trimblectl api read        --product trimble-connect --key K [--path name=value]... [--query name=value]... [--header name=value]...
-  trimblectl api plan        --product trimble-connect --key K [--path ...] [--query ...] [--body-file F] --reason R   (dry run; never sent)
+  trimblectl api plan        [--product trimble-connect] --key K [--path ...] [--query ...] [--body-file F] --reason R   (dry run; never sent; no product for reference keys)
   trimblectl auth login      (Trimble Identity authorization code + PKCE, loopback redirect)
   trimblectl auth logout     (revokes the refresh token and deletes the local store)
   trimblectl audit verify    --file PATH
@@ -84,7 +85,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	case "desktop open":
 		return tool(stdout, stderr, gateway.ToolOpenDesktop, rest, []string{"product", "project", "view", "panel", "reason", "launch"})
 	case "api operations":
-		return tool(stdout, stderr, gateway.ToolAPIOperations, rest, []string{"api", "disposition", "query", "key", "page-size", "page-token"})
+		return tool(stdout, stderr, gateway.ToolAPIOperations, rest, []string{"api", "family", "disposition", "query", "key", "page-size", "page-token"})
 	case "api read":
 		return apiCall(stdout, stderr, gateway.ToolAPIRead, rest)
 	case "api plan":
@@ -119,7 +120,7 @@ var flagToArg = map[string]string{
 	"product": "product", "project": "project_id", "folder": "folder_id", "file": "file_id",
 	"page-size": "page_size", "page-token": "page_token",
 	"view": "view", "panel": "panel", "reason": "reason",
-	"api": "api", "disposition": "disposition", "query": "query", "key": "key",
+	"api": "api", "family": "family", "disposition": "disposition", "query": "query", "key": "key",
 }
 
 func tool(stdout, stderr io.Writer, name string, args []string, allowed []string) int {
@@ -203,7 +204,7 @@ func (p pairs) Set(v string) error {
 func apiCall(stdout, stderr io.Writer, name string, args []string) int {
 	fs := flag.NewFlagSet(name, flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	product := fs.String("product", "trimble-connect", "product")
+	product := fs.String("product", "", "configured product (default trimble-connect; omitted for reference keys)")
 	key := fs.String("key", "", "operation key from `trimblectl api operations`")
 	reason := fs.String("reason", "", "why (plan only)")
 	bodyFile := fs.String("body-file", "", "JSON request body file (plan only)")
@@ -214,7 +215,15 @@ func apiCall(stdout, stderr io.Writer, name string, args []string) int {
 	if err := fs.Parse(args); err != nil || fs.NArg() > 0 || *key == "" {
 		return 2
 	}
-	in := map[string]any{"product": *product, "key": *key}
+	in := map[string]any{"key": *key}
+	switch op, ok := catalog.Lookup(*key); {
+	case *product != "":
+		in["product"] = *product
+	case ok && op.Disposition == catalog.Reference:
+		// Reference operations name their product in the key.
+	default:
+		in["product"] = "trimble-connect"
+	}
 	if len(path) > 0 {
 		in["path_params"] = map[string]string(path)
 	}

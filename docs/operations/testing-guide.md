@@ -161,7 +161,7 @@ For Docker: `docker build -f deploy/docker/Dockerfile -t trimble-mcp .` and moun
 ## Refreshing the API catalogue
 
 ```sh
-make catalog      # downloads all official definitions, regenerates internal/catalog/catalog.json and docs/trimble-products/endpoints/
+make catalog      # downloads every definition (needs Python 3 with PyYAML), regenerates internal/catalog/catalog.json.gz and docs/trimble-products/endpoints/
 go test ./internal/catalog ./internal/gateway ./internal/skilltest
 git diff --stat
 ```
