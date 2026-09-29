@@ -18,6 +18,12 @@ A tool is listed only when all of these hold:
 | `trimble_build_desktop_link` | `trimble:projects:read` | `build_desktop_link` | `product`, `project_id`; optional `view`, `panel` | Trimble Connect for Windows command-line link; no side effects |
 | `trimble_open_in_desktop` | `trimble:desktop:launch` | `launch_desktop` | `product`, `project_id`, `reason`; optional `view`, `panel`, `dry_run` (default true) | Local operator on Windows only; opt-in; the only tool with `readOnlyHint: false` (still `destructiveHint: false`); both desktop tools set `openWorldHint: true` because project verification calls the Connect API |
 
+| `trimble_api_operations` | `trimble:capabilities:read` | none (catalogue) | optional `api`, `disposition`, `query`, `key` | Searches all 1,747 catalogued operations; no upstream call |
+| `trimble_api_read` | `trimble:api:read` | `api_read` | `product`, `key`; `path_params`, `query_params`, `header_params` | Any catalogued production read; see ADR-0007 |
+| `trimble_api_plan` | `trimble:api:plan` | `api_plan` | `product`, `key`, `reason`; parameters and `body` | Dry-run plan for any catalogued production change; never sent |
+
+Every Trimble Connect API operation is accounted for in [../trimble-products/endpoints/README.md](../trimble-products/endpoints/README.md).
+
 The brief's other tools — upload, download, create folder or version, views, geospatial, fleet, jobs, and audit lookup — are **not exposed**. They need either verified upstream support or the approval framework (ADR-0004).
 
 ## Output envelope

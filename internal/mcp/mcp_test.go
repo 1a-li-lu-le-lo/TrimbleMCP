@@ -97,7 +97,7 @@ func TestStdioLegacyLifecycle(t *testing.T) {
 		t.Fatalf("initialize: %v", init)
 	}
 	tools := res["2"]["result"].(map[string]any)["tools"].([]any)
-	if len(tools) != 5 {
+	if len(tools) != 6 { // 5 typed tools + catalogue search
 		t.Fatalf("tools: %d", len(tools))
 	}
 	for _, tl := range tools {

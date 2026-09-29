@@ -6,6 +6,12 @@ Last verified: 2026-09-23. Confidence labels:
 - **S:** seen only in a search excerpt of an official page, or in a third-party page.
 - **Unknown:** no evidence.
 
+## Coverage at a glance
+
+- **Trimble Connect (all 11 production APIs):** every operation in all 34 definitions Trimble publishes on SwaggerHub is catalogued with a disposition. The per-operation list is in [endpoints/README.md](endpoints/README.md): 254 executable reads, 223 dry-run plans, 919 non-production variants, and 351 exclusions with reasons.
+- **Trimble Connect command line:** every documented form is covered or excluded; see [cli-coverage.md](cli-coverage.md).
+- **Other Trimble product families:** classified below. Endpoint-level coverage depends on a public machine-readable definition; see "Other Trimble products".
+
 ## Adopted API families
 
 ### TC-CORE: Trimble Connect REST API (Core)
@@ -109,7 +115,8 @@ Classes:
 | Product | Class | Evidence | Decision |
 |---|---|---|---|
 | Trimble Connect Core REST | A/C (public docs, licensed credentials) | F | **Adopted (read-only)** |
-| Trimble Connect Model / Topics / Organizer / Property Set APIs | A/C | F (listed on portal) | Deferred |
+| Trimble Connect Model, Model Feature, Org (Account/Organizer), Property Set, Topics (BCF), Topics Exchange, Issues, Support, Drive (beta), File Service (preview) | A/C | F (official SwaggerHub definitions) | **Adopted via the catalogue** (reads executable, changes planned); see [endpoints/README.md](endpoints/README.md) |
+| Trimble Connect internal API (`tcps.internal`) | G | F | Excluded: Trimble-internal, not offered to integrators |
 | Trimble Connect Workspace API | D (browser JS) | S | Not applicable to a server |
 | Trimble Connect for Windows command line (`trimbleconnect:`) | D/F (documented local launcher) | F | **Adopted (link builder plus opt-in local launch)** |
 | Connect for Windows installer and MSI command lines | G for this bridge (host changes) | F | Never |

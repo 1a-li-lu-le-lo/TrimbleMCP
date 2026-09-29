@@ -15,6 +15,7 @@ Use configured Trimble APIs safely through the Trimble MCP Bridge while preservi
 
 - The user asks to inspect an authorized Trimble organization or project, for example "list the files in our Trimble Connect project".
 - The user needs a folder, file, or project-metadata workflow supported by a configured adapter.
+- The user needs any other Trimble Connect API operation (models, property sets, topics/BCF, issues, organizer, drive) through the catalogue tools.
 - The user wants to open a project in Trimble Connect for Windows at a view or panel, or wants that Trimble Connect for Windows link.
 - The user wants to prepare an operation plan for a Trimble change (plans only; this release executes no changes).
 - The user asks to troubleshoot or audit the configured Trimble integration.
@@ -49,8 +50,9 @@ Never request, accept, or repeat passwords, tokens, API keys, or client secrets 
 3. Resolve project names to IDs with `trimble_list_projects`. Never guess or construct IDs.
 4. Resolve folders and files with `trimble_list_folder_items`, starting from the project's `root_folder_id`.
 5. Read metadata with `trimble_get_file_metadata` before discussing a specific file.
-6. For a Trimble Connect for Windows link, use `trimble_build_desktop_link`. Open the application with `trimble_open_in_desktop` only when the user asks (see `references/desktop.md`).
-7. Identify units, CRS (if any), versions, and data labels in each result.
+6. For operations without a typed tool, search `trimble_api_operations`, read with `trimble_api_read`, and plan changes with `trimble_api_plan` (see `references/api-catalog.md`).
+7. For a Trimble Connect for Windows link, use `trimble_build_desktop_link`. Open the application with `trimble_open_in_desktop` only when the user asks (see `references/desktop.md`).
+8. Identify units, CRS (if any), versions, and data labels in each result.
 
 ## Workflow
 
@@ -147,6 +149,7 @@ Read only the file relevant to the current task:
 - `references/product-selection.md` — which Trimble products are configured, and how to tell them apart.
 - `references/authentication.md` — how access is configured and troubleshot without handling secrets.
 - `references/files.md` — projects, folders, files, pagination, and IDOR rules.
+- `references/api-catalog.md` — every Trimble Connect API operation: discover, read, or plan.
 - `references/desktop.md` — Trimble Connect for Windows command line (`trimbleconnect:` links).
 - `references/geospatial.md` — CRS, axis order, and unit rules.
 - `references/safety.md` — prohibited actions and output labels.

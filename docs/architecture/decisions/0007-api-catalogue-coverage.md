@@ -1,0 +1,26 @@
+# ADR-0007: Catalogue-driven coverage of every Trimble Connect API operation
+
+- **Status:** Accepted, 2026-09-29.
+- **Context:** The owner asked that the MCP cover all of Trimble's APIs and leave no endpoint unaccounted for. Trimble publishes 34 API definitions (1,747 operations) in its official SwaggerHub organisation. They span 11 production APIs and many staging, integration, QA, test, draft and internal copies. Hand-writing typed tools for roughly 480 production operations is not maintainable. The original brief also forbids a generic, arbitrary Trimble proxy.
+- **Decision:**
+  - `cmd/trimble-catalog` turns every definition into a pinned catalogue (`internal/catalog/catalog.json`, embedded). It records each source's URL and SHA-256, and gives every operation exactly one disposition:
+    - `read`: production GET;
+    - `plan`: production POST, PUT, PATCH or DELETE;
+    - `variant`: the same method and path as a production operation;
+    - `excluded`: not callable, with the reason recorded.
+  - A new definition that is not explicitly classified fails the build. Production hosts come from each definition's `servers` block and are cross-checked against the official `/regions` document.
+  - `trimble_api_read` executes only catalogued production reads, and never an arbitrary URL or method:
+    - only against the documented regional host;
+    - with every path, query and header parameter validated against the definition;
+    - with project grants enforced;
+    - with signed URLs and credentials redacted from responses.
+  - `trimble_api_plan` validates catalogued changes and returns the exact request as a dry-run plan with its approval level. Nothing is executed until the approval framework (ADR-0004) exists.
+  - `trimble_api_operations` searches the whole catalogue, including variant and excluded operations and their reasons.
+  - Two production reads are excluded: presigned download URLs and share-token resolution. Trimble-internal APIs and non-production-only operations are excluded.
+  - The typed tools remain the preferred path for their operations.
+- **Why this is not an arbitrary proxy:** the operation set is fixed at build time from official definitions. Hosts are fixed per API and region, parameters are allowlisted and typed, and methods are limited to GET for execution.
+- **Consequences:**
+  - `internal/catalog` tests enforce that every operation has a disposition, that variants map to production operations, and that no mutation is executable.
+  - The generated docs in `docs/trimble-products/endpoints/` list every operation.
+  - Refreshing is `make catalog`, which needs network access.
+  - Assumption A-10: the Trimble Identity token used for the Core API is accepted by the other Connect APIs. Their definitions declare bearer or OAuth security but do not state the audience.

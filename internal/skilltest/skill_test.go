@@ -18,6 +18,7 @@ import (
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/gateway"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/connect"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/desktop"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/mock"
 )
@@ -198,6 +199,11 @@ func liveToolNames(t *testing.T) []string {
 	reg.Register("t", mock.New())
 	reg.Register("t", desktop.New(desktop.Config{LaunchEnabled: true, GOOS: "windows",
 		Open: func(context.Context, string) error { return nil }}))
+	cn, err := connect.New(connect.Config{Environment: connect.Stage, Region: "us", Tokens: noTokens{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	reg.Register("t", cn)
 	g, err := gateway.New(gateway.Options{Registry: reg, Audit: &audit.Memory{}})
 	if err != nil {
 		t.Fatal(err)
@@ -315,3 +321,40 @@ func TestSafetyAndGeoEvalsParse(t *testing.T) {
 		}
 	}
 }
+
+// The command-line coverage page must account for every documented view and
+// panel of the Trimble Connect for Windows command line and every trimblectl
+// command.
+func TestCLICoverageDocIsComplete(t *testing.T) {
+	doc := read(t, filepath.Join(root, "docs/trimble-products/cli-coverage.md"))
+	for _, v := range desktop.Views() {
+		for _, p := range desktop.Panels() {
+			link := "trimbleconnect:/projects/<id>?show=" + v + "," + p
+			if !strings.Contains(doc, link) {
+				t.Errorf("cli-coverage.md is missing %s", link)
+			}
+		}
+	}
+	usage := read(t, filepath.Join(root, "cmd/trimblectl/main.go"))
+	re := regexp.MustCompile(`(?m)^  trimblectl ([a-z]+(?: [a-z]+)?)`)
+	cmds := re.FindAllStringSubmatch(usage, -1)
+	if len(cmds) < 10 {
+		t.Fatalf("could not parse trimblectl usage (%d commands)", len(cmds))
+	}
+	for _, m := range cmds {
+		cmd := strings.Fields(m[1])
+		name := "trimblectl " + strings.Join(cmd, " ")
+		if !strings.Contains(doc, "`"+name+"`") {
+			t.Errorf("cli-coverage.md does not account for %s", name)
+		}
+	}
+	for _, n := range liveToolNames(t) {
+		if !strings.Contains(doc, "`"+n+"`") && n != "trimble_get_capabilities" {
+			t.Errorf("cli-coverage.md has no CLI command for tool %s", n)
+		}
+	}
+}
+
+type noTokens struct{}
+
+func (noTokens) Token(context.Context) (string, error) { return "", nil }

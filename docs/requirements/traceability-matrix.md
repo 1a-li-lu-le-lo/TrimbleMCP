@@ -20,6 +20,12 @@ Evidence refers to test names; `go test ./...` runs them all.
 | TRM-CLI-006 | Launch via documented ShellExecuteW, never a shell | `desktop/open_windows.go` | `GOOS=windows go vet` and build; manual check on Windows pending | Partial |
 | TRM-CLI-007 | Remote callers cannot hold `trimble:desktop:launch` | `cmd/trimble-mcp` tokens loading | code review | Done |
 | TRM-CLI-008 | CLI parity (`trimblectl desktop link/open`) | `cmd/trimblectl` | `scripts/smoke.sh` | Done |
+| TRM-API-007 | Every operation of every official Trimble Connect API definition has exactly one disposition (read, plan, variant, excluded) | `cmd/trimble-catalog`, `internal/catalog` | `TestEveryOperationHasADisposition`, `TestKeyShape` | Done |
+| TRM-API-008 | Any catalogued production read is executable, with parameter validation, project grants and redaction | `trimble_api_read` | `TestAPIReadExecutesWithValidationAndRedaction`, `TestAPIReadRejections`, `TestAPIReadEnforcesProjectGrant`, `TestAPIReadOtherAPIsAndScope` | Done |
+| TRM-API-009 | Any catalogued production change can be planned (dry run) and is never executed | `trimble_api_plan` | `TestAPIPlanNeverSends`, `TestNoMutationIsExecutable` | Done |
+| TRM-API-010 | Production hosts come from the definitions and are cross-checked against `/regions` | `cmd/trimble-catalog` `crossCheckRegions` | `TestProductionHostsAreDocumentedTrimbleHTTPS`; generation fails on mismatch | Done |
+| TRM-DOC-003 | Generated per-API endpoint references list every operation | `docs/trimble-products/endpoints` | `TestGeneratedDocsListEveryOperation` | Done |
+| TRM-CLI-009 | Every documented Trimble Connect command-line form and every trimblectl command is accounted for | `docs/trimble-products/cli-coverage.md` | `TestCLICoverageDocIsComplete` | Done |
 | TRM-API-001 | Use only documented Trimble Connect endpoints and fields | `trimble/connect` | `docs/trimble-products/trimble-connect.md`, contract tests | Done |
 | TRM-API-002 | Regional base URLs from the documented host list only | `connect.BaseURL` | `TestBaseURLOnlyDocumentedHosts`, `TestOverrideRequiresExplicitTestFlag` | Done |
 | TRM-API-003 | Retry per the Connect error table; never retry 401 | `connect.get`, `mapStatus` | `TestRetryOn429ThenSuccess`, `TestNoRetryOn401AndBodyStaysPrivate`, `TestRetriesExhaustedOn503` | Done |

@@ -40,6 +40,9 @@ Usage:
   trimblectl desktop link    --product trimble-connect-desktop --project ID [--view V] [--panel P]
   trimblectl desktop open    --product trimble-connect-desktop --project ID [--view V] [--panel P] --reason R [--launch]
                              (Trimble Connect for Windows command line; dry run unless --launch)
+  trimblectl api operations  [--api A] [--disposition read|plan|variant|excluded] [--query Q] [--key K] [--page-size N] [--page-token T]
+  trimblectl api read        --product trimble-connect --key K [--path name=value]... [--query name=value]... [--header name=value]...
+  trimblectl api plan        --product trimble-connect --key K [--path ...] [--query ...] [--body-file F] --reason R   (dry run; never sent)
   trimblectl auth login      (Trimble Identity authorization code + PKCE, loopback redirect)
   trimblectl auth logout     (revokes the refresh token and deletes the local store)
   trimblectl audit verify    --file PATH
@@ -80,6 +83,12 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return tool(stdout, stderr, gateway.ToolBuildDesktop, rest, []string{"product", "project", "view", "panel"})
 	case "desktop open":
 		return tool(stdout, stderr, gateway.ToolOpenDesktop, rest, []string{"product", "project", "view", "panel", "reason", "launch"})
+	case "api operations":
+		return tool(stdout, stderr, gateway.ToolAPIOperations, rest, []string{"api", "disposition", "query", "key", "page-size", "page-token"})
+	case "api read":
+		return apiCall(stdout, stderr, gateway.ToolAPIRead, rest)
+	case "api plan":
+		return apiCall(stdout, stderr, gateway.ToolAPIPlan, rest)
 	case "auth login":
 		return fail(stderr, authLogin())
 	case "auth logout":
@@ -110,6 +119,7 @@ var flagToArg = map[string]string{
 	"product": "product", "project": "project_id", "folder": "folder_id", "file": "file_id",
 	"page-size": "page_size", "page-token": "page_token",
 	"view": "view", "panel": "panel", "reason": "reason",
+	"api": "api", "disposition": "disposition", "query": "query", "key": "key",
 }
 
 func tool(stdout, stderr io.Writer, name string, args []string, allowed []string) int {
@@ -146,6 +156,12 @@ func tool(stdout, stderr io.Writer, name string, args []string, allowed []string
 		}
 		in[flagToArg[f]] = *v
 	}
+	return callTool(stdout, stderr, name, in)
+}
+
+// callTool runs one gateway tool as the local operator and prints the
+// structured result. Exit 1 when the tool reports an error.
+func callTool(stdout, stderr io.Writer, name string, in map[string]any) int {
 	cfg, err := config.Load()
 	if err != nil {
 		return fail(stderr, err)
@@ -168,6 +184,67 @@ func tool(stdout, stderr io.Writer, name string, args []string, allowed []string
 		return 1
 	}
 	return 0
+}
+
+// pairs collects repeatable name=value flags.
+type pairs map[string]string
+
+func (p pairs) String() string { return "" }
+func (p pairs) Set(v string) error {
+	k, val, ok := strings.Cut(v, "=")
+	if !ok || k == "" {
+		return errors.New("expected name=value")
+	}
+	p[k] = val
+	return nil
+}
+
+// apiCall implements `trimblectl api read|plan`.
+func apiCall(stdout, stderr io.Writer, name string, args []string) int {
+	fs := flag.NewFlagSet(name, flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	product := fs.String("product", "trimble-connect", "product")
+	key := fs.String("key", "", "operation key from `trimblectl api operations`")
+	reason := fs.String("reason", "", "why (plan only)")
+	bodyFile := fs.String("body-file", "", "JSON request body file (plan only)")
+	path, query, header := pairs{}, pairs{}, pairs{}
+	fs.Var(path, "path", "path parameter name=value (repeatable)")
+	fs.Var(query, "query", "query parameter name=value (repeatable)")
+	fs.Var(header, "header", "header parameter name=value (repeatable)")
+	if err := fs.Parse(args); err != nil || fs.NArg() > 0 || *key == "" {
+		return 2
+	}
+	in := map[string]any{"product": *product, "key": *key}
+	if len(path) > 0 {
+		in["path_params"] = map[string]string(path)
+	}
+	if len(query) > 0 {
+		q := map[string]any{}
+		for k, v := range query {
+			q[k] = v
+		}
+		in["query_params"] = q
+	}
+	if len(header) > 0 {
+		in["header_params"] = map[string]string(header)
+	}
+	if name == gateway.ToolAPIPlan {
+		in["reason"] = *reason
+		if *bodyFile != "" {
+			b, err := os.ReadFile(*bodyFile)
+			if err != nil {
+				return fail(stderr, err)
+			}
+			if !json.Valid(b) {
+				return fail(stderr, errors.New("body file is not valid JSON"))
+			}
+			in["body"] = json.RawMessage(b)
+		}
+	} else if *reason != "" || *bodyFile != "" {
+		fmt.Fprintln(stderr, "trimblectl: --reason and --body-file apply to `api plan` only")
+		return 2
+	}
+	return callTool(stdout, stderr, name, in)
 }
 
 func auditVerify(stdout, stderr io.Writer, args []string) int {

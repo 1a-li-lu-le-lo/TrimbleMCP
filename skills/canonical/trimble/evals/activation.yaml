@@ -21,6 +21,13 @@
     {"id": "pos-desktop-link", "prompt": "Give me the Trimble Connect for Windows command-line link for project rQR1yhTGj9I showing clashes in 3D.", "expect": "activate",
      "must": ["trimble_build_desktop_link", "trimbleconnect:/projects/"]},
 
+    {"id": "pos-bcf-topics", "prompt": "List the BCF topics in our Trimble Connect project Bridge.", "expect": "activate",
+     "must": ["trimble_list_projects", "trimble_api_operations", "trimble_api_read"]},
+    {"id": "pos-pset", "prompt": "Show the property set definitions for our Trimble Connect library.", "expect": "activate",
+     "must": ["trimble_api_operations", "pset"]},
+    {"id": "pos-plan-issue", "prompt": "Close issue 42 in our Trimble Connect project.", "expect": "activate",
+     "must": ["trimble_api_plan", "not executed"], "must_not": ["issue has been closed"]},
+
     {"id": "neg-install", "prompt": "Install Trimble on my laptop.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-go-trim", "prompt": "Explain trim in Go strings.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-excavator", "prompt": "Drive this excavator automatically.", "expect": "no_activate", "stop_condition": "machinery, equipment, or vehicle control"},

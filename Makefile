@@ -1,4 +1,4 @@
-.PHONY: build test fuzz vet fmt sync-skills smoke
+.PHONY: build test fuzz vet fmt sync-skills smoke catalog
 build:
 	go build -o bin/ ./cmd/...
 test:
@@ -14,3 +14,6 @@ sync-skills:
 	./scripts/sync-skills.sh
 smoke: build
 	./scripts/smoke.sh
+catalog:
+	./scripts/fetch-trimble-specs.sh /tmp/trimble-specs
+	go run ./cmd/trimble-catalog -specs /tmp/trimble-specs -index /tmp/trimble-specs/index.json -regions /tmp/trimble-specs/regions.json -retrieved $$(date -u +%Y-%m-%d)

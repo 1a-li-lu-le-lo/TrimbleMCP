@@ -92,13 +92,16 @@ type Config struct {
 	// rejected unless AllowInsecureOverride is set.
 	BaseURLOverride       string
 	AllowInsecureOverride bool
-	Tokens                TokenSource
-	HTTPClient            *http.Client
-	Timeout               time.Duration
-	RatePerSecond         float64
-	Burst                 int
-	MaxAttempts           int
-	UserAgent             string
+	// CatalogBaseOverride maps catalogue API IDs to test servers (tests
+	// only; honoured only with AllowInsecureOverride).
+	CatalogBaseOverride map[string]string
+	Tokens              TokenSource
+	HTTPClient          *http.Client
+	Timeout             time.Duration
+	RatePerSecond       float64
+	Burst               int
+	MaxAttempts         int
+	UserAgent           string
 }
 
 // Adapter implements trimble.ProjectReader and trimble.FileReader.
@@ -187,7 +190,7 @@ func (a *Adapter) Describe() trimble.Descriptor {
 		Auth:         "Trimble Identity OAuth 2.0 authorization code with PKCE (client credentials not supported by Connect)",
 		Scopes:       []string{"openid", "<application scope from Trimble Developer Console>"},
 		TenantModel:  "per Trimble Identity user; projects are bound to one region and resources are independent per region",
-		Capabilities: []trimble.Capability{trimble.CapListProjects, trimble.CapGetProject, trimble.CapListFolder, trimble.CapFileMetadata},
+		Capabilities: []trimble.Capability{trimble.CapListProjects, trimble.CapGetProject, trimble.CapListFolder, trimble.CapFileMetadata, trimble.CapAPIRead, trimble.CapAPIPlan},
 		Pagination:   "v2.1 pageSize + skipToken; next page signalled by links.next",
 		RateLimits:   "not published by Trimble; client-side limit " + strconv.FormatFloat(a.cfg.RatePerSecond, 'f', -1, 64) + " req/s",
 		Idempotency:  "read-only adapter; GET only",
@@ -524,14 +527,35 @@ func (a *Adapter) get(ctx context.Context, segments []string, q url.Values, out 
 	if q != nil {
 		u.RawQuery = q.Encode()
 	}
+	resp, err := a.fetch(ctx, u.String(), nil)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(resp.Body, out); err != nil {
+		return errs.Wrap(errs.UpstreamMalformed, err)
+	}
+	return nil
+}
+
+// RawResponse is a successful (2xx) upstream response.
+type RawResponse struct {
+	Status      int
+	ContentType string
+	Header      http.Header
+	Body        []byte
+}
+
+// fetch performs an authenticated GET with bounded, jittered retries and
+// returns the raw 2xx response.
+func (a *Adapter) fetch(ctx context.Context, rawURL string, headers map[string]string) (*RawResponse, error) {
 	var last error
 	for attempt := 1; attempt <= a.cfg.MaxAttempts; attempt++ {
 		if err := a.waitLimiter(ctx); err != nil {
-			return err
+			return nil, err
 		}
-		retryAfter, err := a.do(ctx, u.String(), out)
+		resp, retryAfter, err := a.doRaw(ctx, rawURL, headers)
 		if err == nil {
-			return nil
+			return resp, nil
 		}
 		last = err
 		e := errs.As(err)
@@ -544,49 +568,51 @@ func (a *Adapter) get(ctx context.Context, segments []string, q url.Values, out 
 			backoff = min(retryAfter, 30*time.Second)
 		}
 		if err := a.sleep(ctx, backoff); err != nil {
-			return errs.Wrap(errs.UpstreamTimeout, err)
+			return nil, errs.Wrap(errs.UpstreamTimeout, err)
 		}
 	}
-	return last
+	return nil, last
 }
 
-func (a *Adapter) do(ctx context.Context, rawURL string, out any) (time.Duration, error) {
+func (a *Adapter) doRaw(ctx context.Context, rawURL string, headers map[string]string) (*RawResponse, time.Duration, error) {
 	tok, err := a.cfg.Tokens.Token(ctx)
 	if err != nil {
-		return 0, errs.Wrap(errs.Authentication, err)
+		return nil, 0, errs.Wrap(errs.Authentication, err)
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
-		return 0, errs.Wrap(errs.Internal, err)
+		return nil, 0, errs.Wrap(errs.Internal, err)
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
 	req.Header.Set("Authorization", "Bearer "+tok)
-	req.Header.Set("Accept", "application/json")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/json")
+	}
 	req.Header.Set("User-Agent", a.cfg.UserAgent)
 	resp, err := a.client.Do(req)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			return 0, errs.Wrap(errs.UpstreamTimeout, redact(err))
+			return nil, 0, errs.Wrap(errs.UpstreamTimeout, redact(err))
 		}
 		if ctx.Err() != nil {
-			return 0, errs.Wrap(errs.UpstreamTimeout, ctx.Err())
+			return nil, 0, errs.Wrap(errs.UpstreamTimeout, ctx.Err())
 		}
-		return 0, errs.Wrap(errs.UpstreamUnavailable, redact(err))
+		return nil, 0, errs.Wrap(errs.UpstreamUnavailable, redact(err))
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(io.LimitReader(resp.Body, maxBody+1))
 	if err != nil {
-		return 0, errs.Wrap(errs.UpstreamUnavailable, err)
+		return nil, 0, errs.Wrap(errs.UpstreamUnavailable, err)
 	}
 	if len(body) > maxBody {
-		return 0, errs.Newf(errs.UpstreamMalformed, "upstream response exceeded %d bytes", maxBody)
+		return nil, 0, errs.Newf(errs.UpstreamMalformed, "upstream response exceeded %d bytes", maxBody)
 	}
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		if err := json.Unmarshal(body, out); err != nil {
-			return 0, errs.Wrap(errs.UpstreamMalformed, err)
-		}
-		return 0, nil
+		return &RawResponse{Status: resp.StatusCode, ContentType: resp.Header.Get("Content-Type"), Header: resp.Header, Body: body}, 0, nil
 	}
-	return retryAfter(resp.Header.Get("Retry-After")), mapStatus(resp.StatusCode, body)
+	return nil, retryAfter(resp.Header.Get("Retry-After")), mapStatus(resp.StatusCode, body)
 }
 
 // mapStatus follows the retry guidance in the Connect reference error table.

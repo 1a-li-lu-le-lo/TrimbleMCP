@@ -25,6 +25,12 @@ const (
 	// ScopeDesktopLaunch permits opening a desktop Trimble application on the
 	// operator's own machine. Never granted by default; local principals only.
 	ScopeDesktopLaunch Scope = "trimble:desktop:launch"
+	// ScopeAPIRead permits executing any catalogued production read of the
+	// Trimble Connect API family through trimble_api_read.
+	ScopeAPIRead Scope = "trimble:api:read"
+	// ScopeAPIPlan permits dry-run plans for catalogued production changes.
+	// Plans are never executed.
+	ScopeAPIPlan Scope = "trimble:api:plan"
 )
 
 // ReadOnlyDefault is granted when configuration does not say otherwise.
@@ -35,6 +41,7 @@ var ReadOnlyDefault = []Scope{ScopeCapabilitiesRead, ScopeProjectsRead}
 var KnownScopes = []Scope{
 	ScopeCapabilitiesRead, ScopeProjectsRead, ScopeFilesRead,
 	ScopeFilesWrite, ScopeFilesDelete, ScopeAuditRead, ScopeDesktopLaunch,
+	ScopeAPIRead, ScopeAPIPlan,
 }
 
 // Principal is an authenticated caller bound to exactly one tenant.

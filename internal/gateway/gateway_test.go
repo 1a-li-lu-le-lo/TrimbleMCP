@@ -88,11 +88,12 @@ func TestNoMutationToolsExist(t *testing.T) {
 func TestToolListFilteredByScope(t *testing.T) {
 	g, _, _ := setup(t)
 	names := toolNames(g, principal(authz.ScopeCapabilitiesRead))
-	if len(names) != 1 || names[0] != ToolGetCapabilities {
+	if len(names) != 2 || names[0] != ToolGetCapabilities || names[1] != ToolAPIOperations {
 		t.Fatalf("got %v", names)
 	}
 	all := toolNames(g, principal())
-	if len(all) != 5 {
+	if len(all) != 6 { // 5 typed tools + catalogue search
+
 		t.Fatalf("got %v", all)
 	}
 	// Hidden tools are rejected exactly like unknown tools.
@@ -205,9 +206,10 @@ func TestCrossTenantIsolation(t *testing.T) {
 	reg := NewRegistry()
 	reg.Register("tenant-b", mock.New())
 	g, _ := New(Options{Registry: reg, Audit: &audit.Memory{}})
-	// tenant-a has no adapters: nothing but capabilities is listed, and
-	// tenant-b's product cannot be reached.
-	if names := toolNames(g, principal()); len(names) != 1 {
+	// tenant-a has no adapters: only the adapter-independent tools
+	// (capabilities, catalogue search) are listed, and tenant-b's product
+	// cannot be reached.
+	if names := toolNames(g, principal()); len(names) != 2 {
 		t.Fatalf("got %v", names)
 	}
 	_, rpcErr := g.CallTool(context.Background(), principal(), ToolListProjects, json.RawMessage(`{"product":"mock"}`))

@@ -33,6 +33,7 @@ make build test smoke
 | `skills/canonical/trimble` | Canonical `SKILL.md`, references, templates, and evals |
 | `.claude/skills/trimble`, `.agents/skills/trimble` | Claude Code and Codex installs (synced by `scripts/sync-skills.sh`) |
 | `connectors/` | Client setup: Claude Code, Codex, Perplexity, Claude app |
+| `cmd/trimble-catalog`, `internal/catalog` | Generator and embedded catalogue of every Trimble Connect API operation (`make catalog`) |
 | `docs/` | Capability matrix, requirements traceability, ADRs, threat model, privacy, operations |
 
 ## Tools
@@ -42,6 +43,7 @@ make build test smoke
 - `trimble_get_project` (listed only where the upstream endpoint is verified)
 - `trimble_list_folder_items`
 - `trimble_get_file_metadata`
+- `trimble_api_operations`, `trimble_api_read`, `trimble_api_plan`: every operation of the 11 official Trimble Connect APIs (1,747 catalogued operations across 34 definitions). Production reads are executable, changes are dry-run planned, and everything else is excluded with a reason. See [docs/trimble-products/endpoints](docs/trimble-products/endpoints/README.md).
 - `trimble_build_desktop_link`: the [Trimble Connect for Windows command line](https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line), `trimbleconnect:/projects/<id>?show=<view>,<panel>`.
 - `trimble_open_in_desktop`: opens that link locally. Windows and the local operator only, opt-in, dry run by default.
 

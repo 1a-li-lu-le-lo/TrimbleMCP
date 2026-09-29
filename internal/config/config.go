@@ -141,7 +141,7 @@ func Load() (*Config, error) {
 	scopes := list(env("TRIMBLE_MCP_LOCAL_SCOPES", ""))
 	if len(scopes) == 0 {
 		c.LocalScopes = append([]authz.Scope{}, authz.ReadOnlyDefault...)
-		c.LocalScopes = append(c.LocalScopes, authz.ScopeFilesRead)
+		c.LocalScopes = append(c.LocalScopes, authz.ScopeFilesRead, authz.ScopeAPIRead)
 	} else if c.LocalScopes, err = authz.ValidateScopes(scopes); err != nil {
 		return nil, err
 	}

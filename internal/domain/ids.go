@@ -60,6 +60,10 @@ func validateID(kind, s string) error {
 	return nil
 }
 
+// ValidateOpaque applies the identifier rules to an upstream parameter value
+// of the given kind (for catalogued API path parameters).
+func ValidateOpaque(kind, s string) error { return validateID(kind, s) }
+
 func ParseTenantID(s string) (TenantID, error) {
 	return TenantID(s), validateID("tenant_id", s)
 }

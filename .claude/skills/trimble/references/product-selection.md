@@ -16,6 +16,10 @@ Always confirm with `trimble_get_capabilities`; an operator may have disabled a 
 
 For anything beyond capabilities: a product is served by an adapter, and each tool is listed only when an enabled adapter supports it.
 
+## Whole Trimble Connect API family (catalogue)
+
+With `trimble-connect` enabled, `trimble_api_operations`, `trimble_api_read` and `trimble_api_plan` reach every operation of the 11 official Trimble Connect APIs (see the API catalogue reference listed in SKILL.md). The typed tools above cover the most common Core reads.
+
 ## Not configured (do not attempt)
 
 These Trimble products exist but have no adapter here. Say so and stop:
@@ -26,7 +30,6 @@ These Trimble products exist but have no adapter here. Say so and stop:
 - Tekla Structures and SketchUp (desktop SDKs, not server APIs).
 - Trimble Transportation / fleet and telematics APIs.
 - GNSS and correction services.
-- Trimble Connect model, topic, property-set, and organizer APIs.
 
 ## Telling products apart
 

@@ -6,7 +6,10 @@ package trimble
 
 import (
 	"context"
+	"net/url"
 	"time"
+
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/catalog"
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/domain"
 )
@@ -25,6 +28,11 @@ const (
 	// CapDesktopLaunch opens Trimble Connect for Windows on the operator's own
 	// machine via its registered URL scheme. It reads and changes no data.
 	CapDesktopLaunch Capability = "launch_desktop"
+	// CapAPIRead executes any catalogued production read operation of the
+	// Trimble Connect API family (internal/catalog).
+	CapAPIRead Capability = "api_read"
+	// CapAPIPlan renders a dry-run plan for any catalogued production change.
+	CapAPIPlan Capability = "api_plan"
 )
 
 // VerificationStatus records how well an adapter's contract is evidenced.
@@ -191,4 +199,21 @@ type DesktopLauncher interface {
 	Base
 	BuildLink(project domain.ProjectID, view, panel string) (DesktopLink, error)
 	Launch(ctx context.Context, link DesktopLink) error
+}
+
+// CatalogResponse is a successful response to a catalogued read.
+type CatalogResponse struct {
+	Status      int
+	ContentType string
+	Headers     map[string]string
+	Body        []byte
+	Prov        domain.Provenance
+}
+
+// CatalogClient executes operations from the Trimble API catalogue
+// (internal/catalog) against the documented regional hosts.
+type CatalogClient interface {
+	Base
+	CatalogURL(op *catalog.Operation, path map[string]string, query url.Values) (*url.URL, error)
+	CatalogRead(ctx context.Context, op *catalog.Operation, path map[string]string, query url.Values, headers map[string]string) (CatalogResponse, error)
 }
