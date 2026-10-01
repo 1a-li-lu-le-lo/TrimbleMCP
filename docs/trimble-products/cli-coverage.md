@@ -182,6 +182,8 @@ Sources (verified 2026-09-29):
 - https://github.com/SketchUp/testup-2/blob/main/README.md, the TestUp 2 continuous-integration examples.
 - https://ruby.sketchup.com/file.ReleaseNotes.html, the SketchUp 2018 M0 and SketchUp 7 notes.
 - https://github.com/SketchUp/rubocop-sketchup (Ruby gem `rubocop-sketchup` 2.1.1, authors "Trimble Inc, SketchUp Team", RubyGems owners `sketchup` and `thomthom`).
+- https://github.com/SketchUp/sketchup-extension-vscode-project, `DEBUGGING.md` (verified 2026-10-01): the `-RubyStartup` debug launcher.
+- https://github.com/SketchUp/sketchup-yard-template (Ruby gem `yard-sketchup` 1.6.0, authors "Trimble Inc, SketchUp Team", RubyGems owner `sketchup`; verified 2026-10-01). The same owner's `sketchup-api-stubs` gem ships no executable.
 
 These switches are passed to `SketchUp.exe`, or to the macOS binary `SketchUp.app/Contents/MacOS/SketchUp`. The SketchUp installer is section 9.
 
@@ -193,10 +195,18 @@ These switches are passed to `SketchUp.exe`, or to the macOS binary `SketchUp.ap
 | `/Applications/SketchUp\ 2024/SketchUp.app/Contents/MacOS/SketchUp -rdebug "ide port=6123"`, or `open -a /Applications/SketchUp\ 2024/SketchUp.app --args -rdebug "ide port=6123"` (macOS, with `SURubyDebugger.dylib` in the bundle's Frameworks folder) | The same on macOS | Excluded: same |
 | `SketchUp.exe -RubyStartupArg "TestUp:CI:Path: <dir>" > results.json` (macOS: `'/Applications/SketchUp 2023/SketchUp.app/Contents/MacOS/sketchup' -RubyStartupArg '...'`) | Passes a string to Ruby at start-up. TestUp 2 reads it, runs the test suite in `<dir>` and writes JSON results to standard output | Excluded: runs Ruby code (test suites) |
 | `SketchUp.exe -RubyStartupArg "TestUp:CI:Config: <Config.yml>"` | TestUp 2 runs the suite described by a YAML file (`Path`, `Output`, `%CONFIG_DIR%`) | Excluded: runs Ruby code; reads and writes local files |
-| `-RubyStartup` | Known only from one release note (SketchUp 2018 M0: "Fixed a crash when using `-RubyStartup` command line argument with a file that raises errors while loading"). It evidently loads a Ruby file at start-up. No page documents its syntax | Excluded: runs Ruby code. Its syntax is undocumented, so it is never guessed |
+| `-RubyStartup <file>` | Runs a Ruby file at start-up, after extensions have loaded (`DEBUGGING.md`; also in the SketchUp 2018 M0 release notes). SketchUp honours only the last `-RubyStartupArg`, so it cannot be combined with TestUp's CI mode | Excluded: runs Ruby code |
+| `SketchUp.exe -RubyStartup "<repo>/tools/su_debug_bootstrap.rb" -RubyStartupArg "su_debug:port=7150"` | The VS Code project's debug launch: the bootstrap file opens a Ruby debugger on the port | Excluded: runs Ruby code; opens a debugger port |
+| `SketchUp.exe -RubyStartupArg "su_debug:port=<port>,wait=1"`, or the variables `RUBY_DEBUG_PORT` and `RUBY_DEBUG_WAIT=1` | Debugs extension start-up; SketchUp waits for the debugger | Excluded: same; freezes SketchUp until an IDE attaches |
+| macOS: `open -n -a "<app>" --env "DYLD_LIBRARY_PATH=<app>/Contents/Frameworks/Ruby.framework/Versions/Current" --args -RubyStartup ... -RubyStartupArg ...` | The macOS form; running the binary directly does not run the `-RubyStartup` file | Excluded: same |
+| `ruby tools/debug-sketchup.rb <version> <port>` (run by the project's VS Code task) | Starts SketchUp with the switches above | Excluded: same |
 | `Sketchup.exe > myRubyLog.txt` | Sends Ruby console output (`puts`) to standard output, here redirected to a file (SketchUp 7 release notes) | Excluded: local process and file |
 | `rubocop --format json --out results.json` | `rubocop-sketchup` (installed with `gem install rubocop` and `gem install rubocop-sketchup`, configured in `.rubocop.yml`) analyses a SketchUp extension's source and writes JSON results | Excluded: developer tooling; reads a source tree and writes files |
 | `rubocop -f extension_review -o report.html` | The Extension Review formatter; writes an HTML report | Excluded: same |
+| `yardoc`, with `--plugin yard-sketchup` in `.yardopts` | Generates SketchUp-style Ruby API documentation with the `yard-sketchup` template | Excluded: developer tooling; reads a source tree and writes files |
+| `yardoc --query '@version.text != "SketchUp 2018"'` | Leaves out objects of one SketchUp version | Excluded: same |
+| `yardoc -t stubs -f text` | Generates API stubs | Excluded: same |
+| `yardoc -t coverage -f text` | Generates `coverage.manifest` | Excluded: same |
 | `LayOut -lang <locale>` | Starts LayOut in the given language. Known only from the SketchUp 2024.0 release notes (https://help.sketchup.com/en/release-notes/sketchup-desktop-20240, verified 2026-10-01: "launching LayOut from the command line using the -lang option"); the value format is not documented | Excluded: launches a desktop application; the syntax is never guessed |
 | `LayOutExporter` | A LayOut C API SDK sample "command line tool that exports .layout documents to .pdf, .png, or .jpg" (https://extensions.sketchup.com/developers/layout_c_api/layout/index.html, verified 2026-10-01); no switches are documented | Excluded: SDK sample that reads and writes local files |
 

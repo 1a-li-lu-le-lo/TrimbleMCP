@@ -356,6 +356,9 @@ def confluence(cfg, errors):
             # Interfaces specified only as attached PDFs are reported for review.
             if re.search(r'ac:name="(viewpdf|view-file)"', body):
                 print(f"note: {page}: specification attached as a file (classify in capability-matrix.md)", file=sys.stderr)
+            # SOAP services (WSDL) are not catalogued; they are reported for review.
+            if re.search(r"\?wsdl\b", body, re.I):
+                print(f"note: {page}: links a WSDL (SOAP; classify in capability-matrix.md)", file=sys.stderr)
         nxt = d.get("_links", {}).get("next")
     print(f"{cfg['space']}: {pages} pages, {len(found)} linked and {len(inline)} inline definitions", file=sys.stderr)
     return found, inline
