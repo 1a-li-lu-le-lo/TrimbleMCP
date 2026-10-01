@@ -906,7 +906,7 @@ Source: https://github.com/trimble-oss/trimble_driver_ros (README, verified 2026
 | Services `get_origin`, `set_origin`, `reset_origin` | Read or change the tangent-plane origin of the published positions | Excluded: changes the positions that downstream vehicles or robots use |
 | `trimble_driver_pcap_test` | Build-time helper that replays captured packets | Excluded: developer tooling |
 
-## 27. Cityworks Public Access CLI installer (`PublicAccess.Installer.CLI.dll`), excluded
+## 27. Cityworks installer command lines (`PublicAccess.Installer.CLI.dll`, `Cityworks.Installer.Cli.exe`, `CwDbSchemaManagerCLI.exe`), excluded
 
 Source: https://help.cityworks.com/InstallUpdate/PublicAccess/Install/7-0/Content/InstallUpdateCLI.htm (verified 2026-10-01; the 6.0 page documents the same installer). The installer is run with the .NET runtime from PowerShell or a command prompt, pointing at `PublicAccess.Installer.CLI.dll`.
 
@@ -951,6 +951,16 @@ Source: https://help.cityworks.com/InstallUpdate/PublicAccess/Install/7-0/Conten
 | `-xip, --xbpitemized` | Send Itemized Payments. [default: False] | Excluded: part of the installer |
 | `-xsi, --xbpitemid <xbpitemid>` | XpressBillPay Single Item Id. <Required if --paymentprovider is XpressBillPay and --xbpitemized is false> | Excluded: part of the installer |
 | `-?, -h, --help` | Show help and usage information | Excluded: part of the installer |
+
+Cityworks core (sources, verified 2026-10-01: https://help.cityworks.com/InstallUpdate/CityworksCore/Update/23-2/Content/RunCommandLineInstaller.htm and https://help.cityworks.com/InstallUpdate/CityworksCore/Update/23-2/Content/23-2_23-x/RunCommandLineDatabaseSchemaManager.htm). Both programs are run from PowerShell or a command prompt in the install files' folder. The installer installs the Cityworks server application (a host change). The Database Schema Manager administers the production Cityworks database, and `--Update` migrates its schema, with a risk of data loss.
+
+| Command/Option | What it does | Disposition |
+|---|---|---|
+| `Cityworks.Installer.Cli.exe` | Runs the Cityworks installer in the terminal; the page documents no switches | Excluded: installs server software |
+| `CwDbSchemaManagerCLI.exe --DbVersion` | Gets the current database version | Excluded: a local program run against the production database |
+| `CwDbSchemaManagerCLI.exe --Script` | Gets the database migration scripts | Excluded: same |
+| `CwDbSchemaManagerCLI.exe --Update` | Updates the database to the latest version | Excluded: migrates the production database schema |
+| `CwDbSchemaManagerCLI.exe --Verify` | Verifies the database | Excluded: a local program run against the production database |
 
 ## 28. B2W Estimate start-up switches (`BID2WIN.exe`), excluded
 
