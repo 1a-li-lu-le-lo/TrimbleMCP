@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 13577 operations in 370 definitions; 254 read, 223 plan, 6202 reference, 3084 variant, 3814 excluded.
+**Totals:** 13785 operations in 372 definitions; 254 read, 223 plan, 6284 reference, 3084 variant, 3940 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -67,8 +67,10 @@ These operations are catalogued from the products' own published definitions so 
 | `accubid-project` | Accubid Anywhere: Anywhere Project Service | [accubid-anywhere/project](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v1.yaml) | 8 | Trimble Identity bearer token in the Authorization header | [accubid-project.md](accubid-project.md) |
 | `accubid-project-v2` | Accubid Anywhere: Anywhere Project Service | [accubid-anywhere/project-v2](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v2.yaml) | 1 | Trimble Identity bearer token in the Authorization header | [accubid-project-v2.md](accubid-project-v2.md) |
 | `civil-site-management` | Trimble Civil Site Management | [civil-site-management/v1](https://developer.trimble.com/docs/civil-site-management/openapi/v1.yaml) | 19 | not declared in the definition (401 responses are defined); Trimble Identity per the product docs | [civil-site-management.md](civil-site-management.md) |
+| `jobpac-connect` | Jobpac Connect API (Trimble Jobpac construction ERP) | [jobpac-connect](https://api-doc.jobpac.com.au/) | 129 | a session token from GiveMeAToken (user ID and password AES-encrypted with a key Trimble issues per environment and application), passed in the Token query parameter | [jobpac-connect.md](jobpac-connect.md) |
 | `mepcontent` | MEPcontent API (Trimble MEP content platform) | [mepcontent](https://api.mepcontent.com/swagger/docs/v1) | 15 | API key in the ApiKey query parameter | [mepcontent.md](mepcontent.md) |
 | `projectsight` | ProjectSight | [projectsight/v1](https://raw.githubusercontent.com/trimble-construction/projectsight-api-samples/main/ProjectSight-v1.json) | 537 | OAuth 2.0 via Trimble Identity (authorization code or client credentials) | [projectsight.md](projectsight.md) |
+| `tekla-powerfab-go` | Tekla PowerFab Go API | [tekla-powerfab-go](https://powerfab-go-api.us-east-1.teklapowerfab.net/v1/metadata/schema) | 79 | Trimble Identity bearer token, plus the X-Site-Subdomain header naming the PowerFab Go site | [tekla-powerfab-go.md](tekla-powerfab-go.md) |
 | `unity-construct` | Trimble Unity Construct (e-Builder) | 2 | 189 | OAuth 2.0 password grant via /api/v2/Authenticate | [unity-construct.md](unity-construct.md) |
 | `unity-maintain-permit` | Trimble Unity Maintain / Permit (Cityworks) | 150 | 1223 | HTTP bearer | [unity-maintain-permit.md](unity-maintain-permit.md) |
 | `viewpoint-for-projects` | Viewpoint For Projects (VFP) | [viewpoint-for-projects](https://api-uk.vfp.viewpoint.com/swagger/docs/latest) | 220 | OAuth 2.0 authorization code via identity-uk.team.viewpoint.com (scope vfp.fullaccess) | [viewpoint-for-projects.md](viewpoint-for-projects.md) |
@@ -152,6 +154,7 @@ These operations are catalogued from the products' own published definitions so 
 | [geospatial/field-data-v1](https://cloud.api.trimble.com/geospatial/jobs-service/1.0/openapi/OpenApi3_0.yaml) | Jobs Service | portal | reference | geospatial-field-data | 29 |  |
 | [issue-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue-stage/v1) | Issue Management Service API | swaggerhub | variant |  | 29 | variant of issue@v1; staging copy |
 | [issue@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue/v1) | Issue Management Service API | swaggerhub | production | issues | 29 |  |
+| [jobpac-connect](https://api-doc.jobpac.com.au/) | Jobpac Connect API | direct | reference | jobpac-connect | 129 |  |
 | [kuebix](https://api-docs.kuebix.com/) | Kuebix REST API Reference Documentation | direct | excluded |  | 26 | discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com |
 | [mepcontent](https://api.mepcontent.com/swagger/docs/v1) | CPWebApi | direct | reference | mepcontent | 15 |  |
 | [mobile-manager/asyncapi-websocket-v1](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v1.json) | WebSocket V1 Server | portal | reference | mobile-manager-ws-v1 | 1 |  |
@@ -180,6 +183,7 @@ These operations are catalogued from the products' own published definitions so 
 | [tdrive-int@1.0](https://api.swaggerhub.com/apis/Trimble-Connect/tdrive-int/1.0) | Trimble Drive Beta | swaggerhub | variant |  | 26 | variant of tdrive@1.0; integration copy |
 | [tdrive-stage@1.0](https://api.swaggerhub.com/apis/Trimble-Connect/tdrive-stage/1.0) | Trimble Drive STAGE API | swaggerhub | empty |  | 0 | published definition contains no paths |
 | [tdrive@1.0](https://api.swaggerhub.com/apis/Trimble-Connect/tdrive/1.0) | Trimble Drive Beta | swaggerhub | production | drive | 26 | Trimble Drive (beta) |
+| [tekla-powerfab-go](https://powerfab-go-api.us-east-1.teklapowerfab.net/v1/metadata/schema) | Tekla PowerFab Go API | direct | reference | tekla-powerfab-go | 79 |  |
 | [tekla-support-dev](https://api.swaggerhub.com/apis/Tekla/ts-support_service_api_v_3/v3) | tsupport-v3-dev | direct | excluded |  | 13 | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
 | [test-api-key-temp-2@v1](https://api.swaggerhub.com/apis/Trimble-Connect/test-api-key-temp-2/v1) | test api key | swaggerhub | variant |  | 32 | variant of org-prod@v1; test copy published by Trimble |
 | [tmt/v1](https://developer.trimble.com/docs/tmt/openapi/v1.json) |  | portal | reference | tmt | 66 |  |

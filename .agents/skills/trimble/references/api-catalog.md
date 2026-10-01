@@ -20,7 +20,7 @@ Its Core Account endpoints, documented in prose only, are reference APIs (`conne
 
 The other products (`reference`), by family:
 
-- **construction:** Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct (`unity-construct`), Unity Maintain/Permit, also known as Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`)
+- **construction:** Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct (`unity-construct`), Unity Maintain/Permit, also known as Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`), Jobpac Connect (`jobpac-connect`), Tekla PowerFab Go (`tekla-powerfab-go`)
 - **geospatial:** Field Configuration (`geospatial-field-configuration`), Field Data/Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`; WebSocket streams as `SUBSCRIBE` operations in `mobile-manager-ws-v1` and `mobile-manager-ws-v2`)
 - **transportation:** TMT (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`)
 - **maps:** Trimble Maps (`trimble-maps-*`) and PC*MILER Route Reports (`pcmiler-route-reports`)

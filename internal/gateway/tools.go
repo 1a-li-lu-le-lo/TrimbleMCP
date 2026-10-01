@@ -143,7 +143,7 @@ func (g *Gateway) buildTools() []*tool {
 				Description: "Searches every operation in every published Trimble API definition: the Trimble Connect APIs (Core, Model, " +
 					"Model Feature, Org, Property Set, Topics/BCF, Topics Exchange, Issues, Support, Drive, File Service) and the other " +
 					"products with public definitions (Vista, ProjectSight, Viewpoint For Projects, Unity Construct, Unity Maintain/Permit, " +
-					"Accubid Anywhere, Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, " +
+					"Accubid Anywhere, Civil Site Management, MEPcontent, Jobpac Connect, Tekla PowerFab Go, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, " +
 					"Transporeon, Trimble Maps, PC*MILER, PTx FarmENGAGE). Each has a disposition: read (Trimble Connect, executable with trimble_api_read), plan (Trimble " +
 					"Connect change, dry-run with trimble_api_plan), reference (another product: documented and plannable, never " +
 					"called), variant (same call as covered_by) or excluded (with the reason). Pass key for one operation's full " +

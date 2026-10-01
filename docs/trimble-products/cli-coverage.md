@@ -148,6 +148,14 @@ Source: https://support.tekla.com/doc/tekla-structures/2025/cus_create_startup_s
 | `/server:<server_name>` | Multi-user server for `/create` | Excluded: creates data |
 | `-m <macro_file_path>` | Runs a macro after start-up | Excluded: runs code |
 
+Tekla Template Editor (source: https://support.tekla.com/doc/tekla-structures/2025/tpled_start_tpled_with_command_line, verified 2026-10-01). The options are case-insensitive. The editor is a local desktop program for report and drawing templates, so it is excluded for the same reason:
+
+| Switch | What it does | Disposition |
+|---|---|---|
+| `-L <language id>` | Three-letter language of the user interface | Excluded with the program |
+| `-i <file path>` | Initialisation (`.ini`) file that says where definition files are searched for | Excluded: local file path |
+| `-w <work folder>` | Work folder, the base for file open and save | Excluded: local file path |
+
 ## 9. SketchUp installer, excluded
 
 Source: https://help.sketchup.com/en/sketchup/performing-silent-install-sketchup (verified 2026-09-29).
@@ -288,6 +296,7 @@ Tekla on-premises licence commands (FlexNet utilities; the commands are case-sen
 | `appactutil.exe -served -commServer 27007@<server_name> -productID NAME=<product>;VERSION=<version> -expiration <dd-Mmm-yyyy>` (run in `C:\TeklaStructures\License\Borrow`) | Borrows a licence from the company licence server until the expiry date. `<product>` is `ProjectViewer`, `Full`, `SteelDetailing`, `Primary`, `Educational`, `ConstructionModeling`, `Drafter`, `Engineering`, `PrecastConcreteDetailing` or `RebarDetailing` | Excluded: licence borrowing; changes entitlements |
 | `appactutil.exe -view -long` | Shows the borrowed licences in trusted storage | Excluded: licensing administration on a client |
 | `appactutil.exe -return <fulfillment ID> -commServer 27007@<server_name>` | Returns a borrowed licence | Excluded: changes entitlements |
+| `lmutil.exe lmstat -a -c <port>@<server name>`, for example `lmutil.exe lmstat -a -c 27001@licenseserver` (run in the licence server installation folder; source: https://support.tekla.com/article/is-it-possible-to-see-which-kind-of-licenses-are-used-by-different-users, verified 2026-10-01; other options are in FlexNet's `fnp_LicAdmin.pdf` in that folder) | Lists licence types, counts, expiry dates, and the user names holding each licence with their Tekla Structures version | Excluded: licensing administration on a server; the output names people (personal data) |
 | `tekla_composite.exe` (run from a command prompt on the licence server) | Prints the composite host ID to put in the `SERVER` line of `tekla.lic`. The same page uses the Windows command `hostname` for the server name | Excluded: exposes a licence-binding host identifier; local program |
 
 Tekla PowerFab database maintenance (on the PowerFab server; Tekla says the commands do not work on other workstations):
@@ -319,6 +328,14 @@ The full switch list of the TSEP builder is not public. The 2017 release notes p
 | Version options (Tekla Structures 2017) | "Options to modify extension product version, and to append product version to the .tsep file name". Their names are only in the sign-in documentation, so they are not listed | Excluded with the builder |
 | `dotnet tool install --global AzureTrustedSignTool` | Installs the signing tool | Excluded: installs software |
 | `AzureTrustedSignTool sign --filePath --accountname AccountName --profilename ProfileName` | Signs a `.tsep` with Azure Trusted Signing; it wraps `dotnet/sign` | Excluded: uses code-signing credentials; writes files |
+
+Central installation of `.tsep` packages (source: https://support.tekla.com/doc/tekla-structures/2026/ins_installing_tsep_packages, verified 2026-10-01). Tekla Structures installs every package in `%XSDATADIR%\Extensions\To be installed` when it starts; the page shows how to do it ahead of time:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `robocopy "\\Server1\prod\TeklaStructures\2026.0\Environments_TSEP" "C:\ProgramData\Trimble\Tekla Structures\2026.0\Extensions\To be installed" *.tsep` | Copies packages from a network share into the local "To be installed" folder (`robocopy` is a Windows command, named here because the page prescribes it) | Excluded: writes local files ahead of an installation |
+| `"C:\Program Files\Tekla Structures\2026.0\bin\TeklaExtensionPackage.TepAutoInstaller.exe" "2026.0" "C:\ProgramData\Trimble\Tekla Structures\2026.0" "2026"` | Installs every package in that folder, so users need not wait at start-up. Arguments: version, data folder, and release year | Excluded: installs extensions, which are code (a host change) |
+| `XS_TSEP_TO_BE_INSTALLED_ORG_DIR` (advanced option in each user's `user.ini`, not a command) | Installs packages from a shared folder at start-up | Excluded: configuration that installs code |
 
 The same page also installs `Knapcode.CertificateExtractor` and `sign --prerelease`, which are third-party tools, not Trimble command lines. The NuGet owner `buildmaster_Tekla` publishes one more dotnet tool, `CxxSonarQubeRunner` 3.8.1. It has no documentation (its description is "Package Description"), so it has no documented command to list, and it is build tooling in any case. That owner's third tool, `teklaenv`, is section 7.
 
@@ -765,7 +782,7 @@ Other npm scopes checked on 2026-10-01: `trimble`, `trimble-construction` and `t
 Sources (verified 2026-10-01):
 
 - https://help.trimble.com/en/trimble-connect/trimble-connect/object-manager/functions/configuration-tools/scheduled-batch-operations ("Scheduled Batch Operations", modified 1 Oct 2026; it redirects to the same path under https://help.trimble.com/doc/). Its sub-page "Run a Batch File Automatically" covers only scheduling the batch file in Windows Task Scheduler.
-- https://help.trimble.com/doc/quadri/quadri/quadri-connectors/quadri-fully-integrated-novapoint: Novapoint includes the Quadri desktop client, so the same `quadri.exe` command line applies to Novapoint installations. No separate Novapoint command line was checked.
+- https://help.trimble.com/doc/quadri/quadri/quadri-connectors/quadri-fully-integrated-novapoint: Novapoint includes the Quadri desktop client, so the same `quadri.exe` command line applies to Novapoint installations. Novapoint's own installer command lines are in section 30.
 
 Trimble Connect Object Manager, formerly Quadri, works on a shared object model on a server. Its desktop client `quadri.exe` takes switches, and Trimble's example batch file (`.cmd`, placed in the folder that holds `quadri.exe`) runs it with `START /wait` to receive, share and run tasks without a user. Example lines, as documented:
 
@@ -828,6 +845,7 @@ Source: "POSPac MMS 8.1 Release Notes" (Applanix, a Trimble company, June 2017),
 | `POSPacBatch.exe` | The command-line version of POSPac, installed with POSPac MMS since 7.2; runs batch projects | Excluded: local GNSS-inertial processing |
 | `-m UAV` | Named once, in an 8.1 bug fix: "using POSPac UAV in command line fails when using the command line option –m UAV". Its full meaning is not documented | Excluded with the program |
 | `.posbat` batch file | XML batch project file, with fields such as multipath settings, lever arms, mounting angles and GAMS lever arms | Excluded: reads a local file |
+| POSPac Complete batch command line | POSPac Complete, the successor to POSPac MMS, advertises "Batch Command Line Processing for all business lines (Airborne, Land, Marine)" (https://applanix.trimble.com/en/software/applanix-pospac-complete, verified 2026-10-01). No public page documents its program name or switches | Excluded: local GNSS-inertial processing, as for `POSPacBatch.exe` |
 
 ## 25. TruckMate program auto-login parameters, excluded
 
@@ -906,12 +924,83 @@ Source: https://help.cityworks.com/InstallUpdate/PublicAccess/Install/7-0/Conten
 | `-xsi, --xbpitemid <xbpitemid>` | XpressBillPay Single Item Id. <Required if --paymentprovider is XpressBillPay and --xbpitemized is false> | Excluded: part of the installer |
 | `-?, -h, --help` | Show help and usage information | Excluded: part of the installer |
 
-## 28. Checked, with no official command line
+## 28. B2W Estimate start-up switches (`BID2WIN.exe`), excluded
+
+Source: https://help.trimble.com/doc/b2w-estimate/b2w-estimate/b2w-estimate-administration/getting-started/customize-how-b2w-estimate-starts (verified 2026-10-01). The switches are not case-sensitive and go after the program path, for example `"C:\Program Files\B2W Software\Estimate\BID2WIN.exe" /Admin`.
+
+**Why it is excluded:** it launches a desktop estimating program against a company database, and two switches put sign-in details on the command line. The bridge runs no local programs and handles no credentials. The B2W Estimate API is classified in [capability-matrix.md](capability-matrix.md).
+
+| Switch | What it does | Disposition |
+|---|---|---|
+| `/Admin` | Starts the B2W Estimate Administration tool (which does not consume a licence) | Excluded: administration of users and databases |
+| `/cid=<CustomerID>` | Starts with a specific customer ID | Excluded with the program |
+| `/Database=<database name>` | Connects to a specific database | Excluded with the program |
+| `/EstimateNumber=<number>` | Opens a specific estimate (needs "view" permission; the newest wins if numbers repeat) | Excluded with the program |
+| `/JobNumber=<number>` | Opens the estimate with that job number (same rules) | Excluded with the program |
+| `/Server=<server name>` | Connects to a specific database server | Excluded with the program |
+| `/ShowLogon` | Shows the logon dialog for user name, password and database | Excluded with the program |
+| `/UserName=<user name>` | Signs in as an existing B2W Estimate user | Excluded: a credential on the command line |
+| `/Password=<password>` | Signs in with this password (with the last-used or given user name) | Excluded: a password on the command line |
+
+## 29. Stabicad silent installation, excluded
+
+Source: https://help.trimble.com/doc/stabicad/stabicad/ins_install_stabicad_silently (verified 2026-10-01; modified 29 Jun 2026). The same page documents an SCCM/Intune sequence for the prerequisites.
+
+**Why it is excluded:** each command installs software and a SQL Server database configuration (a host change, with administrator rights), and the connection-string and password properties carry database credentials. The documented default connection string includes a password, which is not repeated here.
+
+| Command/Property | What it does | Disposition |
+|---|---|---|
+| `Stabicadsetup.exe -silent <mode> [properties]` | Unattended installation; `<mode>` is `express` (properties ignored), `advanced` (local, with properties), `update` or `network` | Excluded: installs software |
+| `INSTALLDIR=<folder>` | Installation folder (a network folder in `network` mode) | Excluded: same |
+| `INSTALLSTCPLATFORM=True\|False` | Whether to install the Trimble CAD platform | Excluded: same |
+| `INSTALLDIR_CADPLATFORM=<folder>` | CAD platform folder | Excluded: same |
+| `PLI_SPECIFIC=True\|False` | Whether to import specific product lines after installation | Excluded: same |
+| `SQLSERVER_CONNECTIONSTRING="<connection string>"` | SQL Server connection string, including the user ID and password | Excluded: a credential on the command line |
+| `ENABLEIMPROVESTABICAD=True\|False` | Whether Stabicad sends improvement messages | Excluded: same |
+| `SQLSERVER_NOLOCK=True\|False` | Prevents putting the database in single-user mode (clusters) | Excluded: database administration |
+| `SQLSERVER_NOBACKUP=True\|False` | Skips the database backup before an upgrade | Excluded: database administration; risk of data loss |
+| `KEEP_DOTNET_POLICIES=True\|False` | Whether to clean up obsolete .NET policies | Excluded: changes the host |
+| `PRODESIGN3DDETECTED=True\|False` | Prevents standalone ProDesign 3D from interfering | Excluded: same |
+| `msiexec /i "StabicadMSI x64.msi" /qn /lv "<log>" [properties]` | Installs the extracted MSI locally | Excluded: installs software |
+| `ALLUSERS=1`, `ARPSYSTEMCOMPONENT=1`, `MSIFASTINSTALL=7`, `INSTALLATIONTYPE=Local\|Network` | Per-machine install; hide from Programs and Features; faster install; installation type | Excluded: same |
+| `SQLSERVER_CONNECTIONSTRING_NOPASSWORD=<connection string>`, `SQLSERVER_PASSWORD=<password>`, `ISPLAINTEXT=True\|False` | Connection string without the password, the password itself, and whether it is stored encrypted in the Stabicad configuration file | Excluded: credentials on the command line |
+| `msiexec /a "StabicadMSI x64.msi" /qn /l*v "<log>" TARGETDIR=<network folder> [properties]` | Administrative (network) installation of the extracted MSI | Excluded: prepares a deployment |
+
+## 30. Novapoint unattended installation, excluded
+
+Source: https://help.trimble.com/doc/novapoint/novapoint/get-started/install-the-novapoint-software/unattended-installation-of-novapoint (verified 2026-10-01; modified 25 Sep 2026).
+
+**Why it is excluded:** it installs software and its prerequisites with administrator rights (a host change). Novapoint's Quadri client command line is section 22.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `Msiexec /i "[PATH]\Novapoint 2025 (TDr).msi" INSTALLDIR="C:\Program Files\Trimble\Novapoint\2025-TDr" /qb` | Installs Novapoint from the MSI (without the prerequisites that `Setup.exe` includes) | Excluded: installs software |
+| `"[PATH]\ISSetupPrerequisites\{<GUID>}\<prerequisite>.exe" /q /norestart` (one line per prerequisite: .NET runtimes and frameworks, Visual C++ redistributables, Trimble Coordinate System Manager, SQL Server Compact 3.5 SP2 x86 then x64) | Installs each prerequisite silently | Excluded: installs software |
+
+## 31. Tekla DSTV to DXF Converter command line, excluded
+
+Source: https://support.tekla.com/help/tekla-structures/dstv_to_dxf_converter (verified 2026-10-01). The extension's CLI mode is documented for Tekla Structures 2018 to 2022; from 2023 the conversion is an integrated component without this command line.
+
+**Why it is excluded:** it is a local program that reads NC files from the model folder and writes DXF files, overwriting them by default. The bridge runs no local programs and has no filesystem tool.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `DSTVtoDXFConverter.exe` | With no arguments, opens the converter dialog | Excluded: local program |
+| `-cfg <attribute file>` | Attribute (configuration) file; `standard` if left out | Excluded: local file path |
+| `-out <output folder>` | Output folder, relative to the model folder; created if missing | Excluded: writes files |
+| `-in <input folder>` | Folder searched for NC files; the model folder by default | Excluded: local file path |
+| `-overwrite` (described with True/False values) and `-no_over_write` (used in the examples) | Whether existing DXF files are overwritten; by default they are | Excluded: overwrites files |
+| `-f <files>` | One or more quoted file names or wildcards; `*.nc1` by default | Excluded: local file paths |
+| `-!` | Prints the version number | Excluded with the program |
+| `-?` | Lists the options and commands | Excluded with the program |
+| `examples` | Lists examples that use correct templates | Excluded with the program |
+
+## 32. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
 - **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.
 - **Also automated through SDKs or APIs:** besides the command lines above, SketchUp, Tekla Structures, Tedds, CoPilot and PC\*MILER have SDKs or APIs. Trimble Access has no documented command line and is automated through its SDK. See [capability-matrix.md](capability-matrix.md).
-- **POSPac:** POSPac MMS's command-line program `POSPacBatch.exe` is publicly named in Applanix release notes (section 24), but no public page documents its switches. POSPac Command-line TBC Subscription is installed by TBC (section 14); no public page documents its own command line.
+- **POSPac:** POSPac MMS's command-line program `POSPacBatch.exe` is publicly named in Applanix release notes, and POSPac Complete advertises a batch command line (both in section 24), but no public page documents their switches. POSPac Cloud is an API, classified in [capability-matrix.md](capability-matrix.md). POSPac Command-line TBC Subscription is installed by TBC (section 14); no public page documents its own command line.
 - **Spectrum Command Prompt** (https://help.trimble.com/doc/spectrum/spectrum/system-administration/administrator-utilities/command-prompt, verified 2026-10-01): opened inside Spectrum with Ctrl + Break, it takes a Spectrum function name to go to that screen, or `PA` to return to the Site Map. Like TBC's CAD command line (section 14), it is an in-application navigation prompt, not an operating-system command line. It belongs to the desktop user interface, which the bridge does not drive, so it is outside this page.
 - **Inpho modules:** apart from the tools and options in section 23, no public page documents a command line for the Inpho modules.
 - **TSEP Manifest Generator** (https://github.com/TrimbleSolutionsCorporation/TSEPManifestGenerator): a GUI tool; its readme documents no command line.

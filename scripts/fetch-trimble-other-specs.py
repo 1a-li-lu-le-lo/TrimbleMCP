@@ -97,6 +97,12 @@ def to_json(raw):
         return json.JSONDecoder().raw_decode(text, m.start())[0]
     import yaml  # PyYAML
 
+    # A documentation page with the definition in a YAML script block
+    # (ReDoc-style "swagger-data", as api-doc.jobpac.com.au publishes it).
+    m = re.search(r'<script[^>]*\bid="swagger-data"[^>]*type="text/yaml"[^>]*>(.*?)</script>', text, re.S)
+    if m and text.lstrip().startswith("<"):
+        text = m.group(1)
+
     spec = yaml.safe_load(text)
     if not isinstance(spec, dict):
         raise ValueError("not an API definition")

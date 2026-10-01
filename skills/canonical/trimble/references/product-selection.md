@@ -29,7 +29,7 @@ Find any of them with `trimble_api_operations` (filter with `family`, or call it
 | Family | Products (catalogue API ids) |
 |---|---|
 | connect | Trimble Connect Core Account endpoints documented in prose (`connect-ecom`, `connect-projects-api`), Trimble Connect Status Sharing (`trimble-connect-status-sharing`) |
-| construction | Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct / e-Builder (`unity-construct`), Unity Maintain / Permit / Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`) |
+| construction | Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct / e-Builder (`unity-construct`), Unity Maintain / Permit / Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`), Jobpac Connect (`jobpac-connect`; almost every operation is excluded because the Jobpac token travels in the request), Tekla PowerFab Go (`tekla-powerfab-go`) |
 | geospatial | Field Configuration (`geospatial-field-configuration`), Field Data / Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`, and WebSocket streams `mobile-manager-ws-v1`, `mobile-manager-ws-v2`) |
 | transportation | TMT Fleet Maintenance (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`: carriers, shippers, visibility, telematics, eCMR, transport operations, rate management, freight audit, freight procurement, yard appointments) |
 | maps | Trimble Maps (`trimble-maps-*`: places, account manager, fleet, dwell time, single search, multi-vehicle routing, routing profile, geofence notifications, road speeds, RouteReporter) and PC*MILER Route Reports (`pcmiler-route-reports`) |
@@ -42,9 +42,11 @@ Some of their operations are `excluded` with a `safety:` reason: anything that s
 These have no public machine-readable API definition, or are out of scope (see the capability matrix):
 
 - PC*MILER Web Services other than Route Reports (WCF help pages only), and Trimble Maps REST APIs without a published definition.
-- Spectrum Data Exchange and Trimble Field View (SOAP services on customer or regional hosts), Jobpac Connect, TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
-- Tekla Structures and SketchUp (desktop SDKs, not server APIs); CoPilot and other SDK-only products.
-- GNSS correction streams (RTX), and PeopleNet telematics.
+- Spectrum Data Exchange and Trimble Field View (SOAP services on customer or regional hosts), TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
+- Tekla Structures and SketchUp (desktop SDKs, not server APIs); the desktop Tekla PowerFab XML command API; CoPilot and other SDK-only products.
+- The SketchUp Connector, a Trimble-hosted MCP service: the user connects it to their client directly; this bridge does not proxy it.
+- APIs advertised without public documentation (POSPac Cloud, LiDAR QC Cloud, 3D Warehouse, Forestry WSX and DataVuze, TMT Road Call).
+- GNSS correction streams (RTX), GNSS receivers' Programmatic Interface (`/prog/...` on the device) and Settop M1 instrument control, and PeopleNet telematics.
 - Anything that would operate machinery or vehicles (prohibited).
 
 Vehicle positions and fleet data are catalogued for some products (Transporeon visibility and telematics, Trimble Maps RouteReporter and Dwell Time, Civil Site Management), but only as reference plans: the bridge returns no location data, and locations are personal data.
@@ -53,7 +55,7 @@ Vehicle positions and fleet data are catalogued for some products (Transporeon v
 
 - "Connect project", "TC project", "Trimble Connect", or a construction document folder: `trimble-connect`.
 - A truck, route, fleet, or hours-of-service question: no data is available. For TMWSuite, TruckMate, TMT, Transporeon or Trimble Maps fleet and routing operations, reference plans only (with the safety exclusions above).
-- A Vista, ProjectSight, Viewpoint For Projects, Unity, e-Builder, Cityworks or Accubid question: reference plans only; the bridge returns none of their data.
+- A Vista, ProjectSight, Viewpoint For Projects, Unity, e-Builder, Cityworks, Accubid, Jobpac or PowerFab Go question: reference plans only; the bridge returns none of their data.
 - A drawing open in Tekla or SketchUp on the user's machine: a desktop SDK, not reachable here.
 - "Open it in Trimble Connect for Windows", "the desktop app", "show the ToDos panel": `trimble-connect-desktop`. Resolve the project through `trimble-connect` first.
 - Unsure: ask the user which product, after showing what `trimble_get_capabilities` reports.
