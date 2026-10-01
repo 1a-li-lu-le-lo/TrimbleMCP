@@ -101,6 +101,81 @@ placeholder example served from a personal GitHub Pages site (noel-tw.github.io)
 | `GET` | `/path/to/endpoint` | `excluded` | the definition's reason (above) |
 | `POST` | `/data` | `excluded` | the definition's reason (above) |
 
+## bsys-dx-trials (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 7 operations. Definition: [bsys-dx-trials](https://trials-apispec.bsys.trimble.com/DX_Trials.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/trial/account/{accountId}/eligibility/{skuId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/trial/eligibility/{skuId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/trial/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/trial/entitlements/general-signup` | `excluded` | the definition's reason (above) |
+| `POST` | `/trial/entitlements/{entitlementId}/licenses/assign` | `excluded` | the definition's reason (above) |
+| `POST` | `/trial/orchestrate` | `excluded` | the definition's reason (above) |
+| `POST` | `/trial/subscribe` | `excluded` | the definition's reason (above) |
+
+## bsys-ems-migration (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 22 operations. Definition: [bsys-ems-migration](https://ems-migration-docs.bsys.trimble.com/EMSv4.1.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/extraction/{id}/activityStatus` | `excluded` | the definition's reason (above) |
+| `GET` | `/fetchUserLicenses/{id}/activityStatus` | `excluded` | the definition's reason (above) |
+| `GET` | `/migration/{id}/activityStatus` | `excluded` | the definition's reason (above) |
+| `GET` | `/{downloadUrl}` | `excluded` | the definition's reason (above) |
+| `POST` | `/callbackNotification` | `excluded` | the definition's reason (above) |
+| `POST` | `/download` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvr/entitlements/enforce` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvr/expire` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvr/migrateEntitlements` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvr/migrateLicenses` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvw/expireLineitems` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvw/migrateEntitlements` | `excluded` | the definition's reason (above) |
+| `POST` | `/dvw/migrateLicenses` | `excluded` | the definition's reason (above) |
+| `POST` | `/ngss/expire` | `excluded` | the definition's reason (above) |
+| `POST` | `/ngss/migrateEntitlements` | `excluded` | the definition's reason (above) |
+| `POST` | `/ngss/migrateLicenses` | `excluded` | the definition's reason (above) |
+| `POST` | `/upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/v3/extract` | `excluded` | the definition's reason (above) |
+| `POST` | `/v3/fetchUserLicenses` | `excluded` | the definition's reason (above) |
+| `POST` | `/v4/extract` | `excluded` | the definition's reason (above) |
+| `POST` | `/v4/extractLicenses` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{uploadUrl}` | `excluded` | the definition's reason (above) |
+
+## bsys-ems-v4.1 (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 53 operations. Definition: [bsys-ems-v4.1](https://emsv4-docs.bsys.trimble.com/EMSv4.1.json).
+
+Operations: [non-production--bsys-ems-v4.1.md](non-production--bsys-ems-v4.1.md).
+
+## bsys-ems-v4.1.1 (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 82 operations. Definition: [bsys-ems-v4.1.1](https://emsv4-docs.bsys.trimble.com/EMSv4.1.1.json).
+
+Operations: [non-production--bsys-ems-v4.1.1.md](non-production--bsys-ems-v4.1.1.md).
+
+## bsys-transition-layer-v3 (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 3 operations. Definition: [bsys-transition-layer-v3](https://tlv3-apispec.bsys.trimble.com/TLv3.yaml).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/accounts/{accountId}/entitlements/exists` | `excluded` | the definition's reason (above) |
+| `GET` | `/entitlements/members/{memberId}/activations` | `excluded` | the definition's reason (above) |
+| `GET` | `/products/{productSku}/features/{featureId}/usagePlans` | `excluded` | the definition's reason (above) |
+
+## bsys-transition-layer-v4.1 (excluded)
+
+Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements. 3 operations. Definition: [bsys-transition-layer-v4.1](https://tlv4-docs.bsys.trimble.com/TLv4.1.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/entitlements/licenses` | `excluded` | the definition's reason (above) |
+| `GET` | `/entitlements/sku/{sku}/licenses` | `excluded` | the definition's reason (above) |
+| `GET` | `/entitlements/{eId}/licenses` | `excluded` | the definition's reason (above) |
+
 ## connect-ecom/core-account (excluded)
 
 the Core Account page documents these endpoints in prose; the ECom Service definition (connect-ecom) is used instead. 3 operations. Definition: [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/).

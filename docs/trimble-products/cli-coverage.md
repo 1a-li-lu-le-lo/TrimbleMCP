@@ -809,6 +809,7 @@ Sources (verified 2026-10-01):
 
 - https://help.trimble.com/en/trimble-connect/trimble-connect/object-manager/functions/configuration-tools/scheduled-batch-operations ("Scheduled Batch Operations", modified 1 Oct 2026; it redirects to the same path under https://help.trimble.com/doc/). Its sub-page "Run a Batch File Automatically" covers only scheduling the batch file in Windows Task Scheduler.
 - https://help.trimble.com/doc/quadri/quadri/quadri-connectors/quadri-fully-integrated-novapoint: Novapoint includes the Quadri desktop client, so the same `quadri.exe` command line applies to Novapoint installations. Novapoint's own installer command lines are in section 30.
+- https://quadrihelp.trimble.com/Downloads-and-Release-Notes/Quadri-Downloads/Quadri-for-Windows--Release-Notes/Quadri-2025-3 (Quadri 2025.3 release notes): the `--batchtaskerror` switch, which the help page does not list.
 
 Trimble Connect Object Manager, formerly Quadri, works on a shared object model on a server. Its desktop client `quadri.exe` takes switches, and Trimble's example batch file (`.cmd`, placed in the folder that holds `quadri.exe`) runs it with `START /wait` to receive, share and run tasks without a user. Example lines, as documented:
 
@@ -845,6 +846,7 @@ Trimble Connect Object Manager, formerly Quadri, works on a shared object model 
 | `-exit:save` or `-exit:discard` | Saves or discards the local model on exit | Excluded: writes local files |
 | `-unit` | Sets the units, for example imperial | Excluded with the program |
 | `-wait:true` | In every example line, but not in the parameter table | Excluded; its effect is undocumented |
+| `--batchtaskerror:Stop` or `--batchtaskerror:RunNext` | Whether a scheduled batch stops after a failed task (`Stop`, the default) or runs the next one; documented only in the Quadri 2025.3 release notes | Excluded with `-batchtask` |
 
 ## 23. Trimble Inpho command-line tools, excluded
 

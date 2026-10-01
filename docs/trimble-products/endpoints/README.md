@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 13928 operations in 381 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4019 excluded.
+**Totals:** 14098 operations in 387 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4189 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -146,6 +146,12 @@ These operations are catalogued from the products' own published definitions so 
 | [accubid-anywhere/project](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v1.yaml) | Anywhere Project Service | portal | reference | accubid-project | 8 |  |
 | [accubid-anywhere/project-v2](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v2.yaml) | Anywhere Project Service | portal | reference | accubid-project-v2 | 1 |  |
 | [app-xchange/example-v1](https://noel-tw.github.io/openapi/noel-example.json) | Noel Example | portal | excluded |  | 5 | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
+| [bsys-dx-trials](https://trials-apispec.bsys.trimble.com/DX_Trials.json) | DX Trials | direct | excluded |  | 7 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
+| [bsys-ems-migration](https://ems-migration-docs.bsys.trimble.com/EMSv4.1.json) | EMS Migration Pipeline (To support migrations from any legacy provisioning systems to EMSv4, including EMSv3) | direct | excluded |  | 22 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
+| [bsys-ems-v4.1](https://emsv4-docs.bsys.trimble.com/EMSv4.1.json) | EMS | direct | excluded |  | 53 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
+| [bsys-ems-v4.1.1](https://emsv4-docs.bsys.trimble.com/EMSv4.1.1.json) | EMS | direct | excluded |  | 82 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
+| [bsys-transition-layer-v3](https://tlv3-apispec.bsys.trimble.com/TLv3.yaml) | Transition Layer(version 3.0) | direct | excluded |  | 3 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
+| [bsys-transition-layer-v4.1](https://tlv4-docs.bsys.trimble.com/TLv4.1.json) | EMS : Transition Layer | direct | excluded |  | 3 | Trimble-internal licensing and entitlement services (sales, licence administration and licence checks), documented at docs.bsys.trimble.com behind a Trimble ID sign-in; agents never inspect or change licences or entitlements |
 | [civil-site-management/v1](https://developer.trimble.com/docs/civil-site-management/openapi/v1.yaml) | Site Management API | portal | reference | civil-site-management | 19 |  |
 | [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | Trimble Connect eCom service (Core Account) | doc | excluded |  | 3 | variant of connect-ecom; the Core Account page documents these endpoints in prose; the ECom Service definition (connect-ecom) is used instead |
 | [connect-projects-api/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | Trimble Connect projects service (Core Account) | doc | reference | connect-projects-api | 1 |  |

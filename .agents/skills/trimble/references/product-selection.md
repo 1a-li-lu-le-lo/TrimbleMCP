@@ -33,7 +33,7 @@ Find any of them with `trimble_api_operations` (filter with `family`, or call it
 | geospatial | Field Configuration (`geospatial-field-configuration`), Field Data / Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`, and WebSocket streams `mobile-manager-ws-v1`, `mobile-manager-ws-v2`) |
 | transportation | TMT Fleet Maintenance (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`: carriers, shippers, visibility, telematics, eCMR, transport operations, rate management, freight audit and freight audit self-service, freight procurement, yard appointments, market insights) |
 | maps | Trimble Maps (`trimble-maps-*`: places, account manager, fleet, dwell time, single search, multi-vehicle routing, routing profile, geofence notifications, road speeds, RouteReporter) and PC*MILER Route Reports (`pcmiler-route-reports`) |
-| agriculture | PTx FarmENGAGE (`ptx-farmengage`) |
+| agriculture | PTx FarmENGAGE (`ptx-farmengage`; PTx Trimble is an AGCO-controlled joint venture in which Trimble holds 15%) |
 
 Some of their operations are `excluded` with a `safety:` reason: anything that sends data to in-cab devices or changes in-cab navigation or field positioning, and every operation that signs in or carries a credential. Explain the reason and stop; do not suggest another way.
 
@@ -42,7 +42,7 @@ Some of their operations are `excluded` with a `safety:` reason: anything that s
 These have no public machine-readable API definition, or are out of scope (see the capability matrix):
 
 - PC*MILER Web Services other than Route Reports (WCF help pages only), and Trimble Maps REST APIs without a published definition.
-- Spectrum Data Exchange (SOAP and REST services on each customer's server), Trimble Field View (SOAP services on regional hosts), Appian DRTrack web services (SOAP on a per-customer host), Trimble Maps Trip Management and the PC*Miler Rail web services (prose only), Transporeon's and PC*MILER's SOAP services, TMWSuite SystemsLink, the TMT SOAP API and the TruckMate MCP Server, Master Builder and the Viewpoint Team connector, the Trimble Business Center Data Service (local OData), TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
+- Spectrum Data Exchange (SOAP and REST services on each customer's server), Trimble Field View (SOAP services on regional hosts), Appian DRTrack web services (SOAP on a per-customer host), Trimble Maps Trip Management and the PC*Miler Rail web services (prose only), Transporeon's and PC*MILER's SOAP services, TMWSuite SystemsLink, the TMT SOAP API, the TruckMate MCP Server, the Unity Work Management ArcGIS connector, WorksManager's ISO 15143-4 exchange, Master Builder and the Viewpoint Team connector, the Trimble Business Center Data Service (local OData), TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
 - Tekla Structures and SketchUp (desktop SDKs, not server APIs); the desktop Tekla PowerFab XML command API; CoPilot and other SDK-only products.
 - The SketchUp Connector, a Trimble-hosted MCP service: the user connects it to their client directly; this bridge does not proxy it.
 - APIs advertised without public documentation (POSPac Cloud, LiDAR QC Cloud, 3D Warehouse, Forestry WSX and DataVuze, TMT Road Call).
