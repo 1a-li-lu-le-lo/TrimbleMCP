@@ -6,7 +6,7 @@ Part of [Trimble Construction One: Vista (App Xchange Direct API)](vista.md): di
 
 ## Vista Accounts Payable v2 Direct API
 
-Definition [vista/accounts-payable](https://direct-api.xchange.trimble.com/llms.txt), 143 operations.
+Definition [vista/accounts-payable](https://direct-api.xchange.trimble.com/llms.txt), 150 operations.
 
 | Method | Path | Disposition | Tag | Summary | Parameters |
 |---|---|---|---|---|---|
@@ -26,6 +26,11 @@ Definition [vista/accounts-payable](https://direct-api.xchange.trimble.com/llms.
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/cache/keyid/{KeyID}` | `reference` | Invoice Batches | Gets one Invoice Batches object from the cache. | subscriber_code* (path); KeyID* (path); X-Application-Key* (header) |
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/cache/natural/{Co}/{Mth}/{BatchId}` | `reference` | Invoice Batches | Gets one Invoice Batches object from the cache. | subscriber_code* (path); Co* (path); Mth* (path); BatchId* (path); X-Application-Key* (header) |
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/cache/{ryvitId_value}` | `reference` | Invoice Batches | Gets one Invoice Batches object from the cache. | subscriber_code* (path); ryvitId_value* (path); X-Application-Key* (header) |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache` | `reference` | Invoice Headers | Gets all Invoice Headers objects from the cache. | subscriber_code* (path); limit (query); modifiedUTCSince (query); continuationToken (query); X-Application-Key* (header) |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache/__ryvitId/{ryvitId_value}` | `reference` | Invoice Headers | Gets one Invoice Headers object from the cache. | subscriber_code* (path); ryvitId_value* (path); X-Application-Key* (header) |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache/keyid/{KeyID}` | `reference` | Invoice Headers | Gets one Invoice Headers object from the cache. | subscriber_code* (path); KeyID* (path); X-Application-Key* (header) |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache/natural/{APCo}/{Mth}/{APTrans}` | `reference` | Invoice Headers | Gets one Invoice Headers object from the cache. | subscriber_code* (path); APCo* (path); Mth* (path); APTrans* (path); X-Application-Key* (header) |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache/{ryvitId_value}` | `reference` | Invoice Headers | Gets one Invoice Headers object from the cache. | subscriber_code* (path); ryvitId_value* (path); X-Application-Key* (header) |
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/cache` | `reference` | Invoice Holds | Gets all Invoice Holds objects from the cache. | subscriber_code* (path); limit (query); modifiedUTCSince (query); continuationToken (query); X-Application-Key* (header) |
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/cache/__ryvitId/{ryvitId_value}` | `reference` | Invoice Holds | Gets one Invoice Holds object from the cache. | subscriber_code* (path); ryvitId_value* (path); X-Application-Key* (header) |
 | `GET` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/cache/natural/{APCo}/{Mth}/{APTrans}/{APLine}/{APSeq}/{HoldCode}` | `reference` | Invoice Holds | Gets one Invoice Holds object from the cache. | subscriber_code* (path); APCo* (path); Mth* (path); APTrans* (path); APLine* (path); APSeq* (path); HoldCode* (path); X-Application-Key* (header) |
@@ -113,6 +118,8 @@ Definition [vista/accounts-payable](https://direct-api.xchange.trimble.com/llms.
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/actions/unlock` | `reference` | Invoice Batches | Executes the Unlock action for the Invoice Batches data object. | subscriber_code* (path); X-Application-Key* (header); body: application/json |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/actions/upsert` | `reference` | Invoice Batches | Executes the Upsert action for the Invoice Batches data object. | subscriber_code* (path); X-Application-Key* (header); body: application/json |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/inv_batches/cache/search` | `reference` | Invoice Batches | Search through Invoice Batches objects in the data cache | subscriber_code* (path); X-Application-Key* (header); body: application/json |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/actions/refresh_cache` | `reference` | Invoice Headers | Executes the Refresh Cache action for the Invoice Headers data object. | subscriber_code* (path); X-Application-Key* (header); body: application/json |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_headers/cache/search` | `reference` | Invoice Headers | Search through Invoice Headers objects in the data cache | subscriber_code* (path); X-Application-Key* (header); body: application/json |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/actions/hold_invoice` | `reference` | Invoice Holds | Executes the Hold Invoice action for the Invoice Holds data object. | subscriber_code* (path); X-Application-Key* (header); body: application/json |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/actions/release_invoice` | `reference` | Invoice Holds | Executes the Release Invoice action for the Invoice Holds data object. | subscriber_code* (path); X-Application-Key* (header); body: application/json |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/ap/2/data/invoice_holds/cache/search` | `reference` | Invoice Holds | Search through Invoice Holds objects in the data cache | subscriber_code* (path); X-Application-Key* (header); body: application/json |

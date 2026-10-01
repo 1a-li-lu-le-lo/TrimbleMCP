@@ -7,381 +7,210 @@
 - **Authentication:** OAuth 2.0 password grant via /api/v2/Authenticate. Declared security schemes: PasswordFlow.
 - **Access:** Customer.
 - **To call it you would need:** an e-Builder / Unity Construct account and API credentials; regional hosts api2.e-builder.net, api2-us2/us3/us4, api2.ca, gov-api2.
-- **Documented servers:** `https://api2.e-builder.net`, `https://api2-us2.e-builder.net`, `https://api2-us3.e-builder.net`, `https://api2-us4.e-builder.net`, `https://api2.ca.e-builder.net`, `https://gov-api2.e-builder.net`.
-- **Definition:** [unity-construct/v2](https://api2.e-builder.net/swagger3/docs/v1#/) (Unity Construct APIs, version v1). Documentation: https://developer.trimble.com/docs/unity-construct/reference/openapi/v2/.
-
-## AccountCodeOptions
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/AccountCodeOptions/Import` | `reference` | Account Codes Options - IMPORT | schema (query); schemaType (query); body: application/json |
-
-## AccountFunding
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/AccountFundingAdjustments` | `reference` | Account Funding Adjustments - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingDistributions` | `reference` | Account Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingRules` | `reference` | Account Funding Rules - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingRules/{id}` | `reference` | Account Funding Rule - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/AccountFundingRules/{id}/distributions` | `reference` | Account Funding Rule Distributions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingSources` | `reference` | Account Funding Sources - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingSources/{id}` | `reference` | Account Funding Source - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/AccountFundingSources/{id}/adjustments` | `reference` | Account Funding Source Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingSources/{id}/customfields` | `reference` | Account Funding Source Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingSources/{id}/transactions` | `reference` | Account Funding Source Transactions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/AccountFundingTransactions` | `reference` | Account Funding Transactions - GET | dateModified (query); limit (query); offset (query); schema (query) |
-
-## AccountFundingProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/AccountFundingProcesses/Import` | `reference` | Account Funding Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-
-## Authenticate
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/Authenticate` | `reference` | Authenticate a user | body: application/x-www-form-urlencoded |
-
-## BudgetChangeProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/BudgetChangeProcesses/DynamicGrid/Query` | `reference` | Budget Change Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/BudgetChangeProcesses/Import` | `reference` | Budget Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/BudgetChangeProcesses/Query` | `reference` | Budget Change Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
-
-## BudgetChanges
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/BudgetChanges/Import` | `reference` | Budget Changes - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/BudgetChanges/Query` | `reference` | Budget Changes - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-| `PUT` | `/api/v2/BudgetChanges/StatusUpdate` | `reference` | Budget Change Status - UPDATE | schema (query); schemaType (query); body: application/json |
-
-## Budgets
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Budgets` | `reference` | Budgets - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Budgets/budgetChangeReasonCodes` | `reference` | Budget Change Reason Codes - GET | changeReasonCodeId (query); schema (query) |
-| `GET` | `/api/v2/Budgets/{id}` | `reference` | Budget - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Budgets/{id}/changes` | `reference` | Budget Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Budgets/{id}/customFields` | `reference` | Budget Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Budgets/{id}/items` | `reference` | Budget Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/BudgetLineItems/Import` | `reference` | Budget Line Items - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Budgets/Query` | `reference` | Budgets - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-
-## CashFlow
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/CashFlows` | `reference` | Cash Flows - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CashFlows/{id}` | `reference` | Cash Flow - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/CashFlows/{id}/customFields` | `reference` | Cash Flow Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CashFlows/{id}/items` | `reference` | Cash Flow Line Items - GET | id* (path); month (query); limit (query); offset (query); schema (query) |
-
-## CommitmentChangeProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/CommitmentChangeProcesses/DynamicGrid/Query` | `reference` | Commitment Change Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/CommitmentChangeProcesses/Import` | `reference` | Commitment Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/CommitmentChangeProcesses/Query` | `reference` | Commitment Change Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
-
-## CommitmentChanges
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/CommitmentChanges` | `reference` | Commitment Changes - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CommitmentChanges/{id}` | `reference` | Commitment Change - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/CommitmentChanges/{id}/customfields` | `reference` | Commitment Change Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CommitmentChanges/{id}/items` | `reference` | Commitment Change Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/CommitmentChanges/Import` | `reference` | Commitment Changes - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/CommitmentChanges/Query` | `reference` | Commitment Changes - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-| `PUT` | `/api/v2/CommitmentChanges/StatusUpdate` | `reference` | Commitment Changes Status - UPDATE | schema (query); schemaType (query); body: application/json |
-
-## CommitmentInvoices
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/CommitmentInvoiceItems/{id}` | `reference` | Commitment Invoice Line Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/CommitmentInvoiceItems/{id}/customFields` | `reference` | Commitment Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CommitmentInvoices` | `reference` | Commitment Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CommitmentInvoices/{id}` | `reference` | Commitment Invoice - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/CommitmentInvoices/{id}/customFields` | `reference` | Commitment Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/CommitmentInvoices/{id}/items` | `reference` | Commitment Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/CommitmentInvoices/Query` | `reference` | Commitment Invoices - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-
-## CommitmentProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/CommitmentProcesses/DynamicGrid/Query` | `reference` | Commitment Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/CommitmentProcesses/Import` | `reference` | Commitment Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/CommitmentProcesses/Query` | `reference` | Commitment Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
-
-## Commitments
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/CommitmentItems/{id}/customfields` | `reference` | Commitment Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Commitments` | `reference` | Commitments - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Commitments/{id}` | `reference` | Commitment - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Commitments/{id}/changes` | `reference` | Commitment Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Commitments/{id}/customfields` | `reference` | Commitment Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Commitments/{id}/items` | `reference` | Commitment Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/Commitments/Import` | `reference` | Commitments - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Commitments/Query` | `reference` | Commitments - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-| `PUT` | `/api/v2/Commitments/StatusUpdate` | `reference` | Commitment Status - UPDATE | schema (query); schemaType (query); body: application/json |
-
-## Companies
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Companies` | `reference` | Companies - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Companies/{id}` | `reference` | Company - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Companies/{id}/contacts` | `reference` | Company Contacts - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Companies/{id}/customFields` | `reference` | Company Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/Companies/Import` | `reference` | Companies - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Companies/query` | `reference` | Companies - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
-
-## Contacts
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Contacts` | `reference` | Contacts - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Contacts/{id}` | `reference` | Contact - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Contacts/{id}/customFields` | `reference` | Contact Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/Contacts/Import` | `reference` | Contacts - IMPORT | schema (query); schemaType (query); body: application/json |
-
-## Documents
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/Documents/Create` | `reference` | Documents - Create | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Documents/Import` | `reference` | Documents - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Documents/Query` | `reference` | Document - QUERY | dateModified (query); schema (query); pageSize (query); pageNumber (query); includeAllVersions (query); body: application/json |
-
-## Forecasts
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/ForecastItems` | `reference` | Forecast Line Items (All) - GET | limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ForecastItems/{id}` | `reference` | Forecast Line Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/ForecastItems/{id}/adjustments` | `reference` | Forecast Line Item Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ForecastItems/{id}/details` | `reference` | Forecast Line Item Details - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Forecasts` | `reference` | Forecasts - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Forecasts/{id}` | `reference` | Forecast - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Forecasts/{id}/adjustments` | `reference` | Forecast Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Forecasts/{id}/items` | `reference` | Forecast Line Items - GET | id* (path); limit (query); offset (query); schema (query) |
-
-## Forms
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/FormTypes` | `reference` | Form Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FormTypes/{id}` | `reference` | Form Type - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/FormTypes/{id}/customFields` | `reference` | Form Type Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FormTypes/{id}/forms` | `reference` | Form Type Forms - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Forms/{id}` | `reference` | Form - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Forms/{id}/formFields` | `reference` | Form Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-
-## FundingDistributions
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/CostItemFundingDistributions` | `reference` | Cost Item Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingDistributions` | `reference` | Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingDistributions/{id}` | `reference` | Funding Distribution - GET | id* (path); schema (query) |
-
-## FundingRules
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/FundingRules` | `reference` | Funding Rules - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingRules/{id}` | `reference` | Funding Rule - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/FundingRules/{id}/distributions` | `reference` | Funding Rule Distributions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-
-## FundingSourceAdjustments
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/FundingSourceAdjustments/{id}` | `reference` | Funding Source Adjustment - GET | id* (path); schema (query) |
-
-## FundingSources
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/FundingSourceAdjustments` | `reference` | Funding Source Adjustments (All) - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingSources` | `reference` | Funding Sources - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingSources/{id}` | `reference` | Funding Source - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/FundingSources/{id}/adjustments` | `reference` | Funding Source Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/FundingSources/{id}/customfields` | `reference` | Funding Source Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/ProjectFundingSources/Import` | `reference` | Project Funding Source - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/ProjectFundingSources/Query` | `reference` | Project Funding Sources - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-
-## GeneralInvoices
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/GeneralInvoiceItems/{id}` | `reference` | General Invoice Line Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/GeneralInvoiceItems/{id}/customFields` | `reference` | General Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/GeneralInvoices` | `reference` | General Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/GeneralInvoices/{id}` | `reference` | General Invoice - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/GeneralInvoices/{id}/customFields` | `reference` | General Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/GeneralInvoices/{id}/items` | `reference` | General Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/GeneralInvoices/Query` | `reference` | General Invoices - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-| `PUT` | `/api/v2/GeneralInvoices/StatusUpdate` | `reference` | General Invoice Status - UPDATE | schema (query); schemaType (query); body: application/json |
-
-## InvoiceProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/CommitmentInvoiceProcesses/DynamicGrid/Query` | `reference` | Commitment Invoice Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/CommitmentInvoiceProcesses/Query` | `reference` | Commitment Invoice Processes - QUERY | schema (query); pageNumber (query); pageSize (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/GeneralInvoiceProcesses/DynamicGrid/Query` | `reference` | General Invoice Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/GeneralInvoiceProcesses/Query` | `reference` | General Invoice Processes - QUERY | schema (query); pageNumber (query); pageSize (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/InvoiceProcesses/Import` | `reference` | Invoice Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-
-## Invoices
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/Invoices/Import` | `reference` | Invoices - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Invoices/StatusUpdate` | `reference` | Invoice Status - UPDATE | schema (query); schemaType (query); body: application/json |
-
-## MasterCommitmentChangeProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/MasterCommitmentChangeProcesses/Import` | `reference` | Master Commitment Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-
-## MasterCommitmentChanges
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/MasterCommitmentChanges/Import` | `reference` | Master Commitment Changes - IMPORT | schema (query); schemaType (query); body: application/json |
-
-## MasterCommitmentProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/MasterCommitmentProcesses/Import` | `reference` | Master Commitment Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/MasterCommitments/Import` | `reference` | Master Commitments - IMPORT | schema (query); schemaType (query); body: application/json |
-
-## MasterCommitments
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/MasterCommitmentChanges/{id}` | `reference` | Master Commitment Change - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/MasterCommitmentChanges/{id}/customFields` | `reference` | Master Commitment Change Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitmentChanges/{id}/items` | `reference` | Master Commitment Change Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitmentItems/{id}` | `reference` | Master Commitment Line Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/MasterCommitmentItems/{id}/customFields` | `reference` | Master Commitment Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitments` | `reference` | Master Commitments - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitments/{id}` | `reference` | Master Commitment - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/MasterCommitments/{id}/changes` | `reference` | Master Commitment Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitments/{id}/commitments` | `reference` | Master Commitment Child Commitments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitments/{id}/customFields` | `reference` | Master Commitment Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterCommitments/{id}/items` | `reference` | Master Commitment Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-
-## MasterInvoices
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/MasterInvoiceItems/{id}` | `reference` | Master Invoice Line Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/MasterInvoiceItems/{id}/customFields` | `reference` | Master Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterInvoices` | `reference` | Master Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterInvoices/{id}` | `reference` | Master Invoice - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/MasterInvoices/{id}/customFields` | `reference` | Master Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/MasterInvoices/{id}/items` | `reference` | Master Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-
-## NonCostProcesses
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/api/v2/NonCostProcesses/DynamicGrid/Query` | `reference` | Non-Cost Processes Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
-| `POST` | `/api/v2/NonCostProcesses/Import` | `reference` | Non-cost Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
-| `POST` | `/api/v2/NonCostProcesses/Query` | `reference` | Non-Cost Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
-
-## ProcessDefinitions
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/DynamicCostTypes` | `reference` | Dynamic Cost Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/DynamicCostTypes/{id}` | `reference` | Dynamic Cost Type - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/DynamicCostTypes/{id}/items` | `reference` | Dynamic Cost Type Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessTypes` | `reference` | Process Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessTypes/{id}` | `reference` | Process Type - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/ProcessTypes/{id}/customFields` | `reference` | Process Type Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-
-## ProcessInstances
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/DynamicCostItems/{id}` | `reference` | Dynamic Cost Line Items - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/DynamicCostItems/{id}/customFields` | `reference` | Dynamic Cost Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}` | `reference` | Process Instance - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}/Comments` | `reference` | Process Instance Comments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}/dataFields` | `reference` | Process Instance Data Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids` | `reference` | Process Instance Dynamic Grids- GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids/{dynamicGridId}` | `reference` | Process Instance Dynamic Grid - GET | id* (path); dynamicGridId* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids/{dynamicGridId}/items` | `reference` | Process Instance Dynamic Grid Line Items - GET | id* (path); dynamicGridId* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ProcessTypes/{id}/instances` | `reference` | Process Type Instances - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/ProcessInstance/{processInstanceId}/Attach` | `reference` | Process Instance Attach - UPDATE | processInstanceId* (path); schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/ProcessInstances/{id}/Comments/Create` | `reference` | Process Instance Comments - Create | id* (path); schema (query); schemaType (query); body: application/json |
-
-## Projects
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Projects` | `reference` | Projects - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Projects/{id}` | `reference` | Project - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Projects/{id}/customfields` | `reference` | Project Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `POST` | `/api/v2/Projects/Import` | `reference` | Projects - IMPORT | schema (query); schemaType (query); body: application/json |
-| `POST` | `/api/v2/Projects/Query` | `reference` | Projects - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
-
-## Schedules
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/ScheduleTasks` | `reference` | Schedule Tasks (All) - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ScheduleTasks/{id}` | `reference` | Schedule Task - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/ScheduleTasks/{id}/customFields` | `reference` | Schedule Task Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/ScheduleTasks/{id}/predecessors` | `reference` | Schedule Task Predecessors - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Schedules` | `reference` | Schedules - GET | dateCreated (query); lastUpdated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Schedules/{id}` | `reference` | Schedule - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Schedules/{id}/customFields` | `reference` | Schedule Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Schedules/{id}/tasks` | `reference` | Schedule Tasks - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
-
-## Submittals
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/SubmittalItems` | `reference` | Submittal Items - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/SubmittalItems/{id}` | `reference` | Submittal Item - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/SubmittalItems/{id}/customFields` | `reference` | Submittal Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/SubmittalItems/{id}/reviewers` | `reference` | Submittal Item Reviewers - GET | id* (path); dateDue (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/SubmittalPackages` | `reference` | Submittal Packages - GET | dateModified (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/SubmittalPackages/{id}` | `reference` | Submittal Package - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/SubmittalPackages/{id}/customFields` | `reference` | Submittal Package Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/SubmittalPackages/{id}/items` | `reference` | Submittal Package Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
-
-## System
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Counters` | `reference` | Counters - GET | lastModifiedDate (query); schema (query) |
-| `GET` | `/api/v2/Health` | `reference` | Health - GET | schema (query) |
-
-## Users
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/api/v2/Users` | `reference` | Users - GET | dateCreated (query); limit (query); offset (query); schema (query) |
-| `GET` | `/api/v2/Users/{id}` | `reference` | User - GET | id* (path); schema (query) |
-| `GET` | `/api/v2/Users/{id}/customfields` | `reference` | User Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+- **Documented servers:** `https://{base_url}` (template: the customer's host), `https://api2.e-builder.net`, `https://api2-us2.e-builder.net`, `https://api2-us3.e-builder.net`, `https://api2-us4.e-builder.net`, `https://api2.ca.e-builder.net`, `https://gov-api2.e-builder.net`.
+- **Definitions:** 2, one section each below.
+
+## Unity Construct Import API (documentation page)
+
+Definition [unity-construct/import-api-page](https://developer.trimble.com/docs/unity-construct/reference/import-api/), 5 operations. Documentation: https://developer.trimble.com/docs/unity-construct/reference/import-api/.
+
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `POST` | `/api/v2/Documents/Upload` | `reference` |  | Upload a document as Base64 (3 MB limit) | body: application/json |
+| `POST` | `/api/v2/NonCostProcesses/DynamicGrid/Import` | `reference` |  | Import non-cost process dynamic grid rows | body: application/json |
+| `PUT` | `/api/v2/BudgetChanges/Status` | `reference` |  | Update budget change status (the definition names this /StatusUpdate) | body: application/json |
+| `PUT` | `/api/v2/CommitmentChanges` | `reference` |  | Update commitment change header fields | body: application/json |
+| `PUT` | `/api/v2/CommitmentChanges/Status` | `reference` |  | Update commitment change status (the definition names this /StatusUpdate) | body: application/json |
+
+## Unity Construct APIs
+
+Definition [unity-construct/v2](https://api2.e-builder.net/swagger3/docs/v1#/), 184 operations. Documentation: https://developer.trimble.com/docs/unity-construct/reference/openapi/v2/.
+
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `GET` | `/api/v2/AccountFundingAdjustments` | `reference` | AccountFunding | Account Funding Adjustments - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingDistributions` | `reference` | AccountFunding | Account Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingRules` | `reference` | AccountFunding | Account Funding Rules - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingRules/{id}` | `reference` | AccountFunding | Account Funding Rule - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/AccountFundingRules/{id}/distributions` | `reference` | AccountFunding | Account Funding Rule Distributions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingSources` | `reference` | AccountFunding | Account Funding Sources - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingSources/{id}` | `reference` | AccountFunding | Account Funding Source - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/AccountFundingSources/{id}/adjustments` | `reference` | AccountFunding | Account Funding Source Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingSources/{id}/customfields` | `reference` | AccountFunding | Account Funding Source Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingSources/{id}/transactions` | `reference` | AccountFunding | Account Funding Source Transactions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/AccountFundingTransactions` | `reference` | AccountFunding | Account Funding Transactions - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Budgets` | `reference` | Budgets | Budgets - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Budgets/budgetChangeReasonCodes` | `reference` | Budgets | Budget Change Reason Codes - GET | changeReasonCodeId (query); schema (query) |
+| `GET` | `/api/v2/Budgets/{id}` | `reference` | Budgets | Budget - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Budgets/{id}/changes` | `reference` | Budgets | Budget Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Budgets/{id}/customFields` | `reference` | Budgets | Budget Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Budgets/{id}/items` | `reference` | Budgets | Budget Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CashFlows` | `reference` | CashFlow | Cash Flows - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CashFlows/{id}` | `reference` | CashFlow | Cash Flow - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/CashFlows/{id}/customFields` | `reference` | CashFlow | Cash Flow Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CashFlows/{id}/items` | `reference` | CashFlow | Cash Flow Line Items - GET | id* (path); month (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentChanges` | `reference` | CommitmentChanges | Commitment Changes - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentChanges/{id}` | `reference` | CommitmentChanges | Commitment Change - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/CommitmentChanges/{id}/customfields` | `reference` | CommitmentChanges | Commitment Change Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentChanges/{id}/items` | `reference` | CommitmentChanges | Commitment Change Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoiceItems/{id}` | `reference` | CommitmentInvoices | Commitment Invoice Line Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoiceItems/{id}/customFields` | `reference` | CommitmentInvoices | Commitment Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoices` | `reference` | CommitmentInvoices | Commitment Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoices/{id}` | `reference` | CommitmentInvoices | Commitment Invoice - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoices/{id}/customFields` | `reference` | CommitmentInvoices | Commitment Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentInvoices/{id}/items` | `reference` | CommitmentInvoices | Commitment Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CommitmentItems/{id}/customfields` | `reference` | Commitments | Commitment Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Commitments` | `reference` | Commitments | Commitments - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Commitments/{id}` | `reference` | Commitments | Commitment - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Commitments/{id}/changes` | `reference` | Commitments | Commitment Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Commitments/{id}/customfields` | `reference` | Commitments | Commitment Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Commitments/{id}/items` | `reference` | Commitments | Commitment Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Companies` | `reference` | Companies | Companies - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Companies/{id}` | `reference` | Companies | Company - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Companies/{id}/contacts` | `reference` | Companies | Company Contacts - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Companies/{id}/customFields` | `reference` | Companies | Company Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Contacts` | `reference` | Contacts | Contacts - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Contacts/{id}` | `reference` | Contacts | Contact - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Contacts/{id}/customFields` | `reference` | Contacts | Contact Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/CostItemFundingDistributions` | `reference` | FundingDistributions | Cost Item Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Counters` | `reference` | System | Counters - GET | lastModifiedDate (query); schema (query) |
+| `GET` | `/api/v2/DynamicCostItems/{id}` | `reference` | ProcessInstances | Dynamic Cost Line Items - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/DynamicCostItems/{id}/customFields` | `reference` | ProcessInstances | Dynamic Cost Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/DynamicCostTypes` | `reference` | ProcessDefinitions | Dynamic Cost Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/DynamicCostTypes/{id}` | `reference` | ProcessDefinitions | Dynamic Cost Type - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/DynamicCostTypes/{id}/items` | `reference` | ProcessDefinitions | Dynamic Cost Type Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ForecastItems` | `reference` | Forecasts | Forecast Line Items (All) - GET | limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ForecastItems/{id}` | `reference` | Forecasts | Forecast Line Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/ForecastItems/{id}/adjustments` | `reference` | Forecasts | Forecast Line Item Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ForecastItems/{id}/details` | `reference` | Forecasts | Forecast Line Item Details - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Forecasts` | `reference` | Forecasts | Forecasts - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Forecasts/{id}` | `reference` | Forecasts | Forecast - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Forecasts/{id}/adjustments` | `reference` | Forecasts | Forecast Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Forecasts/{id}/items` | `reference` | Forecasts | Forecast Line Items - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FormTypes` | `reference` | Forms | Form Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FormTypes/{id}` | `reference` | Forms | Form Type - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/FormTypes/{id}/customFields` | `reference` | Forms | Form Type Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FormTypes/{id}/forms` | `reference` | Forms | Form Type Forms - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Forms/{id}` | `reference` | Forms | Form - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Forms/{id}/formFields` | `reference` | Forms | Form Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingDistributions` | `reference` | FundingDistributions | Funding Distributions - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingDistributions/{id}` | `reference` | FundingDistributions | Funding Distribution - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/FundingRules` | `reference` | FundingRules | Funding Rules - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingRules/{id}` | `reference` | FundingRules | Funding Rule - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/FundingRules/{id}/distributions` | `reference` | FundingRules | Funding Rule Distributions - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingSourceAdjustments` | `reference` | FundingSources | Funding Source Adjustments (All) - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingSourceAdjustments/{id}` | `reference` | FundingSourceAdjustments | Funding Source Adjustment - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/FundingSources` | `reference` | FundingSources | Funding Sources - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingSources/{id}` | `reference` | FundingSources | Funding Source - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/FundingSources/{id}/adjustments` | `reference` | FundingSources | Funding Source Adjustments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/FundingSources/{id}/customfields` | `reference` | FundingSources | Funding Source Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/GeneralInvoiceItems/{id}` | `reference` | GeneralInvoices | General Invoice Line Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/GeneralInvoiceItems/{id}/customFields` | `reference` | GeneralInvoices | General Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/GeneralInvoices` | `reference` | GeneralInvoices | General Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/GeneralInvoices/{id}` | `reference` | GeneralInvoices | General Invoice - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/GeneralInvoices/{id}/customFields` | `reference` | GeneralInvoices | General Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/GeneralInvoices/{id}/items` | `reference` | GeneralInvoices | General Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Health` | `reference` | System | Health - GET | schema (query) |
+| `GET` | `/api/v2/MasterCommitmentChanges/{id}` | `reference` | MasterCommitments | Master Commitment Change - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/MasterCommitmentChanges/{id}/customFields` | `reference` | MasterCommitments | Master Commitment Change Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitmentChanges/{id}/items` | `reference` | MasterCommitments | Master Commitment Change Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitmentItems/{id}` | `reference` | MasterCommitments | Master Commitment Line Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/MasterCommitmentItems/{id}/customFields` | `reference` | MasterCommitments | Master Commitment Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitments` | `reference` | MasterCommitments | Master Commitments - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitments/{id}` | `reference` | MasterCommitments | Master Commitment - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/MasterCommitments/{id}/changes` | `reference` | MasterCommitments | Master Commitment Changes - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitments/{id}/commitments` | `reference` | MasterCommitments | Master Commitment Child Commitments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitments/{id}/customFields` | `reference` | MasterCommitments | Master Commitment Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterCommitments/{id}/items` | `reference` | MasterCommitments | Master Commitment Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterInvoiceItems/{id}` | `reference` | MasterInvoices | Master Invoice Line Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/MasterInvoiceItems/{id}/customFields` | `reference` | MasterInvoices | Master Invoice Line Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterInvoices` | `reference` | MasterInvoices | Master Invoices - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterInvoices/{id}` | `reference` | MasterInvoices | Master Invoice - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/MasterInvoices/{id}/customFields` | `reference` | MasterInvoices | Master Invoice Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/MasterInvoices/{id}/items` | `reference` | MasterInvoices | Master Invoice Line Items - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}` | `reference` | ProcessInstances | Process Instance - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}/Comments` | `reference` | ProcessInstances | Process Instance Comments - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}/dataFields` | `reference` | ProcessInstances | Process Instance Data Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids` | `reference` | ProcessInstances | Process Instance Dynamic Grids- GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids/{dynamicGridId}` | `reference` | ProcessInstances | Process Instance Dynamic Grid - GET | id* (path); dynamicGridId* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessInstances/{id}/dynamicGrids/{dynamicGridId}/items` | `reference` | ProcessInstances | Process Instance Dynamic Grid Line Items - GET | id* (path); dynamicGridId* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessTypes` | `reference` | ProcessDefinitions | Process Types - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessTypes/{id}` | `reference` | ProcessDefinitions | Process Type - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/ProcessTypes/{id}/customFields` | `reference` | ProcessDefinitions | Process Type Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ProcessTypes/{id}/instances` | `reference` | ProcessInstances | Process Type Instances - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Projects` | `reference` | Projects | Projects - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Projects/{id}` | `reference` | Projects | Project - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Projects/{id}/customfields` | `reference` | Projects | Project Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ScheduleTasks` | `reference` | Schedules | Schedule Tasks (All) - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ScheduleTasks/{id}` | `reference` | Schedules | Schedule Task - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/ScheduleTasks/{id}/customFields` | `reference` | Schedules | Schedule Task Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/ScheduleTasks/{id}/predecessors` | `reference` | Schedules | Schedule Task Predecessors - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Schedules` | `reference` | Schedules | Schedules - GET | dateCreated (query); lastUpdated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Schedules/{id}` | `reference` | Schedules | Schedule - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Schedules/{id}/customFields` | `reference` | Schedules | Schedule Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Schedules/{id}/tasks` | `reference` | Schedules | Schedule Tasks - GET | id* (path); dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalItems` | `reference` | Submittals | Submittal Items - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalItems/{id}` | `reference` | Submittals | Submittal Item - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/SubmittalItems/{id}/customFields` | `reference` | Submittals | Submittal Item Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalItems/{id}/reviewers` | `reference` | Submittals | Submittal Item Reviewers - GET | id* (path); dateDue (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalPackages` | `reference` | Submittals | Submittal Packages - GET | dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalPackages/{id}` | `reference` | Submittals | Submittal Package - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/SubmittalPackages/{id}/customFields` | `reference` | Submittals | Submittal Package Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/SubmittalPackages/{id}/items` | `reference` | Submittals | Submittal Package Line Items - GET | id* (path); dateModified (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Users` | `reference` | Users | Users - GET | dateCreated (query); limit (query); offset (query); schema (query) |
+| `GET` | `/api/v2/Users/{id}` | `reference` | Users | User - GET | id* (path); schema (query) |
+| `GET` | `/api/v2/Users/{id}/customfields` | `reference` | Users | User Custom Fields - GET | id* (path); limit (query); offset (query); schema (query) |
+| `POST` | `/api/v2/AccountCodeOptions/Import` | `reference` | AccountCodeOptions | Account Codes Options - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/AccountFundingProcesses/Import` | `reference` | AccountFundingProcesses | Account Funding Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/Authenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authenticate | Authenticate a user | body: application/x-www-form-urlencoded |
+| `POST` | `/api/v2/BudgetChangeProcesses/DynamicGrid/Query` | `reference` | BudgetChangeProcesses | Budget Change Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/BudgetChangeProcesses/Import` | `reference` | BudgetChangeProcesses | Budget Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/BudgetChangeProcesses/Query` | `reference` | BudgetChangeProcesses | Budget Change Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/BudgetChanges/Import` | `reference` | BudgetChanges | Budget Changes - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/BudgetChanges/Query` | `reference` | BudgetChanges | Budget Changes - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/BudgetLineItems/Import` | `reference` | Budgets | Budget Line Items - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Budgets/Query` | `reference` | Budgets | Budgets - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/CommitmentChangeProcesses/DynamicGrid/Query` | `reference` | CommitmentChangeProcesses | Commitment Change Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/CommitmentChangeProcesses/Import` | `reference` | CommitmentChangeProcesses | Commitment Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/CommitmentChangeProcesses/Query` | `reference` | CommitmentChangeProcesses | Commitment Change Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/CommitmentChanges/Import` | `reference` | CommitmentChanges | Commitment Changes - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/CommitmentChanges/Query` | `reference` | CommitmentChanges | Commitment Changes - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/CommitmentInvoiceProcesses/DynamicGrid/Query` | `reference` | InvoiceProcesses | Commitment Invoice Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/CommitmentInvoiceProcesses/Query` | `reference` | InvoiceProcesses | Commitment Invoice Processes - QUERY | schema (query); pageNumber (query); pageSize (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/CommitmentInvoices/Query` | `reference` | CommitmentInvoices | Commitment Invoices - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/CommitmentProcesses/DynamicGrid/Query` | `reference` | CommitmentProcesses | Commitment Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/CommitmentProcesses/Import` | `reference` | CommitmentProcesses | Commitment Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/CommitmentProcesses/Query` | `reference` | CommitmentProcesses | Commitment Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/Commitments/Import` | `reference` | Commitments | Commitments - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Commitments/Query` | `reference` | Commitments | Commitments - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/Companies/Import` | `reference` | Companies | Companies - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Companies/query` | `reference` | Companies | Companies - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/Contacts/Import` | `reference` | Contacts | Contacts - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Documents/Create` | `reference` | Documents | Documents - Create | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Documents/Import` | `reference` | Documents | Documents - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Documents/Query` | `reference` | Documents | Document - QUERY | dateModified (query); schema (query); pageSize (query); pageNumber (query); includeAllVersions (query); body: application/json |
+| `POST` | `/api/v2/GeneralInvoiceProcesses/DynamicGrid/Query` | `reference` | InvoiceProcesses | General Invoice Process Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/GeneralInvoiceProcesses/Query` | `reference` | InvoiceProcesses | General Invoice Processes - QUERY | schema (query); pageNumber (query); pageSize (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/GeneralInvoices/Query` | `reference` | GeneralInvoices | General Invoices - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/InvoiceProcesses/Import` | `reference` | InvoiceProcesses | Invoice Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/Invoices/Import` | `reference` | Invoices | Invoices - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Invoices/StatusUpdate` | `reference` | Invoices | Invoice Status - UPDATE | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/MasterCommitmentChangeProcesses/Import` | `reference` | MasterCommitmentChangeProcesses | Master Commitment Change Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/MasterCommitmentChanges/Import` | `reference` | MasterCommitmentChanges | Master Commitment Changes - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/MasterCommitmentProcesses/Import` | `reference` | MasterCommitmentProcesses | Master Commitment Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/MasterCommitments/Import` | `reference` | MasterCommitmentProcesses | Master Commitments - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/NonCostProcesses/DynamicGrid/Query` | `reference` | NonCostProcesses | Non-Cost Processes Dynamic Grid - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); gridName (query); body: application/json |
+| `POST` | `/api/v2/NonCostProcesses/Import` | `reference` | NonCostProcesses | Non-cost Processes - IMPORT | schema (query); schemaType (query); processPrefix (query); body: application/json |
+| `POST` | `/api/v2/NonCostProcesses/Query` | `reference` | NonCostProcesses | Non-Cost Processes - QUERY | schema (query); processPrefix (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/ProcessInstance/{processInstanceId}/Attach` | `reference` | ProcessInstances | Process Instance Attach - UPDATE | processInstanceId* (path); schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/ProcessInstances/{id}/Comments/Create` | `reference` | ProcessInstances | Process Instance Comments - Create | id* (path); schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/ProjectFundingSources/Import` | `reference` | FundingSources | Project Funding Source - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/ProjectFundingSources/Query` | `reference` | FundingSources | Project Funding Sources - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `POST` | `/api/v2/Projects/Import` | `reference` | Projects | Projects - IMPORT | schema (query); schemaType (query); body: application/json |
+| `POST` | `/api/v2/Projects/Query` | `reference` | Projects | Projects - QUERY | schema (query); pageNumber (query); pageSize (query); body: application/json |
+| `PUT` | `/api/v2/BudgetChanges/StatusUpdate` | `reference` | BudgetChanges | Budget Change Status - UPDATE | schema (query); schemaType (query); body: application/json |
+| `PUT` | `/api/v2/CommitmentChanges/StatusUpdate` | `reference` | CommitmentChanges | Commitment Changes Status - UPDATE | schema (query); schemaType (query); body: application/json |
+| `PUT` | `/api/v2/Commitments/StatusUpdate` | `reference` | Commitments | Commitment Status - UPDATE | schema (query); schemaType (query); body: application/json |
+| `PUT` | `/api/v2/GeneralInvoices/StatusUpdate` | `reference` | GeneralInvoices | General Invoice Status - UPDATE | schema (query); schemaType (query); body: application/json |
 
 `*` marks a required parameter.

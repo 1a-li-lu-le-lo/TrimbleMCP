@@ -60,9 +60,11 @@ func canonical(v string, allowed []string) (string, bool) {
 	return "", false
 }
 
-// Default view and panel. The documented example says show=3D,ToDos opens
-// "the ToDos tab instead of the models tab", so 3D with models is the
-// application's documented default.
+// Default view and panel that the bridge emits when neither is given. The
+// page documents no default: its example says show=3D,ToDos opens "the ToDos
+// tab instead of the models tab", which implies models is the usual panel;
+// 3D as the default view is assumption A-9. 3D,models is a documented
+// combination either way.
 const (
 	DefaultView  = "3D"
 	DefaultPanel = "models"
@@ -70,7 +72,7 @@ const (
 
 // BuildURI validates inputs and returns the launch URI. Only the documented
 // two-value form "show=[view],[panel]" is ever emitted: when both are
-// omitted the documented default (3D, models) is used, and supplying only
+// omitted the bridge emits 3D,models (assumption A-9), and supplying only
 // one of them is rejected because single-value forms are undocumented.
 func BuildURI(project domain.ProjectID, view, panel string) (trimble.DesktopLink, error) {
 	if !projectID.MatchString(string(project)) {

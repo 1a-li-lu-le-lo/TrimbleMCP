@@ -41,6 +41,7 @@ type rule struct {
 	MatchSpec   string `json:"match_spec"`
 	MatchDoc    string `json:"match_doc"`
 	MatchSource string `json:"match_source"`
+	MatchPrefix string `json:"match_prefix"`
 	Class       string `json:"class"` // connect | reference | excluded | identity
 	API         string `json:"api"`
 	Family      string `json:"family"`
@@ -50,7 +51,11 @@ type rule struct {
 	Requires    string `json:"requires"`
 	Reason      string `json:"reason"`
 	Note        string `json:"note"`
-	used        bool
+	// CoveredByAPI, on an excluded rule, marks operations that the named
+	// reference API also documents as variants of it; only the rest are
+	// excluded.
+	CoveredByAPI string `json:"covered_by_api"`
+	used         bool
 }
 
 func (r *rule) matches(d found) bool {
@@ -66,6 +71,8 @@ func (r *rule) matches(d found) bool {
 		return false
 	case r.MatchSource != "":
 		return d.ID == r.MatchSource || strings.HasPrefix(d.ID, r.MatchSource+"/")
+	case r.MatchPrefix != "":
+		return strings.HasPrefix(d.ID, r.MatchPrefix)
 	}
 	return false
 }
@@ -77,6 +84,9 @@ type found struct {
 	DocURLs []string `json:"doc_urls"`
 	Kind    string   `json:"kind"`
 	Error   string   `json:"error"`
+	// Unavailable records a definition the manifest lists as known to fail
+	// to download, with the reason; it is catalogued with no operations.
+	Unavailable string `json:"unavailable"`
 }
 
 // identityEndpoints classifies every endpoint field of the Trimble Identity
@@ -136,6 +146,16 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 			attachConnectDocs(cat, d)
 			continue
 		}
+		if d.Unavailable != "" {
+			// Listed in the manifest as known to fail; recorded so it is
+			// accounted for, with no operations to catalogue.
+			if r.Class != "excluded" {
+				fail("%s is unavailable (%s) but its rule is %q; only excluded definitions may be unavailable", d.ID, d.Unavailable, r.Class)
+			}
+			cat.Sources = append(cat.Sources, Source{ID: d.ID, Title: d.ID, URL: d.SpecURL, DocURLs: d.DocURLs, Kind: d.Kind,
+				Class: r.Class, Family: r.Family, Product: r.Product, Note: r.Reason, Unavailable: d.Unavailable})
+			continue
+		}
 		b, err := os.ReadFile(filepath.Join(dir, strings.ReplaceAll(d.ID, "/", "__")+".json"))
 		if err != nil {
 			fail("read %s: %v", d.ID, err)
@@ -167,6 +187,7 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 			if r.Reason == "" {
 				fail("excluded rule for %s has no reason", d.ID)
 			}
+			src.VariantOf = r.CoveredByAPI
 			excluded, excludedSpecs = append(excluded, src), append(excludedSpecs, sp)
 		case "identity":
 			addIdentity(cat, src, sp)
@@ -220,10 +241,13 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 					o.Key = api + ":" + mp
 					first[mp] = o.Key
 					o.Disposition, o.Reason = catalog.Reference, "reference only; the bridge never executes it (see the API's requirements)"
+					if o.Method == "ANY" {
+						o.Disposition, o.Reason = catalog.Excluded, "API Gateway catch-all (any method); not a documented operation"
+					}
 				}
 				cat.Operations = append(cat.Operations, o)
 			}
-			src.Ops = len(ops)
+			src.Ops = len(ops) + addWebhooks(cat, src, g.specs[i])
 			cat.Sources = append(cat.Sources, *src)
 		}
 		for s := range sec {
@@ -256,16 +280,54 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 		}
 	}
 
+	keys := map[string]*Operation{}
+	for i := range cat.Operations {
+		keys[cat.Operations[i].Key] = &cat.Operations[i]
+	}
 	for i, src := range excluded {
 		ops := excludedSpecs[i].operations()
 		for _, o := range ops {
 			o.Key = src.ID + ":" + o.Method + " " + o.Path
 			o.Disposition, o.Reason = catalog.Excluded, src.Note
+			if api := src.VariantOf; api != "" {
+				if !hasAPI(cat, api) {
+					fail("covered_by_api %q for %s is not a catalogued API", api, src.ID)
+				}
+				if k := api + ":" + o.Method + " " + o.Path; keys[k] != nil && keys[k].Disposition == catalog.Reference {
+					o.API, o.Disposition, o.CoveredBy = api, catalog.Variant, k
+					o.Reason = "also published in " + src.ID + " (" + src.Note + "); the same call as " + k
+				}
+			}
 			cat.Operations = append(cat.Operations, o)
 		}
-		src.Ops = len(ops)
+		src.Ops = len(ops) + addWebhooks(cat, src, excludedSpecs[i])
 		cat.Sources = append(cat.Sources, *src)
 	}
+}
+
+// addWebhooks catalogues a definition's OpenAPI 3.1 webhooks as excluded:
+// they are requests the provider sends to the customer's own endpoint, so
+// there is nothing for anyone to call at the provider. Their keys carry a
+// /webhook suffix on the source id.
+func addWebhooks(cat *Catalog, src *Source, sp *spec) int {
+	hooks := sp.webhooks()
+	for _, o := range hooks {
+		o.API = src.API
+		o.Key = src.ID + "/webhook:" + o.Method + " " + o.Path
+		o.Disposition = catalog.Excluded
+		o.Reason = "webhook: the provider sends this request to the customer's endpoint; nothing to call at the provider"
+		cat.Operations = append(cat.Operations, o)
+	}
+	return len(hooks)
+}
+
+func hasAPI(cat *Catalog, id string) bool {
+	for _, a := range cat.APIs {
+		if a.ID == id {
+			return true
+		}
+	}
+	return false
 }
 
 // apiName expands a rule's api template with the definition's name: the part
@@ -316,16 +378,28 @@ func attachConnectDocs(cat *Catalog, d found) {
 func addIdentity(cat *Catalog, src *Source, sp *spec) {
 	type ep struct{ field, raw string }
 	var eps []ep
+	// Every absolute URL in the document, at the top level or one level down
+	// (mtls_endpoint_aliases), is an endpoint unless it is a documentation
+	// link; each must be classified in identityEndpoints.
+	isURL := func(v any) (string, bool) {
+		s, ok := v.(string)
+		if !ok {
+			return "", false
+		}
+		u, err := url.Parse(s)
+		return s, err == nil && (u.Scheme == "https" || u.Scheme == "http") && u.Host != ""
+	}
 	for k, v := range sp.raw {
-		s, isStr := v.(string)
-		switch {
-		case identityDocFields[k]:
-		case k == "mtls_endpoint_aliases":
-			for ak, av := range obj(v) {
-				eps = append(eps, ep{k + "." + ak, str(map[string]any{"v": av}, "v")})
-			}
-		case isStr && (strings.HasSuffix(k, "_endpoint") || strings.HasSuffix(k, "_uri")):
+		if identityDocFields[k] {
+			continue
+		}
+		if s, ok := isURL(v); ok {
 			eps = append(eps, ep{k, s})
+		}
+		for ak, av := range obj(v) {
+			if s, ok := isURL(av); ok {
+				eps = append(eps, ep{k + "." + ak, s})
+			}
 		}
 	}
 	sort.Slice(eps, func(i, j int) bool { return eps[i].field < eps[j].field })

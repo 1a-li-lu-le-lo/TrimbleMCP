@@ -100,7 +100,7 @@ var apiMeta = map[string]struct{ title, status, doc string }{
 	"core":           {"Trimble Connect Core API", "ga", "https://developer.trimble.com/docs/connect/core"},
 	"model":          {"Trimble Connect Model API", "ga", "https://developer.trimble.com/docs/connect"},
 	"model-feature":  {"Trimble Connect Model Feature Service", "ga", "https://developer.trimble.com/docs/connect"},
-	"org":            {"Trimble Connect Org Service (Core Account / Organizer)", "ga", "https://developer.trimble.com/docs/connect"},
+	"org":            {"Trimble Connect Org Service (Organizer)", "ga", "https://developer.trimble.com/docs/connect"},
 	"pset":           {"Trimble Connect Property Set Service", "ga", "https://developer.trimble.com/docs/connect"},
 	"topics":         {"Trimble Connect Topics API (BCF 2.1 / 3.0)", "ga", "https://developer.trimble.com/docs/connect"},
 	"topic-exchange": {"Trimble Connect Topics Exchange Service (BCF)", "ga", "https://developer.trimble.com/docs/connect"},
@@ -277,6 +277,9 @@ func main() {
 	for si := range order {
 		src := order[si]
 		ops := specs[src.ID].operations()
+		if len(specs[src.ID].webhooks()) > 0 {
+			fail("%s declares webhooks; classify them before regenerating", src.ID)
+		}
 		for _, o := range ops {
 			M, p := o.Method, o.Path
 			switch src.Class {
@@ -296,6 +299,8 @@ func main() {
 					o.Disposition, o.Reason = catalog.Read, "production read; executable through trimble_api_read"
 				case M == "OPTIONS" || M == "TRACE":
 					o.Disposition, o.Reason = catalog.Excluded, "CORS preflight or diagnostic method; not an API operation"
+				case M == "ANY":
+					o.Disposition, o.Reason = catalog.Excluded, "API Gateway catch-all (any method); not a documented operation"
 				default:
 					o.Disposition, o.Reason = catalog.Plan, "production change; dry-run plan through trimble_api_plan (execution requires the approval framework, ADR-0004)"
 				}
@@ -397,7 +402,7 @@ var regionServices = map[string]struct{ api, note string }{
 	"pset-api":          {"pset", ""},
 	"topic-api":         {"topics", ""},
 	"issues-api":        {"issues", ""},
-	"projects-api":      {"", "listed by /regions, but Trimble publishes no API definition for it; project operations are in the Core API"},
+	"projects-api":      {"", "listed by /regions; Trimble publishes no API definition for it. Its one documented endpoint (POST /v1/projects/update-users, Core Account) is catalogued as connect-projects-api"},
 	"user-api":          {"", "listed by /regions, but Trimble publishes no API definition for it; user operations are in the Core API"},
 	"batch-api":         {"", "listed by /regions, but Trimble publishes no API definition for it"},
 	"objects-sync-api":  {"", "listed by /regions, but Trimble publishes no API definition for it"},

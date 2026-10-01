@@ -80,9 +80,9 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/Integration/OAuth/Refresh` | `reference` | Refresh access token using refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
-| `POST` | `/Integration/OAuth/Revoke` | `reference` | Revoke refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
-| `POST` | `/Integration/OAuth/Token` | `reference` | Generate access token using username/password | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Refresh` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Refresh access token using refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Revoke` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Revoke refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate access token using username/password | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 
 ## Integration/Parts/FCA
 

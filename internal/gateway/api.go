@@ -100,6 +100,12 @@ func validateOperationArgs(op *catalog.Operation, in apiArgs) (map[string]string
 		if err != nil {
 			return nil, nil, nil, err
 		}
+		if p.Join != "" {
+			// A non-exploded array (explode:false, collectionFormat csv...)
+			// is one parameter with delimited values, as the definition says.
+			query.Add(k, strings.Join(vals, p.Join))
+			continue
+		}
 		for _, v := range vals {
 			query.Add(k, v)
 		}
@@ -555,6 +561,9 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	if err != nil {
 		return nil, err
 	}
+	if err := refuseCredentials(in); err != nil {
+		return nil, err
+	}
 	if reference {
 		// Project grants name Trimble Connect projects; another product's
 		// project IDs cannot be checked against them, so a restricted
@@ -611,7 +620,7 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	}
 	plan := map[string]any{
 		"key": op.Key, "method": op.Method, "url": u.String(), "headers": headers,
-		"content_type": firstOr(op.BodyTypes, ""), "body": body, "reason": in.Reason,
+		"content_type": catalog.PreferredContentType(op.BodyTypes), "body": body, "reason": in.Reason,
 		"approval_level": level, "approval": approval,
 		"executed": false,
 		"rollback": rollbackFor(op.Method),
@@ -622,6 +631,63 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 		Result: map[string]any{"plan": plan}, DataLabels: []string{"dry_run", "planning_aid", "not_executed"},
 		Warnings: warnings, NextAction: "Present the plan for human review. Nothing was sent to Trimble.",
 	}, nil
+}
+
+// credentialNames are parameter and body field names that carry secrets.
+// Plans are shown to people and models and recorded, so they must never
+// contain credentials; pagination cursors such as skipToken are not
+// credentials and are allowed.
+var credentialNames = map[string]bool{
+	"password": true, "passwd": true, "pwd": true, "secret": true, "clientsecret": true, "client_secret": true,
+	"apikey": true, "api_key": true, "x-api-key": true, "accesstoken": true, "access_token": true,
+	"refreshtoken": true, "refresh_token": true, "idtoken": true, "id_token": true, "gistoken": true,
+	"mfatoken": true, "token": true, "authtoken": true, "auth_token": true, "authorization": true,
+	"privatekey": true, "private_key": true, "sessiontoken": true, "session_token": true,
+}
+
+// refuseCredentials rejects plan inputs whose parameter or body field names
+// (at any depth) are credentials.
+func refuseCredentials(in apiArgs) error {
+	isCred := func(k string) bool { return credentialNames[strings.ToLower(k)] }
+	for _, m := range []map[string]string{in.Path, in.Headers} {
+		for k := range m {
+			if isCred(k) {
+				return errs.Newf(errs.PolicyDenied, "%q carries a credential; plans never contain credentials", cleanUntrusted(k))
+			}
+		}
+	}
+	for k := range in.Query {
+		if isCred(k) {
+			return errs.Newf(errs.PolicyDenied, "%q carries a credential; plans never contain credentials", cleanUntrusted(k))
+		}
+	}
+	var found string
+	var walk func(v any)
+	walk = func(v any) {
+		switch t := v.(type) {
+		case map[string]any:
+			for k, x := range t {
+				if isCred(k) && found == "" {
+					found = k
+				}
+				walk(x)
+			}
+		case []any:
+			for _, x := range t {
+				walk(x)
+			}
+		}
+	}
+	if len(in.Body) > 0 {
+		var body any
+		if json.Unmarshal(in.Body, &body) == nil {
+			walk(body)
+		}
+	}
+	if found != "" {
+		return errs.Newf(errs.PolicyDenied, "body field %q carries a credential; plans never contain credentials", cleanUntrusted(found))
+	}
+	return nil
 }
 
 // referencePlan renders a dry-run request for another product's operation.
@@ -649,7 +715,7 @@ func referencePlan(op *catalog.Operation, path map[string]string, query url.Valu
 	}
 	level, approval := "L1", "a read in another product; it still needs that product's credentials and the user's authorisation"
 	switch op.Method {
-	case "GET", "HEAD":
+	case "GET", "HEAD", "SUBSCRIBE": // SUBSCRIBE: receive messages from a documented channel
 	case "DELETE":
 		level, approval = "L4", "case-specific approval (deletion)"
 	default:
@@ -665,7 +731,7 @@ func referencePlan(op *catalog.Operation, path map[string]string, query url.Valu
 	plan := map[string]any{
 		"key": op.Key, "product": a.Product, "method": op.Method, "path": p, "headers": headers,
 		"documented_servers": a.Servers, "authentication": a.Auth, "access": a.Access, "requires": a.Requires,
-		"content_type": firstOr(op.BodyTypes, ""), "body": body, "reason": reason,
+		"content_type": catalog.PreferredContentType(op.BodyTypes), "body": body, "reason": reason,
 		"approval_level": level, "approval": approval,
 		"executed": false,
 		"rollback": rollbackFor(op.Method),
@@ -690,13 +756,6 @@ func rollbackFor(method string) string {
 		return "Not applicable: a read changes nothing."
 	}
 	return "Review manually."
-}
-
-func firstOr(s []string, def string) string {
-	if len(s) > 0 {
-		return s[0]
-	}
-	return def
 }
 
 // catalogKeys lists every operation key (tests and diagnostics).

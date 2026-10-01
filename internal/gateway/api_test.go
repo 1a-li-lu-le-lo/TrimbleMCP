@@ -12,6 +12,7 @@ import (
 
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/audit"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/authz"
+	"github.com/1a-li-lu-le-lo/trimblemcp/internal/catalog"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/domain"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/errs"
 	"github.com/1a-li-lu-le-lo/trimblemcp/internal/trimble/connect"
@@ -274,5 +275,54 @@ func TestPlanToolNeedsNoConfiguredProduct(t *testing.T) {
 	env = invoke(t, g, p, ToolAPIPlan, `{"product":"mock","key":"core:DELETE /projects/{projectId}","path_params":{"projectId":"p1"},"reason":"x"}`)
 	if env.Error == nil || env.Error.Code != errs.UnsupportedCapability {
 		t.Fatalf("a Trimble Connect plan without the Connect adapter must fail closed: %+v", env.Error)
+	}
+}
+
+// Non-exploded array parameters are sent as one delimited value, as the
+// definition declares (core include: explode false).
+func TestAPIReadJoinsNonExplodedArrays(t *testing.T) {
+	f := setupAPI(t, func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"id":"f1"}`)) })
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIRead, `{"product":"trimble-connect","key":"core:GET /files/{fileId}","path_params":{"fileId":"f1"},"query_params":{"include":["_actions","path"]}}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+	if got := f.last.Load().(string); got != "/tc/api/2.0/files/f1?include=_actions%2Cpath" {
+		t.Fatalf("request %s", got)
+	}
+}
+
+func TestPlansNeverCarryCredentials(t *testing.T) {
+	f := setupAPI(t, func(http.ResponseWriter, *http.Request) {})
+	for name, args := range map[string]string{
+		"password in body":      `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":{"x":{"Password":"p"}},"reason":"x"}`,
+		"client secret in body": `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":[{"client_secret":"s"}],"reason":"x"}`,
+		"credential sign-in op": `{"key":"unity-construct:POST /api/v2/Authenticate","reason":"x"}`,
+		"maps credential op":    `{"key":"trimble-maps-fleet:POST /accounts/authenticate","reason":"x"}`,
+		"fleet routing to cabs": `{"key":"trimble-maps-routing-profile:DELETE /routing/v1/routingprofiles/{routingProfileId}","path_params":{"routingProfileId":"r1"},"reason":"x"}`,
+		"resource file to cab":  `{"key":"ptx-farmengage:PATCH /resources/{orgId}/resourcefiles/{id}/send","path_params":{"orgId":"o","id":"i"},"body":[{"deviceId":"d"}],"reason":"x"}`,
+		"prescription import":   `{"key":"ptx-farmengage:POST /prescriptions/{orgId}/rx/importjob","path_params":{"orgId":"o"},"body":{"fileName":"a","rateColumn":"r","rateUnit":"u"},"reason":"x"}`,
+	} {
+		env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, args)
+		if env.Error == nil || env.Error.Code != errs.PolicyDenied {
+			t.Errorf("%s: %+v", name, env.Error)
+		}
+	}
+	// Pagination cursors are not credentials.
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"product":"trimble-connect","key":"core:DELETE /projects/{projectId}","path_params":{"projectId":"p1"},"reason":"x"}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+}
+
+func TestPlanContentTypeIsConcrete(t *testing.T) {
+	f := setupAPI(t, func(http.ResponseWriter, *http.Request) {})
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"key":"trimble-maps-places:DELETE /places/v1/place/{placeId}","path_params":{"placeId":"p"},"reason":"x"}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+	for _, o := range catalog.Must().Operations {
+		if ct := catalog.PreferredContentType(o.BodyTypes); strings.Contains(ct, "*") && slices.Contains(o.BodyTypes, "application/json") {
+			t.Fatalf("%s: plan would present %q", o.Key, ct)
+		}
 	}
 }

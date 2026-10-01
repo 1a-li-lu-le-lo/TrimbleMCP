@@ -58,7 +58,7 @@ func TestEveryOperationHasADisposition(t *testing.T) {
 			}
 		}
 		if hasAPI && api.Kind == KindReference && o.Disposition != Reference && o.Disposition != Variant &&
-			!(o.Disposition == Excluded && strings.HasPrefix(o.Reason, "safety: ")) {
+			!(o.Disposition == Excluded && (strings.HasPrefix(o.Reason, "safety: ") || strings.HasPrefix(o.Reason, "webhook: ") || o.Method == "ANY")) {
 			t.Errorf("%s: an operation of reference API %s must be reference, variant or safety-excluded", o.Key, api.ID)
 		}
 	}
@@ -69,10 +69,10 @@ func TestEveryOperationHasADisposition(t *testing.T) {
 		if !slices.Contains([]string{"production", "variant", "internal", "empty", "reference", "excluded", "identity"}, s.Class) {
 			t.Errorf("source %s: class %q", s.ID, s.Class)
 		}
-		if !slices.Contains([]string{"swaggerhub", "portal", "direct", "vista", "oidc"}, s.Kind) {
+		if !slices.Contains([]string{"swaggerhub", "portal", "maps", "app-xchange", "confluence", "direct", "doc", "vista", "oidc"}, s.Kind) {
 			t.Errorf("source %s: kind %q", s.ID, s.Kind)
 		}
-		if s.SHA256 == "" || !strings.HasPrefix(s.URL, "https://") {
+		if (s.SHA256 == "") != (s.Unavailable != "") || !strings.HasPrefix(s.URL, "https://") {
 			t.Errorf("source %s: provenance missing", s.ID)
 		}
 		if s.Kind == "swaggerhub" && !strings.HasPrefix(s.URL, "https://api.swaggerhub.com/apis/Trimble-Connect/") {
@@ -169,10 +169,49 @@ func TestSafetyExclusions(t *testing.T) {
 		"ptx-farmengage:PUT /prescriptions/{orgId}/rx/{rxId}/vehicletarget/{vehicleId}",
 		"ptx-farmengage:PUT /operations/{orgId}/workorders/{workOrderId}/vehicletarget/{vehicleId}",
 		"mobile-manager:PUT /api/v1/correctionSource/",
+		"ptx-farmengage:PATCH /resources/{orgId}/resourcefiles/{id}/send",
+		"ptx-farmengage:POST /prescriptions/{orgId}/rx/importjob",
+		"unity-construct:POST /api/v2/Authenticate",
+		"truckmate:POST /login",
+		"trimble-maps-routing-profile:PUT /routing/v1/routingprofiles/{routingProfileId}",
 	} {
 		o, ok := Lookup(k)
 		if !ok || o.Disposition != Excluded || !strings.HasPrefix(o.Reason, "safety: ") {
 			t.Errorf("%s must be safety-excluded, got %+v", k, o)
+		}
+	}
+}
+
+// Every {name} in a path template has exactly one declared path parameter,
+// so every catalogued operation can be validated and planned.
+func TestPathTemplatesMatchParameters(t *testing.T) {
+	tmpl := regexp.MustCompile(`\{([^{}]+)\}`)
+	for _, o := range Must().Operations {
+		for _, m := range tmpl.FindAllStringSubmatch(o.Path, -1) {
+			n := 0
+			for _, p := range o.Params {
+				if p.In == "path" && p.Name == m[1] {
+					n++
+				}
+			}
+			if n != 1 {
+				t.Errorf("%s: path parameter %q declared %d times", o.Key, m[1], n)
+			}
+		}
+	}
+}
+
+func TestPreferredContentType(t *testing.T) {
+	for _, c := range []struct {
+		in   []string
+		want string
+	}{
+		{[]string{"application/*+json", "application/json", "text/json"}, "application/json"},
+		{[]string{"application/*+json", "text/plain"}, "text/plain"},
+		{nil, ""},
+	} {
+		if got := PreferredContentType(c.in); got != c.want {
+			t.Errorf("%v: got %q", c.in, got)
 		}
 	}
 }
@@ -245,7 +284,7 @@ func TestGeneratedDocsListEveryOperation(t *testing.T) {
 	}
 }
 
-var keyShape = regexp.MustCompile(`^[A-Za-z0-9@._/-]+:(GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE) /`)
+var keyShape = regexp.MustCompile(`^[A-Za-z0-9@._/-]+:(GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|ANY|SUBSCRIBE|PUBLISH) /`)
 
 func TestKeyShape(t *testing.T) {
 	for _, o := range Must().Operations {

@@ -142,6 +142,26 @@ func Families() []string {
 	return out
 }
 
+// PreferredContentType chooses the request content type to present and
+// validate: application/json when offered, else the first concrete type (a
+// media range such as application/*+json is not a valid Content-Type).
+func PreferredContentType(types []string) string {
+	for _, t := range types {
+		if t == "application/json" {
+			return t
+		}
+	}
+	for _, t := range types {
+		if !strings.Contains(t, "*") {
+			return t
+		}
+	}
+	if len(types) > 0 {
+		return types[0]
+	}
+	return ""
+}
+
 // BaseURL returns the base for api in env and region. Only Trimble Connect
 // APIs have executable hosts; reference APIs never do.
 func (a *API) BaseURL(env, region string) (string, bool) {

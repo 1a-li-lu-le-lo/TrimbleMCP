@@ -30,8 +30,12 @@
     - validated by `trimble_api_plan` into a dry-run request that lists the documented servers verbatim and does not choose one. The plan takes no `product`, because the key names the API;
     - refused by `trimble_api_read`, and never executed by any tool. `catalog.API.BaseURL` refuses reference APIs, and the Trimble Connect adapter refuses non-Connect APIs.
   - **Safety exclusions.** Operations that could reach machinery, vehicles or field positioning are `excluded` with a `safety:` reason, so they cannot even be planned:
-    - FarmENGAGE operations that send prescriptions or work orders to in-cab vehicle devices;
-    - Mobile Manager changes to GNSS receiver, antenna, correction source or position stream.
+    - FarmENGAGE operations that send prescriptions, work orders or resource files (guidance lines, boundaries, vehicle and implement profiles) to in-cab devices, and both steps of a prescription import (it can target devices);
+    - Trimble Maps Fleet and Routing Profile changes to the routing, configuration or map data that in-cab CoPilot navigation uses;
+    - Mobile Manager changes to GNSS receiver, antenna, correction source or position stream;
+    - every other product's sign-in, token and secret-storing operations, as for Trimble Identity (added after the 2026-09-29 audit).
+
+    Every plan also refuses a parameter or body field that carries a credential.
 
     Plans for transportation and agriculture operations carry a warning that a qualified person must review and perform them.
   - **Project-restricted callers cannot plan reference operations.** Their grants name Trimble Connect projects, which cannot be checked against another product's project IDs, so the plan fails closed.
@@ -42,7 +46,7 @@
     - a placeholder example served from a personal site.
   - **Trimble Connect `/regions` services with no definition** are listed with a note. The generator fails on a new service it does not know.
   - **Products with no machine-readable definition** are classified in the capability matrix: SDKs, desktop APIs, prose-only, WCF help-only and Postman-only APIs.
-  - **Command-line tools** are accounted for in `docs/trimble-products/cli-coverage.md`: Trimble Connect for Windows and its installer, the App Xchange `xchange` CLI, `teklaenv`, and the Tekla Structures and SketchUp start-up switches. Only the Trimble Connect for Windows link is supported (ADR-0006). The others are excluded because running local programs or changing remote state is outside the bridge's scope.
+  - **Command-line tools and local launchers** are accounted for in `docs/trimble-products/cli-coverage.md`, command by command: Trimble Connect for Windows and its installer, App Xchange `xchange`, `teklaenv`, Tekla Structures start-up switches and Tekla installers, servers and packaging, SketchUp start-up and installer switches, Tedds `TeddsCalcCommand.exe`, eCognition, PC*MILER BatchPro, Trimble Business Center deployment, Convert to RINEX, the Vista client installer, the CoPilot and Mobile Manager URL launchers, and Trimble-published npm executables. Only the Trimble Connect for Windows link is supported (ADR-0006); the others are excluded because running local programs, changing a host or handling credentials is outside the bridge's scope.
   - The catalogue is embedded gzip-compressed (`internal/catalog/catalog.json.gz`, about 340 KB). Large multi-definition APIs get one generated page per definition.
 - **Why not execute reference operations now:** executing them would need, for every product:
   - a credential model and a tenant binding;
@@ -56,6 +60,7 @@
     - 254 read, 223 plan;
     - 5,190 reference, 936 variant;
     - 413 excluded.
+  - **Update, 2026-10-01 (after an independent audit):** discovery now also covers every page of developer.trimblemaps.com, the App Xchange connector pages, the Transporeon developer documentation, AsyncAPI definitions, Viewpoint For Projects, and endpoints documented only in prose. Discovery failures are recorded and fail the build. The catalogue is **12,963 operations in 347 definitions** (61 APIs: 254 read, 223 plan, 6,075 reference, 2,985 variant, 3,426 excluded). Credential operations of every product, more vehicle-reaching operations (FarmENGAGE resource files and prescription imports; Trimble Maps fleet and routing profiles) and webhooks are excluded, and plans refuse credential fields.
   - `trimble:api:plan` is now a default local scope, because plans send nothing, and `trimble_api_plan` no longer needs a configured Trimble Connect adapter.
   - `make catalog` needs Python 3 with PyYAML, in addition to network access.
   - Assumption A-11: portal-embedded definitions describe the production APIs; Trimble does not state this on every page. Open question Q-9 tracks whether any product should get an executing adapter.

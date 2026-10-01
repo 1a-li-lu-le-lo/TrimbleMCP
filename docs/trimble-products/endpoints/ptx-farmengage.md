@@ -14,7 +14,7 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/adaptplugin/token` | `reference` | Generates adapt token for an applicationId |  |
+| `POST` | `/adaptplugin/token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generates adapt token for an applicationId |  |
 
 ## Boundaries
 
@@ -358,8 +358,8 @@
 | `GET` | `/prescriptions/{orgId}/rx/importjob/{jobId}` | `reference` | Get Prescription import status | orgId* (path); jobId* (path) |
 | `GET` | `/prescriptions/{orgId}/rx/{rxId}` | `reference` | Get detail for a Prescription | orgId* (path); rxId* (path); includeLinks (query) |
 | `GET` | `/prescriptions/{orgId}/rx/{rxId}/devices` | `reference` | Get Prescription send status | orgId* (path); rxId* (path); includeLinks (query) |
-| `PATCH` | `/prescriptions/{orgId}/rx/importjob/{jobId}` | `reference` | Upload zip file for Prescription import | orgId* (path); jobId* (path) |
-| `POST` | `/prescriptions/{orgId}/rx/importjob` | `reference` | Initiate Prescription import | orgId* (path); fieldId (query); materialId (query); body: application/*+json, application/json, text/json |
+| `PATCH` | `/prescriptions/{orgId}/rx/importjob/{jobId}` | `excluded`: safety: imports a prescription (application map) that is sent to the in-cab devices named in deviceIds; a plan cannot tell whether the job targets devices, so neither step is planned | Upload zip file for Prescription import | orgId* (path); jobId* (path) |
+| `POST` | `/prescriptions/{orgId}/rx/importjob` | `excluded`: safety: imports a prescription (application map) that is sent to the in-cab devices named in deviceIds; a plan cannot tell whether the job targets devices, so neither step is planned | Initiate Prescription import | orgId* (path); fieldId (query); materialId (query); body: application/*+json, application/json, text/json |
 | `PUT` | `/prescriptions/{orgId}/rx/{rxId}/vehicletarget/{vehicleId}` | `excluded`: safety: sends a work order or prescription (application map) to the in-cab device of a vehicle, which can drive field machinery; the bridge never plans or performs anything that reaches machinery | Sends a prescription to a TaskDoc device associated with the vehicle. This endpoint only works when the vehicle has a current TaskDoc device attached. | orgId* (path); rxId* (path); vehicleId* (path) |
 
 ## Resource Files
@@ -370,7 +370,7 @@
 | `GET` | `/resources/{orgId}/resourcefiles` | `reference` | Get the list of Resource Files | orgId* (path); includeLinks (query); bookmark (query) |
 | `GET` | `/resources/{orgId}/resourcefiles/{id}` | `reference` | Get detail for a Resource File | orgId* (path); id* (path); includeLinks (query) |
 | `GET` | `/resources/{orgId}/resourcefiles/{id}/send` | `reference` | Get status of the Resource File sent to Device | orgId* (path); id* (path); includeLinks (query) |
-| `PATCH` | `/resources/{orgId}/resourcefiles/{id}/send` | `reference` | Send Resource File to a device | orgId* (path); id* (path); body: application/*+json, application/json, text/json |
+| `PATCH` | `/resources/{orgId}/resourcefiles/{id}/send` | `excluded`: safety: sends a resource file (guidance lines, boundaries, vehicle and implement profiles) to in-cab PTx displays that guide field machinery; the bridge never plans or performs anything that reaches machinery | Send Resource File to a device | orgId* (path); id* (path); body: application/*+json, application/json, text/json |
 | `POST` | `/resources/{orgId}/resourcefiles` | `reference` | Create a Resource File | orgId* (path); includeLinks (query); body: application/*+json, application/json, text/json |
 
 ## Scouting Reports

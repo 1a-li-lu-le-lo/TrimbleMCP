@@ -29,7 +29,7 @@ Sources (checked 2026-09-23):
 To build `trimbleconnect:` links, set `TRIMBLE_CONNECT_DESKTOP_ENABLED=true`. To let the agent open the app on this Windows machine, also set:
 
 - `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`
-- `TRIMBLE_MCP_LOCAL_SCOPES=trimble:capabilities:read,trimble:projects:read,trimble:files:read,trimble:desktop:launch`
+- `TRIMBLE_MCP_LOCAL_SCOPES=trimble:capabilities:read,trimble:projects:read,trimble:files:read,trimble:api:read,trimble:api:plan,trimble:desktop:launch` (setting the variable replaces the default list, so keep the default scopes in it)
 
 Launching is a dry run unless the agent passes `dry_run: false`. The client will also ask you to approve the tool, because it is not read-only.
 

@@ -7,95 +7,100 @@
 - **Authentication:** API key in the Authorization header. Declared security schemes: Bearer.
 - **Access:** Trimble Maps API key.
 - **To call it you would need:** a Trimble Maps API key.
-- **Documented servers:** `https://api.trimblemaps.com`.
-- **Definition:** [trimble-maps-places](https://api.trimblemaps.com/swagger/v1/swagger.json) (Places API, version v1). Documentation: https://api.trimblemaps.com/places/v1/swagger/index.html.
+- **Documented servers:** `https://api.trimblemaps.com`, `https://api.az.trimblemaps.com`.
+- **Definitions:** 2, one section each below.
 
-## Authenticate
+## Places API
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/places/v1/authenticate` | `reference` | Returns an access token to be used in Places API requests. | body: application/*+json, application/json, application/json-patch+json, text/json |
+Definition [trimble-maps-places](https://api.trimblemaps.com/swagger/v1/swagger.json), 43 operations. Documentation: https://api.trimblemaps.com/places/v1/swagger/index.html.
 
-## Categories
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `DELETE` | `/places/v1/place/{placeId}` | `reference` | Places | Deletes an existing place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/contactinfo` | `reference` | ContactInfo | Deletes any attached contact information for a place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/customplaceid` | `reference` | Places | Removes a Custom Place Id from its associated place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/fleetsubmission/{noteId}` | `reference` | PlaceFleetSubmission | Deletes a fleet note. | placeId* (path); noteId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/notes` | `reference` | PlaceNotes | Deletes any attached notes for a place. | placeId* (path); applicationName (query) |
+| `DELETE` | `/places/v1/place/{placeId}/operatinghours` | `reference` | OperatingHours | Deletes any attached operating hours for a place. | placeId* (path) |
+| `DELETE` | `/places/v1/sets/{setId}` | `reference` | Categories | Deletes a place set. | setId* (path) |
+| `GET` | `/places/v1/category` | `reference` | Categories | Gets the list of supported categories. |  |
+| `GET` | `/places/v1/contains` | `reference` | Search | Returns all places that contain the given coordinates. | lat (query); lon (query); buffer (query) |
+| `GET` | `/places/v1/place/boundingbox` | `reference` | Places | Gets public and private places within a bounding box | lowerLongitude (query); lowerLatitude (query); upperLongitude (query); upperLatitude (query) |
+| `GET` | `/places/v1/place/customplaceid` | `reference` | Search | Finds any Places that match the given Custom Place Id. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
+| `GET` | `/places/v1/place/filter` | `reference` | Search | Filter places by point + radius and/or country, with optional brand and/or category match. Returns hydrated place details (site, operating hours, contact info, etc.) wrapped in the standard paged col… | Latitude (query); Longitude (query); Buffer (query); Country (query); Brand (query); CategoryName (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query) |
+| `GET` | `/places/v1/place/search` | `reference` | Search | Finds any Place where the name or Custom PlaceId matches the query provided. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
+| `GET` | `/places/v1/place/updatedplaces` | `reference` | Places | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); pageSize (query); lastRecordId (query) |
+| `GET` | `/places/v1/place/{placeId}` | `reference` | Places | Get the standard information about a single place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/contactinfo` | `reference` | ContactInfo | Retrieves any attached contact information for a place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/details` | `reference` | Places | Get the full details about a single place. | placeId* (path); attributeSource (query) |
+| `GET` | `/places/v1/place/{placeId}/editor` | `reference` | Editor | Returns the editor URL of a given place ID. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/fleetsubmission` | `reference` | PlaceFleetSubmission | Retrieves the latest fleet note for a place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/fleetsubmissions` | `reference` | PlaceFleetSubmission | Retrieves all fleet notes for a place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/notes` | `reference` | PlaceNotes | Retrieves any attached notes for a place. | placeId* (path); applicationName (query) |
+| `GET` | `/places/v1/place/{placeId}/operatinghours` | `reference` | OperatingHours | Retrieves any attached operating hours for a place. | placeId* (path) |
+| `GET` | `/places/v1/sets` | `reference` | Categories | Gets all the place sets of the company. |  |
+| `GET` | `/places/v1/sets/{setId}` | `reference` | Categories | Gets a place set's information by its identifier. | setId* (path) |
+| `GET` | `/places/v1/sets/{setId}/placelist` | `reference` | Categories | Gets all the places in a set | setId* (path) |
+| `PATCH` | `/places/v1/place/{placeId}/customcontent` | `reference` | Places | Updates custom content for a single place. Applies to both public and custom places. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/authenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authenticate | Returns an access token to be used in Places API requests. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/contains/bulk` | `reference` | Search | Returns all places that contain the given coordinates. | buffer (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place` | `reference` | Places | Creates a new place. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/customplaceid/bulk` | `reference` | Places | Bullk assign Custom Place Ids to places. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/customplaceid/validate` | `reference` | Places | Validates the supplied CustomPlaceIds against the requirements, returning the status and if any Id is already is in use. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/fleetsubmissions/bulk` | `reference` | PlaceFleetSubmission | Retrieves fleet notes for multiple places in a single call. | all (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/updatedplaces/id` | `reference` | Places | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/contactinfo` | `reference` | ContactInfo | Attaches contact information to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/fleetsubmission` | `reference` | PlaceFleetSubmission | Submits a fleet note for a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/notes` | `reference` | PlaceNotes | Attaches notes to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/operatinghours` | `reference` | OperatingHours | Attaches operating hours to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{trimblePlaceId}/customplaceid` | `reference` | Places | Assigns a Custom Place Id to a place. | trimblePlaceId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/sets` | `reference` | Categories | Creates a place set to hold company places. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/place/customcontent/bulk` | `reference` | Places | Updates a group of places custom content in bulk. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/place/{placeId}` | `reference` | Places | Updates an existing place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/place/{placeId}/fleetsubmission/{noteId}` | `reference` | PlaceFleetSubmission | Updates a fleet note. | placeId* (path); noteId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/sets/{setId}` | `reference` | Categories | Updates the name of a place set. | setId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/sets/{setId}` | `reference` | Deletes a place set. | setId* (path) |
-| `GET` | `/places/v1/category` | `reference` | Gets the list of supported categories. |  |
-| `GET` | `/places/v1/sets` | `reference` | Gets all the place sets of the company. |  |
-| `GET` | `/places/v1/sets/{setId}` | `reference` | Gets a place set's information by its identifier. | setId* (path) |
-| `GET` | `/places/v1/sets/{setId}/placelist` | `reference` | Gets all the places in a set | setId* (path) |
-| `POST` | `/places/v1/sets` | `reference` | Creates a place set to hold company places. | body: application/*+json, application/json, application/json-patch+json, text/json |
-| `PUT` | `/places/v1/sets/{setId}` | `reference` | Updates the name of a place set. | setId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+## Places API
 
-## ContactInfo
+Definition [trimble-maps/places](https://developer.trimblemaps.com/restful-apis/api/places.json), 36 operations. Documentation: https://developer.trimblemaps.com/restful-apis/places/api-guide/, https://developer.trimblemaps.com/restful-apis/places/introduction, https://developer.trimblemaps.com/restful-apis/places/introduction/.
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/place/{placeId}/contactinfo` | `reference` | Deletes any attached contact information for a place. | placeId* (path) |
-| `GET` | `/places/v1/place/{placeId}/contactinfo` | `reference` | Retrieves any attached contact information for a place. | placeId* (path) |
-| `POST` | `/places/v1/place/{placeId}/contactinfo` | `reference` | Attaches contact information to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-
-## Editor
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/places/v1/place/{placeId}/editor` | `reference` | Returns the editor URL of a given place ID. | placeId* (path) |
-
-## OperatingHours
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/place/{placeId}/operatinghours` | `reference` | Deletes any attached operating hours for a place. | placeId* (path) |
-| `GET` | `/places/v1/place/{placeId}/operatinghours` | `reference` | Retrieves any attached operating hours for a place. | placeId* (path) |
-| `POST` | `/places/v1/place/{placeId}/operatinghours` | `reference` | Attaches operating hours to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-
-## PlaceFleetSubmission
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/place/{placeId}/fleetsubmission/{noteId}` | `reference` | Deletes a fleet note. | placeId* (path); noteId* (path) |
-| `GET` | `/places/v1/place/{placeId}/fleetsubmission` | `reference` | Retrieves the latest fleet note for a place. | placeId* (path) |
-| `GET` | `/places/v1/place/{placeId}/fleetsubmissions` | `reference` | Retrieves all fleet notes for a place. | placeId* (path) |
-| `POST` | `/places/v1/place/fleetsubmissions/bulk` | `reference` | Retrieves fleet notes for multiple places in a single call. | all (query); body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place/{placeId}/fleetsubmission` | `reference` | Submits a fleet note for a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-| `PUT` | `/places/v1/place/{placeId}/fleetsubmission/{noteId}` | `reference` | Updates a fleet note. | placeId* (path); noteId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-
-## PlaceNotes
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/place/{placeId}/notes` | `reference` | Deletes any attached notes for a place. | placeId* (path); applicationName (query) |
-| `GET` | `/places/v1/place/{placeId}/notes` | `reference` | Retrieves any attached notes for a place. | placeId* (path); applicationName (query) |
-| `POST` | `/places/v1/place/{placeId}/notes` | `reference` | Attaches notes to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-
-## Places
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/places/v1/place/{placeId}` | `reference` | Deletes an existing place. | placeId* (path) |
-| `DELETE` | `/places/v1/place/{placeId}/customplaceid` | `reference` | Removes a Custom Place Id from its associated place. | placeId* (path) |
-| `GET` | `/places/v1/place/boundingbox` | `reference` | Gets public and private places within a bounding box | lowerLongitude (query); lowerLatitude (query); upperLongitude (query); upperLatitude (query) |
-| `GET` | `/places/v1/place/updatedplaces` | `reference` | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); pageSize (query); lastRecordId (query) |
-| `GET` | `/places/v1/place/{placeId}` | `reference` | Get the standard information about a single place. | placeId* (path) |
-| `GET` | `/places/v1/place/{placeId}/details` | `reference` | Get the full details about a single place. | placeId* (path); attributeSource (query) |
-| `PATCH` | `/places/v1/place/{placeId}/customcontent` | `reference` | Updates custom content for a single place. Applies to both public and custom places. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place` | `reference` | Creates a new place. | body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place/customplaceid/bulk` | `reference` | Bullk assign Custom Place Ids to places. | body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place/customplaceid/validate` | `reference` | Validates the supplied CustomPlaceIds against the requirements, returning the status and if any Id is already is in use. | body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place/updatedplaces/id` | `reference` | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); body: application/*+json, application/json, application/json-patch+json, text/json |
-| `POST` | `/places/v1/place/{trimblePlaceId}/customplaceid` | `reference` | Assigns a Custom Place Id to a place. | trimblePlaceId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-| `PUT` | `/places/v1/place/customcontent/bulk` | `reference` | Updates a group of places custom content in bulk. | body: application/*+json, application/json, application/json-patch+json, text/json |
-| `PUT` | `/places/v1/place/{placeId}` | `reference` | Updates an existing place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
-
-## Search
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/places/v1/contains` | `reference` | Returns all places that contain the given coordinates. | lat (query); lon (query); buffer (query) |
-| `GET` | `/places/v1/place/customplaceid` | `reference` | Finds any Places that match the given Custom Place Id. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
-| `GET` | `/places/v1/place/filter` | `reference` | Filter places by point + radius and/or country, with optional brand and/or category match. Returns hydrated place details (site, operating hours, contact info, etc.) wrapped in the standard paged col… | Latitude (query); Longitude (query); Buffer (query); Country (query); Brand (query); CategoryName (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query) |
-| `GET` | `/places/v1/place/search` | `reference` | Finds any Place where the name or Custom PlaceId matches the query provided. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
-| `POST` | `/places/v1/contains/bulk` | `reference` | Returns all places that contain the given coordinates. | buffer (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `DELETE` | `/places/v1/place/{placeId}` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/place/{placeId}` | Places | Deletes an existing place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/contactinfo` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/place/{placeId}/contactinfo` | ContactInfo | Deletes any attached contact information for a place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/customplaceid` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/place/{placeId}/customplaceid` | Places | Removes a Custom Place Id from its associated place. | placeId* (path) |
+| `DELETE` | `/places/v1/place/{placeId}/notes` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/place/{placeId}/notes` | PlaceNotes | Deletes any attached notes for a place. | placeId* (path); applicationName (query) |
+| `DELETE` | `/places/v1/place/{placeId}/operatinghours` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/place/{placeId}/operatinghours` | OperatingHours | Deletes any attached operating hours for a place. | placeId* (path) |
+| `DELETE` | `/places/v1/sets/{setId}` | `variant`: same call as `trimble-maps-places:DELETE /places/v1/sets/{setId}` | Categories | Deletes a place set. | setId* (path) |
+| `GET` | `/places/v1/category` | `variant`: same call as `trimble-maps-places:GET /places/v1/category` | Categories | Gets the list of supported categories. |  |
+| `GET` | `/places/v1/contains` | `variant`: same call as `trimble-maps-places:GET /places/v1/contains` | Search | Returns all places that contain the given coordinates. | lat (query); lon (query); buffer (query) |
+| `GET` | `/places/v1/place/boundingbox` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/boundingbox` | Places | Gets public and private places within a bounding box | lowerLongitude (query); lowerLatitude (query); upperLongitude (query); upperLatitude (query) |
+| `GET` | `/places/v1/place/customplaceid` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/customplaceid` | Search | Finds any Places that match the given Custom Place Id. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
+| `GET` | `/places/v1/place/filter` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/filter` | Search | Filter places by point + radius and/or country, with optional brand and/or category match. | Latitude (query); Longitude (query); Buffer (query); Country (query); Brand (query); CategoryName (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query) |
+| `GET` | `/places/v1/place/search` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/search` | Search | Finds any Place where the name or Custom PlaceId matches the query provided. | query (query); Offset (query); Limit (query); SortExpression (query); SortDirection (query); region (query) |
+| `GET` | `/places/v1/place/updatedplaces` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/updatedplaces` | Places | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); pageSize (query); lastRecordId (query) |
+| `GET` | `/places/v1/place/{placeId}` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}` | Places | Get the standard information about a single place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/contactinfo` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}/contactinfo` | ContactInfo | Retrieves any attached contact information for a place. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/details` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}/details` | Places | Get the full details about a single place. | placeId* (path); attributeSource (query) |
+| `GET` | `/places/v1/place/{placeId}/editor` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}/editor` | Editor | Returns the editor URL of a given place ID. | placeId* (path) |
+| `GET` | `/places/v1/place/{placeId}/notes` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}/notes` | PlaceNotes | Retrieves any attached notes for a place. | placeId* (path); applicationName (query) |
+| `GET` | `/places/v1/place/{placeId}/operatinghours` | `variant`: same call as `trimble-maps-places:GET /places/v1/place/{placeId}/operatinghours` | OperatingHours | Retrieves any attached operating hours for a place. | placeId* (path) |
+| `GET` | `/places/v1/sets` | `variant`: same call as `trimble-maps-places:GET /places/v1/sets` | Categories | Gets all the place sets of the company. |  |
+| `GET` | `/places/v1/sets/{setId}` | `variant`: same call as `trimble-maps-places:GET /places/v1/sets/{setId}` | Categories | Gets a place set's information by its identifier. | setId* (path) |
+| `GET` | `/places/v1/sets/{setId}/placelist` | `variant`: same call as `trimble-maps-places:GET /places/v1/sets/{setId}/placelist` | Categories | Gets all the places in a set | setId* (path) |
+| `POST` | `/places/v1/authenticate` | `variant`: same call as `trimble-maps-places:POST /places/v1/authenticate` | Authenticate | Returns an access token to be used in Places API requests. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/contains/bulk` | `variant`: same call as `trimble-maps-places:POST /places/v1/contains/bulk` | Search | Returns all places that contain the given coordinates. | buffer (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place` | `variant`: same call as `trimble-maps-places:POST /places/v1/place` | Places | Creates a new place. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/customplaceid/bulk` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/customplaceid/bulk` | Places | Bulk assign Custom Place Ids to places. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/customplaceid/validate` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/customplaceid/validate` | Places | Validates the supplied CustomPlaceIds against the requirements, returning the status and if any Id is already in use. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/updatedplaces/id` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/updatedplaces/id` | Places | Retrieves the list of places that have been modified or deleted since the given timestamp. | lastModifiedDate (query); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/contactinfo` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/{placeId}/contactinfo` | ContactInfo | Attaches contact information to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/notes` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/{placeId}/notes` | PlaceNotes | Attaches notes to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{placeId}/operatinghours` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/{placeId}/operatinghours` | OperatingHours | Attaches operating hours to a place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/place/{trimblePlaceId}/customplaceid` | `variant`: same call as `trimble-maps-places:POST /places/v1/place/{trimblePlaceId}/customplaceid` | Places | Assigns a Custom Place Id to a place. | trimblePlaceId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `POST` | `/places/v1/sets` | `variant`: same call as `trimble-maps-places:POST /places/v1/sets` | Categories | Creates a place set to hold company places. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/place/customcontent/bulk` | `variant`: same call as `trimble-maps-places:PUT /places/v1/place/customcontent/bulk` | Places | Updates a group of places custom content in bulk. | body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/place/{placeId}` | `variant`: same call as `trimble-maps-places:PUT /places/v1/place/{placeId}` | Places | Updates an existing place. | placeId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
+| `PUT` | `/places/v1/sets/{setId}` | `variant`: same call as `trimble-maps-places:PUT /places/v1/sets/{setId}` | Categories | Updates the name of a place set. | setId* (path); body: application/*+json, application/json, application/json-patch+json, text/json |
 
 `*` marks a required parameter.

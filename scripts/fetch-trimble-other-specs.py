@@ -3,26 +3,42 @@
 organisation, as classified in cmd/trimble-catalog/sources-other.json.
 
 Discovery:
-  * every developer.trimble.com product section's sitemap is crawled for
-    pages that embed an OpenAPI viewer (spec-url="..."), so a definition
-    Trimble links from its developer portal cannot be missed;
+  * every page of every developer.trimble.com product section (from each
+    section's sitemap) and every page of developer.trimblemaps.com (a
+    same-site crawl) is scanned for embedded definitions: OpenAPI viewers
+    (spec-url, in any quoting style) and links to OpenAPI, Swagger or
+    AsyncAPI definition files. A definition Trimble links from these sites
+    therefore cannot be missed;
   * the manifest's direct sources are downloaded as listed;
   * Vista's per-operation OpenAPI fragments are collected from its llms.txt
     index and merged into one definition per module;
+  * App Xchange connector pages on help.trimble.com are scanned for their
+    per-module Direct API definitions;
+  * the manifest's "documented" entries (endpoints documented in prose with
+    no definition) are turned into definitions, after checking that every
+    path still appears on its documentation page;
   * Trimble Identity's OpenID Connect discovery document is saved so every
     Identity endpoint is accounted for.
 
+Failures are never silent: a sitemap, page or definition that cannot be
+retrieved after retries is recorded with an "error", the script exits
+non-zero, and the generator refuses to build from a run that has errors.
+Known-unavailable definitions are listed in the manifest's "unavailable".
+
 Output (in OUT, default /tmp/trimble-specs/other):
-  <source-id>.json      normalised JSON definition (YAML converted)
-  discovered.json       [{id, spec_url, doc_urls, kind}] for the generator
+  <source-id with / as __>.json   normalised JSON definition (YAML converted)
+  discovered.json                 [{id, spec_url, doc_urls, kind, error?}]
 
 Requires Python 3 and PyYAML (for YAML definitions).
 """
 import concurrent.futures as cf
+import html
 import json
 import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -31,69 +47,182 @@ MANIFEST = os.path.join(ROOT, "cmd", "trimble-catalog", "sources-other.json")
 UA = "trimble-mcp-bridge-catalog/1.0"
 
 
-def get(url, timeout=60):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+class NotFound(Exception):
+    pass
 
 
-def to_json(raw, url):
+class Challenged(Exception):
+    """The site answered with a bot challenge (HTTP 202). It is never evaded."""
+
+
+def get(url, timeout=60, tries=3):
+    """GET with retries for transient failures; 404/410 raise NotFound."""
+    url = urllib.parse.quote(url, safe=":/?&=%#@+,;~!$'()*[]")
+    last = None
+    for i in range(tries):
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                if r.status == 202:
+                    raise Challenged(f"HTTP 202 challenge from {urllib.parse.urlparse(url).netloc}")
+                return r.read()
+        except Challenged:
+            raise
+        except urllib.error.HTTPError as e:
+            if e.code in (404, 410):
+                raise NotFound(f"HTTP {e.code}")
+            last = e
+            if e.code < 500 and e.code != 429:
+                break
+        except Exception as e:  # network errors, timeouts
+            last = e
+        time.sleep(2 ** i)
+    raise last
+
+
+def to_json(raw):
+    """Parse JSON, JSON with trailing commas, or YAML."""
     text = raw.decode("utf-8-sig")
     try:
         return json.loads(text)
     except ValueError:
-        import yaml  # PyYAML
+        pass
+    try:
+        return json.loads(re.sub(r",(\s*[}\]])", r"\1", text))
+    except ValueError:
+        pass
+    # A Swagger UI page with the definition embedded inline.
+    m = re.search(r'\{\s*"(?:openapi|swagger|asyncapi)"\s*:', text)
+    if m and text.lstrip().startswith("<"):
+        return json.JSONDecoder().raw_decode(text, m.start())[0]
+    import yaml  # PyYAML
 
-        return yaml.safe_load(text)
+    spec = yaml.safe_load(text)
+    if not isinstance(spec, dict):
+        raise ValueError("not an API definition")
+    return spec
 
 
 def slug(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
 
-def discover_portal(base, sections):
-    found = {}  # spec_url -> set(doc_url)
-    pages = []
-    for s in sections:
-        try:
-            idx = get(f"{base}/docs/{s}/sitemap-index.xml").decode()
-        except Exception as e:  # section without a sitemap
-            print(f"warn: {s}: no sitemap ({e})", file=sys.stderr)
-            continue
-        for sm in re.findall(r"<loc>([^<]+)</loc>", idx):
-            try:
-                body = get(sm).decode()
-            except Exception as e:
-                print(f"warn: {sm}: {e}", file=sys.stderr)
-                continue
-            pages += [u for u in re.findall(r"<loc>([^<]+)</loc>", body) if "/reference/" in u]
+SPEC_URL = re.compile(r"""spec-url\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>"']+))""", re.I)
+SPEC_LINK = re.compile(r"""href\s*=\s*["']?([^"'\s>]*(?:openapi|asyncapi|swagger)[^"'\s>]*\.(?:json|ya?ml))["'\s>]""", re.I)
 
-    def spec_urls(page):
+
+def spec_links(page, body):
+    out = [next(g for g in m.groups() if g) for m in SPEC_URL.finditer(body)]
+    out += [m.group(1) for m in SPEC_LINK.finditer(body)]
+    return sorted({urllib.parse.urljoin(page, html.unescape(u)) for u in out})
+
+
+def scan_pages(pages, errors):
+    """Fetch pages concurrently; return {spec_url: set(page_url)}."""
+    found = {}
+
+    def one(page):
         try:
-            html = get(page).decode("utf-8", "replace")
+            return page, spec_links(page, get(page).decode("utf-8", "replace")), None
+        except NotFound as e:
+            print(f"warn: {page}: {e} (listed in a sitemap but gone)", file=sys.stderr)
+            return page, [], None
         except Exception as e:
-            print(f"warn: {page}: {e}", file=sys.stderr)
-            return page, []
-        return page, [urllib.parse.urljoin(page, u.replace("&amp;", "&")) for u in re.findall(r'spec-url="([^"]+)"', html)]
+            return page, [], str(e)
 
     with cf.ThreadPoolExecutor(16) as ex:
-        for page, urls in ex.map(spec_urls, sorted(set(pages))):
+        for page, urls, err in ex.map(one, sorted(set(pages))):
+            if err:
+                errors.append({"id": "page:" + page, "spec_url": page, "doc_urls": [page], "kind": "page", "error": err})
             for u in urls:
-                found.setdefault(u, set()).add(urllib.parse.urlparse(page).path)
+                found.setdefault(u, set()).add(page)
+    print(f"developer portal: {len(set(pages))} pages scanned", file=sys.stderr)
     return found
 
 
-def portal_id(doc_path):
+def portal_pages(base, sections, errors):
+    pages = []
+    for s in sections:
+        index = f"{base}/docs/{s}/sitemap-index.xml"
+        try:
+            idx = get(index).decode()
+        except Exception as e:
+            errors.append({"id": "sitemap:" + s, "spec_url": index, "doc_urls": [], "kind": "sitemap", "error": str(e)})
+            continue
+        for sm in re.findall(r"<loc>([^<]+)</loc>", idx):
+            try:
+                pages += re.findall(r"<loc>([^<]+)</loc>", get(sm).decode())
+            except Exception as e:
+                errors.append({"id": "sitemap:" + sm, "spec_url": sm, "doc_urls": [], "kind": "sitemap", "error": str(e)})
+    return pages
+
+
+def crawl_site(base, seeds, errors, limit=6000):
+    """Breadth-first crawl of one site's HTML pages (same host only)."""
+    host = urllib.parse.urlparse(base).netloc
+    seen, frontier, bodies = set(), [urllib.parse.urljoin(base, s) for s in seeds], {}
+    skip = re.compile(r"\.(png|jpe?g|gif|svg|ico|css|js|pdf|zip|json|ya?ml|xml|txt|woff2?|ttf|eot|mp4|webm)$", re.I)
+
+    def one(page):
+        try:
+            return page, get(page).decode("utf-8", "replace"), None
+        except NotFound:
+            return page, "", None
+        except urllib.error.HTTPError as e:
+            if e.code == 403:  # the site's CDN answers 403 for links to missing objects
+                print(f"warn: {page}: HTTP 403 (broken link on the site)", file=sys.stderr)
+                return page, "", None
+            return page, "", str(e)
+        except Exception as e:
+            return page, "", str(e)
+
+    with cf.ThreadPoolExecutor(16) as ex:
+        while frontier and len(seen) < limit:
+            batch = [p for p in dict.fromkeys(frontier) if p not in seen][: limit - len(seen)]
+            frontier = []
+            seen.update(batch)
+            for page, body, err in ex.map(one, batch):
+                if err:
+                    errors.append({"id": "page:" + page, "spec_url": page, "doc_urls": [page], "kind": "page", "error": err})
+                    continue
+                bodies[page] = body
+                for m in re.findall(r"""href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>"']+))""", body):
+                    href = html.unescape(m[0] or m[1] or m[2]).split("#")[0]
+                    if not href or "\\" in href or href.startswith(("javascript:", "mailto:", "data:")):
+                        continue  # escaped markup inside scripts, not a link
+                    u = urllib.parse.urljoin(page, href).split("?")[0]
+                    pu = urllib.parse.urlparse(u)
+                    if pu.scheme == "https" and pu.netloc == host and not skip.search(pu.path) and u not in seen:
+                        frontier.append(u)
+    if frontier:
+        errors.append({"id": "crawl:" + host, "spec_url": base, "doc_urls": [], "kind": "page",
+                       "error": f"crawl stopped at {limit} pages; raise the limit"})
+    found = {}
+    for page, body in bodies.items():
+        for u in spec_links(page, body):
+            found.setdefault(u, set()).add(page)
+    print(f"{host}: {len(bodies)} pages crawled", file=sys.stderr)
+    return found
+
+
+def portal_id(doc_path, spec_url):
     # /docs/<section>/reference/openapi/<rest>/ -> <section>/<rest>
     m = re.match(r"^/docs/([^/]+)/reference/openapi/(.*?)/?$", doc_path)
-    if not m:
-        return slug(doc_path)
-    section, rest = m.group(1), m.group(2)
-    rest = rest.replace("controllers/", "")
-    return f"{section}/{slug(rest) or 'v1'}"
+    if m:
+        rest = m.group(2).replace("controllers/", "")
+        return f"{m.group(1)}/{slug(rest) or 'v1'}"
+    section = re.match(r"^/docs/([^/]+)/", doc_path)
+    path = urllib.parse.urlparse(spec_url).path
+    stem = slug(os.path.splitext(path.split(f"/docs/{section.group(1)}/", 1)[-1] if section else path)[0])
+    return f"{section.group(1) if section else 'portal'}/{stem}"
 
 
-def vista(index_url):
+def maps_id(spec_url):
+    p = urllib.parse.urlparse(spec_url).path
+    return "trimble-maps/" + slug(os.path.splitext(p.rsplit("/api/", 1)[-1])[0])
+
+
+def vista(index_url, errors):
     idx = get(index_url).decode()
     module, ops = None, []
     for line in idx.splitlines():
@@ -120,11 +249,10 @@ def vista(index_url):
         return module, url, json.loads(m.group(1)), None
 
     merged = {}
-    errors = []
     with cf.ThreadPoolExecutor(16) as ex:
         for module, url, frag, err in ex.map(fragment, ops):
             if err:
-                errors.append((url, err))
+                errors.append({"id": "vista-page:" + url, "spec_url": url, "doc_urls": [url], "kind": "vista", "error": err})
                 continue
             spec = merged.setdefault(module, {"openapi": frag.get("openapi", "3.0.1"), "info": frag.get("info", {}),
                                               "servers": frag.get("servers", []), "paths": {}, "components": {},
@@ -134,59 +262,168 @@ def vista(index_url):
                 spec["paths"].setdefault(p, {}).update(item)
             for section, entries in frag.get("components", {}).items():
                 spec["components"].setdefault(section, {}).update(entries)
-    return merged, len(ops), errors
+    print(f"vista: {len(ops)} operation pages, {len(merged)} modules", file=sys.stderr)
+    return merged
+
+
+DIRECT_UI = re.compile(r"""https://api\.xchange\.trimble\.com/connect/v1/direct/[^"'\s<>?#]+?/swagger/index\.html""")
+
+
+def app_xchange(cfg, errors):
+    """Per-module Direct API definitions linked from App Xchange connector pages.
+
+    help.trimble.com answers unknown clients with a bot challenge, which is
+    never evaded. The manifest therefore lists every connector page and its
+    definitions (captured with curl on the date in "checked"); when the index
+    is readable, any connector page missing from the manifest is an error.
+    """
+    listed = {c["page"] for c in cfg["connectors"]}
+    try:
+        body = html.unescape(get(cfg["index"]).decode("utf-8", "replace"))
+        prefix = cfg["index"].rstrip("/") + "/"
+        pages = {u for u in (urllib.parse.urljoin(cfg["index"], h).split("#")[0].split("?")[0]
+                             for h in re.findall(r"""href\s*=\s*["']([^"']+)["']""", body)) if u.startswith(prefix)}
+        for p in sorted(pages - listed):
+            errors.append({"id": "app-xchange:" + p, "spec_url": p, "doc_urls": [p], "kind": "page",
+                           "error": "connector page not listed in the manifest's app_xchange.connectors; add it with its definitions"})
+    except Challenged as e:
+        print(f"warn: {cfg['index']}: {e}; using the manifest's connector list (checked {cfg['checked']})", file=sys.stderr)
+    found = {}
+    for c in cfg["connectors"]:
+        for u in c["definitions"]:
+            found.setdefault(u, set()).add(c["page"])
+    print(f"app xchange: {len(listed)} connector pages, {len(found)} definitions", file=sys.stderr)
+    return found
+
+
+DEFINITION = re.compile(r"(swagger|openapi|api-docs|asyncapi|/documentation/)|\.ya?ml$", re.I)
+
+
+def confluence(cfg, errors):
+    """Definition links on every page of a public Confluence documentation
+    space (Transporeon), read through Confluence's REST API."""
+    nxt = "/rest/api/content/search?" + urllib.parse.urlencode(
+        {"cql": f"space={cfg['space']} and type=page", "limit": "50", "expand": "body.storage"})
+    found, pages = {}, 0
+    while nxt:
+        try:
+            d = json.loads(get(cfg["base"] + nxt))
+        except Exception as e:
+            errors.append({"id": "confluence:" + cfg["space"], "spec_url": cfg["base"] + nxt, "doc_urls": [], "kind": "page", "error": str(e)})
+            break
+        for r in d.get("results", []):
+            pages += 1
+            page = cfg["base"] + r["_links"]["webui"]
+            for u in re.findall(r"""https?://[^"'<>\s\]]+""", r["body"]["storage"]["value"]):
+                u = html.unescape(u)
+                if DEFINITION.search(u) and not any(x in u for x in cfg["ignore"]):
+                    found.setdefault(u, set()).add(page)
+        nxt = d.get("_links", {}).get("next")
+    print(f"{cfg['space']}: {pages} pages, {len(found)} definitions", file=sys.stderr)
+    return found
+
+
+def documented(entry, errors):
+    """A definition for endpoints documented only in prose, checked against the page."""
+    try:
+        page = html.unescape(get(entry["doc_url"]).decode("utf-8", "replace"))
+    except Exception as e:
+        errors.append({"id": entry["id"], "spec_url": entry["doc_url"], "doc_urls": [entry["doc_url"]], "kind": "doc", "error": str(e)})
+        return None
+    paths = {}
+    for op in entry["ops"]:
+        if op["path"] not in page:
+            errors.append({"id": entry["id"], "spec_url": entry["doc_url"], "doc_urls": [entry["doc_url"]], "kind": "doc",
+                           "error": f"path {op['path']} no longer appears on the documentation page; review the entry"})
+        params = [{"name": p["name"], "in": p["in"], "required": p.get("required", p["in"] == "path"),
+                   "schema": {"type": p.get("type", "string")}} for p in op.get("params", [])]
+        o = {"summary": op["summary"], "parameters": params}
+        if op.get("body"):
+            o["requestBody"] = {"content": {"application/json": {"schema": {"type": "object"}}}}
+        paths.setdefault(op["path"], {})[op["method"].lower()] = o
+    return {"openapi": "3.0.3", "info": {"title": entry["title"], "version": "documented"},
+            "servers": [{"url": s} for s in entry["servers"]], "paths": paths,
+            "x-note": "Built from the documentation page by scripts/fetch-trimble-other-specs.py; Trimble publishes no definition."}
+
+
+def save(out, sid, spec):
+    json.dump(spec, open(os.path.join(out, sid.replace("/", "__") + ".json"), "w"), sort_keys=True)
 
 
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else "/tmp/trimble-specs/other"
     os.makedirs(out, exist_ok=True)
     man = json.load(open(MANIFEST))
-    discovered = []
+    unavailable = {u["url"]: u["reason"] for u in man.get("unavailable", [])}
+    discovered, errors = [], []
 
-    for spec_url, docs in sorted(discover_portal(man["portal"]["base"], man["portal"]["sections"]).items()):
-        docs = sorted(docs)
-        rec = {"id": portal_id(docs[0]), "spec_url": spec_url, "doc_urls": [man["portal"]["base"] + d for d in docs], "kind": "portal"}
-        if spec_url.startswith("https://api.swaggerhub.com/apis/Trimble-Connect/"):
-            discovered.append(rec)  # catalogued from the SwaggerHub organisation
-            continue
-        try:
-            spec = to_json(get(spec_url), spec_url)
-        except Exception as e:
-            rec["error"] = str(e)
+    def fetch_defs(found, idf, kind):
+        for spec_url, docs in sorted(found.items()):
+            docs = sorted(docs)
+            rec = {"id": idf(spec_url, docs), "spec_url": spec_url, "doc_urls": docs, "kind": kind}
+            if spec_url.startswith("https://api.swaggerhub.com/apis/Trimble-Connect/"):
+                discovered.append(rec)  # catalogued from the SwaggerHub organisation
+                continue
+            try:
+                save(out, rec["id"], to_json(get(spec_url)))
+            except Exception as e:
+                if spec_url in unavailable:
+                    rec["unavailable"] = f"{unavailable[spec_url]} (retrieval failed: {e})"
+                else:
+                    rec["error"] = str(e)
             discovered.append(rec)
-            continue
-        json.dump(spec, open(os.path.join(out, rec["id"].replace("/", "__") + ".json"), "w"))
-        discovered.append(rec)
+
+    pages = portal_pages(man["portal"]["base"], man["portal"]["sections"], errors)
+    # Name a definition after its OpenAPI reference page when it has one, so
+    # ids stay stable when guides also link the same definition.
+    ref_page = lambda d: next((x for x in d if "/reference/openapi/" in x), d[0])
+    fetch_defs(scan_pages(pages, errors), lambda u, d: portal_id(urllib.parse.urlparse(ref_page(d)).path, u), "portal")
+    maps = man["maps"]
+    fetch_defs(crawl_site(maps["base"], maps["seeds"], errors), lambda u, d: maps_id(u), "maps")
+    fetch_defs(app_xchange(man["app_xchange"], errors),
+               lambda u, d: "xchange-connector/" + slug(u.split("/direct/", 1)[1].replace("/swagger/openapi.json", "")), "app-xchange")
+
+    for c in man["confluence"]:
+        fetch_defs(confluence(c, errors), lambda u, d, c=c: c["id_prefix"] + slug(urllib.parse.unquote(
+            urllib.parse.urlparse(u).netloc.split(".")[-2] + urllib.parse.urlparse(u).path)), "confluence")
 
     for d in man["direct"]:
         rec = {"id": d["id"], "spec_url": d["url"], "doc_urls": [d["doc_url"]] if d["doc_url"] else [], "kind": "direct"}
         try:
-            spec = to_json(get(d["url"]), d["url"])
-            json.dump(spec, open(os.path.join(out, d["id"] + ".json"), "w"))
+            save(out, d["id"], to_json(get(d["url"])))
         except Exception as e:
             rec["error"] = str(e)
         discovered.append(rec)
 
+    for entry in man["documented"]:
+        spec = documented(entry, errors)
+        if spec:
+            save(out, entry["id"], spec)
+            discovered.append({"id": entry["id"], "spec_url": entry["doc_url"], "doc_urls": [entry["doc_url"]], "kind": "doc"})
+
     idn = man["identity"]
     rec = {"id": idn["id"], "spec_url": idn["url"], "doc_urls": [idn["doc_url"]], "kind": "oidc"}
     try:
-        json.dump(to_json(get(idn["url"]), idn["url"]), open(os.path.join(out, idn["id"] + ".json"), "w"))
+        save(out, idn["id"], to_json(get(idn["url"])))
     except Exception as e:
         rec["error"] = str(e)
     discovered.append(rec)
 
-    merged, pages, errors = vista(man["vista"]["index"])
-    for module, spec in sorted(merged.items()):
+    for module, spec in sorted(vista(man["vista"]["index"], errors).items()):
         sid = "vista/" + slug(module.replace("Vista ", "").replace(" v2 Direct API", ""))
-        json.dump(spec, open(os.path.join(out, sid.replace("/", "__") + ".json"), "w"))
+        save(out, sid, spec)
         discovered.append({"id": sid, "spec_url": man["vista"]["index"], "doc_urls": spec["x-doc-pages"], "kind": "vista"})
-    for url, err in errors:
-        print(f"warn: vista {url}: {err}", file=sys.stderr)
-        discovered.append({"id": "vista-page", "spec_url": url, "doc_urls": [url], "kind": "vista", "error": err})
-    print(f"vista: {pages} operation pages, {len(merged)} modules, {len(errors)} errors", file=sys.stderr)
 
+    discovered += errors
+    ids = [r["id"] for r in discovered if not r.get("error")]
+    for i in sorted({i for i in ids if ids.count(i) > 1}):
+        discovered.append({"id": i, "spec_url": "", "doc_urls": [], "kind": "page", "error": "two definitions map to this id"})
     json.dump(discovered, open(os.path.join(out, "discovered.json"), "w"), indent=1)
-    print(f"{len(discovered)} definitions recorded in {out}/discovered.json", file=sys.stderr)
+    bad = [r for r in discovered if r.get("error")]
+    for r in bad:
+        print(f"error: {r['id']}: {r['error']}", file=sys.stderr)
+    print(f"{len(discovered)} records ({len(bad)} errors) in {out}/discovered.json", file=sys.stderr)
+    sys.exit(1 if bad else 0)
 
 
 if __name__ == "__main__":

@@ -7,8 +7,8 @@ You never handle credentials. An operator configures access outside the conversa
 - **Agent → bridge:** stdio runs as the local operator with read-only scopes. Remote HTTP uses a bearer token held in the client's own secret store, never in chat.
 - **Bridge → Trimble Connect:** Trimble Identity OAuth 2.0 authorization code with PKCE. Trimble Connect does not accept client-credentials tokens. The operator signs in with `trimblectl auth login`, and the refresh token is stored encrypted.
 - **Scopes:** the bridge uses its own scopes:
-  - `trimble:capabilities:read`, `trimble:projects:read` and `trimble:files:read` are the local stdio default.
-  - `trimble:audit:read` is also available.
+  - `trimble:capabilities:read`, `trimble:projects:read`, `trimble:files:read`, `trimble:api:read` and `trimble:api:plan` are the local stdio default.
+  - `trimble:audit:read` is reserved; no tool uses it yet.
   - `trimble:desktop:launch` is for the local operator only.
   - `trimble:files:write` and `trimble:files:delete` are reserved; configuration rejects them in this release.
 

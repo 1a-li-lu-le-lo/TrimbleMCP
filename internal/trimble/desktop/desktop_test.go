@@ -20,7 +20,7 @@ func TestBuildURIDocumentedExample(t *testing.T) {
 
 func TestBuildURIVariants(t *testing.T) {
 	cases := []struct{ view, panel, want string }{
-		{"", "", "trimbleconnect:/projects/p1?show=3D,models"}, // documented default
+		{"", "", "trimbleconnect:/projects/p1?show=3D,models"}, // bridge default (assumption A-9)
 		{"data", "objects", "trimbleconnect:/projects/p1?show=data,objects"},
 		{"3d", "todos", "trimbleconnect:/projects/p1?show=3D,ToDos"}, // case-insensitive, documented spelling out
 		{"PROJECTS", "VIEWS", "trimbleconnect:/projects/p1?show=projects,views"},

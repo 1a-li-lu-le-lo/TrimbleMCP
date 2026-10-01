@@ -355,29 +355,51 @@ func writeNonProduction(dir string, cat *Catalog) {
 	n.WriteString("# Non-production, excluded and Identity operations\n\n")
 	n.WriteString("Every operation in a definition that is not a Trimble Connect production API or another product's reference API:\n\n")
 	n.WriteString("- Trimble Connect staging, integration, QA, test, draft, internal or empty definitions. `variant` operations are the same call as the production operation they name; `excluded` operations exist only outside production or in Trimble-internal APIs.\n")
-	n.WriteString("- Definitions that are publicly reachable but not linked from Trimble documentation, or that are placeholders. The bridge does not use undocumented endpoints.\n")
+	n.WriteString("- Definitions that Trimble marks as internal (App Xchange connector definitions), push or webhook contracts that the customer implements, and definitions that are undocumented, deprecated, credential-only or placeholders.\n")
 	n.WriteString("- Trimble Identity endpoints, which carry credentials and are never agent-callable.\n\n")
+	n.WriteString("Definitions with many operations are listed on their own page, linked from their section.\n\n")
 	for i := range cat.Sources {
 		s := &cat.Sources[i]
 		if s.Class == "production" || s.Class == "reference" {
 			continue
 		}
 		fmt.Fprintf(&n, "## %s (%s)\n\n%s. %d operations. Definition: %s.\n\n", s.ID, s.Class, mdEscape(strings.TrimSuffix(firstNonEmpty(s.Note, s.Title), ".")), s.Ops, sourceLink(s))
+		if s.Unavailable != "" {
+			fmt.Fprintf(&n, "**Unavailable:** %s.\n\n", mdEscape(strings.TrimSuffix(s.Unavailable, ".")))
+		}
 		if s.Ops == 0 {
 			continue
 		}
-		n.WriteString("| Method | Path | Disposition | Detail |\n|---|---|---|---|\n")
+		var t strings.Builder
+		t.WriteString("| Method | Path | Disposition | Detail |\n|---|---|---|---|\n")
 		for _, o := range cat.Operations {
 			if o.Source != s.ID {
 				continue
 			}
 			detail := o.Reason
-			if o.CoveredBy != "" {
+			switch {
+			case o.CoveredBy != "":
 				detail = "covered by `" + o.CoveredBy + "`"
+			case o.Reason == s.Note:
+				detail = "the definition's reason (above)"
 			}
-			fmt.Fprintf(&n, "| `%s` | `%s` | `%s` | %s |\n", o.Method, o.Path, o.Disposition, mdEscape(detail))
+			fmt.Fprintf(&t, "| `%s` | `%s` | `%s` | %s |\n", o.Method, o.Path, o.Disposition, mdEscape(detail))
 		}
-		n.WriteString("\n")
+		if s.Ops <= nonProdInline {
+			n.WriteString(t.String() + "\n")
+			continue
+		}
+		page := "non-production--" + strings.NewReplacer("/", "-", "@", "-").Replace(s.ID) + ".md"
+		fmt.Fprintf(&n, "Operations: [%s](%s).\n\n", page, page)
+		var sub strings.Builder
+		sub.WriteString(generatedNote)
+		fmt.Fprintf(&sub, "# %s (%s)\n\nPart of [non-production.md](non-production.md). %s. %d operations. Definition: %s.\n\n",
+			s.ID, s.Class, mdEscape(strings.TrimSuffix(firstNonEmpty(s.Note, s.Title), ".")), s.Ops, sourceLink(s))
+		sub.WriteString(t.String())
+		writeFile(dir, page, &sub)
 	}
 	writeFile(dir, "non-production.md", &n)
 }
+
+// nonProdInline is the largest definition listed inline in non-production.md.
+const nonProdInline = 40

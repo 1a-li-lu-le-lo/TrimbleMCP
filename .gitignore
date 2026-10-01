@@ -3,3 +3,5 @@
 *.token
 *.key
 .env
+__pycache__/
+*.pyc

@@ -28,7 +28,7 @@ User-level install (`--scope user`, `~/.claude/skills/`) is only justified for a
 
 ## Authentication
 
-- **stdio:** the server acts as the local operator with read-only scopes (`TRIMBLE_MCP_LOCAL_SCOPES`, default `trimble:capabilities:read trimble:projects:read trimble:files:read`). Write and delete scopes are rejected at startup.
+- **stdio:** the server acts as the local operator with read-only scopes (`TRIMBLE_MCP_LOCAL_SCOPES`, default `trimble:capabilities:read trimble:projects:read trimble:files:read trimble:api:read trimble:api:plan`; setting the variable replaces the default). Write and delete scopes are rejected at startup.
 - **Trimble Connect:** an operator runs `trimblectl auth login` once. Use sandbox (`stage`) credentials. Never paste tokens into the conversation.
 
 ## Remote (HTTP) alternative
@@ -57,7 +57,7 @@ It must not receive production secrets in prompts, mutate production projects (n
 To build `trimbleconnect:` links, set `TRIMBLE_CONNECT_DESKTOP_ENABLED=true`. To let the agent open the app on this Windows machine, also set:
 
 - `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`
-- `TRIMBLE_MCP_LOCAL_SCOPES=trimble:capabilities:read,trimble:projects:read,trimble:files:read,trimble:desktop:launch`
+- `TRIMBLE_MCP_LOCAL_SCOPES=trimble:capabilities:read,trimble:projects:read,trimble:files:read,trimble:api:read,trimble:api:plan,trimble:desktop:launch` (setting the variable replaces the default list, so keep the default scopes in it)
 
 Launching is a dry run unless the agent passes `dry_run: false`. The client will also ask you to approve the tool, because it is not read-only.
 

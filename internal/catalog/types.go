@@ -27,7 +27,7 @@ type Source struct {
 	Version   string   `json:"version"`
 	URL       string   `json:"url"`
 	DocURLs   []string `json:"doc_urls,omitempty"`
-	Kind      string   `json:"kind"` // swaggerhub | portal | direct | vista | oidc
+	Kind      string   `json:"kind"` // swaggerhub | portal | maps | app-xchange | confluence | direct | doc | vista | oidc
 	SHA256    string   `json:"sha256"`
 	Class     string   `json:"class"` // production | variant | internal | empty | reference | excluded | identity
 	VariantOf string   `json:"variant_of,omitempty"`
@@ -35,7 +35,10 @@ type Source struct {
 	Family    string   `json:"family,omitempty"`
 	Product   string   `json:"product,omitempty"`
 	Note      string   `json:"note,omitempty"`
-	Ops       int      `json:"operations"`
+	// Unavailable explains why a listed definition could not be retrieved;
+	// such a source has no SHA-256 and no operations.
+	Unavailable string `json:"unavailable,omitempty"`
+	Ops         int    `json:"operations"`
 }
 
 // API kinds.
@@ -76,8 +79,12 @@ type Param struct {
 	Required bool     `json:"required"`
 	Type     string   `json:"type,omitempty"`
 	Format   string   `json:"format,omitempty"`
-	Enum     []string `json:"enum,omitempty"`
-	Desc     string   `json:"description,omitempty"`
+	Enum     []string `json:"enum,omitempty"` // for arrays, the allowed item values
+	// Join is the delimiter that serialises an array parameter as one value
+	// (OpenAPI explode:false styles, Swagger 2.0 collectionFormat); empty
+	// means one repeated parameter per value.
+	Join string `json:"join,omitempty"`
+	Desc string `json:"description,omitempty"`
 }
 
 type Operation struct {

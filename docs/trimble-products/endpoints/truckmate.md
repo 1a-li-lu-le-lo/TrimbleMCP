@@ -31,7 +31,7 @@
 |---|---|---|---|---|
 | `GET` | `/documents` | `reference` | Retrieve imaging document configuration records | searchValue (query); limit (query); offset (query); $filter (query); $orderBy (query); $select (query); useDefaultImagingVendor (query) |
 | `GET` | `/documents/{documentType}/searchValues/{documentIdentifier}/{documentFormat}` | `reference` | Retrieve a document from the image system | documentType* (path); documentIdentifier* (path); documentFormat* (path); token* (query); documentId (query) |
-| `POST` | `/documents/{documentType}/searchValues/{documentIdentifier}/token` | `reference` | Generate document access token | documentType* (path); documentIdentifier* (path); body: application/json |
+| `POST` | `/documents/{documentType}/searchValues/{documentIdentifier}/token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate document access token | documentType* (path); documentIdentifier* (path); body: application/json |
 
 ## External Trace
 
@@ -50,8 +50,8 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `GET` | `/login` | `reference` | Renew login session |  |
-| `POST` | `/login` | `reference` | Generate a JWT | body: application/json |
+| `GET` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Renew login session |  |
+| `POST` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate a JWT | body: application/json |
 
 ## Order Customs
 

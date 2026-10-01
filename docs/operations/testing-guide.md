@@ -18,7 +18,7 @@ git checkout claude/trimble-mcp-bridge-7ow2iz
 make build test smoke        # without make: go build -o bin/ ./cmd/... && go test ./... && ./scripts/smoke.sh
 ```
 
-**Pass:** every package prints `ok`, and the last line is `smoke: OK`.
+**Pass:** no package prints `FAIL` (packages without tests print `? … [no test files]`), and the last line is `smoke: OK`.
 
 ```sh
 export TRIMBLE_MCP_AUDIT_LOG=/tmp/trimble-audit.jsonl
@@ -92,7 +92,7 @@ Then run these checks in order, using IDs from earlier results. Never type an ID
 | `trimblectl files list --product trimble-connect --project <id> --folder <root_folder_id>` | Folders and files with `size_bytes`. Files carry `checksum_algorithm: md5` |
 | `trimblectl files metadata --product trimble-connect --project <id> --file <file id>` | Metadata with no `revision` or `checksum` (the file endpoint documents neither) |
 | `trimblectl api read --key 'core:GET /projects/{projectId}' --path projectId=<id>` | HTTP 200 body; any signed URLs show `[redacted: signed URL]` |
-| `trimblectl api read --key 'topics:GET /bcf/2.1/projects/{projectId}/topics' --path projectId=<id>` | A BCF topics list, or `[]`. Only `core`, `topics`, `topic-exchange` and `file-service` have staging hosts; other APIs return `unsupported_capability` in staging |
+| `trimblectl api read --key 'topics:GET /bcf/2.1/projects/{projectId}/topics' --path projectId=<id>` | A BCF topics list, or `[]`. Staging hosts exist only for `core` (us, eu, ap), `topics` and `topic-exchange` (us, ap) and `file-service` (us); any other API or region returns `unsupported_capability` in staging |
 | `trimblectl api plan --key 'core:DELETE /projects/{projectId}' --path projectId=<id> --reason test` | A plan with `executed: false` and `approval_level: L4`. Confirm in Trimble Connect that nothing changed |
 | `trimblectl api read --key 'civil-site-management:GET /projects/{id}' --path id=p1` | Fails with `unsupported_capability` ("… which the bridge documents but never calls"). No request leaves the machine |
 | Wait for the access token to expire (see `expires_in`), then repeat `projects list` | It still works (Serial PKCE refresh), and `audit verify` still reports intact |
@@ -159,10 +159,11 @@ For Docker: `docker build -f deploy/docker/Dockerfile -t trimble-mcp .` and moun
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `configuration_error: client ID and redirect URI are required` | `TRIMBLE_CLIENT_ID` or `TRIMBLE_SCOPE` not set | Export both (stage 3) |
+| `configuration_error: client ID and redirect URI are required` | `TRIMBLE_CLIENT_ID` (or `TRIMBLE_REDIRECT_URI`) is empty | Export it (stage 3) |
+| `configuration_error: scope must include openid and the application scope` | `TRIMBLE_SCOPE` is missing or lacks `openid` | Export `TRIMBLE_SCOPE='openid <application scope>'` |
 | `… must not be accessible by group or others` | Secret file mode too open (Unix) | `chmod 600 <file>` |
 | `authentication_error` | Not signed in, session expired, or refresh lock held | `trimblectl auth login`; check for a stale `<store>.lock` older than 2 minutes |
-| `unsupported_capability` from `api read` in staging | That API publishes no staging host | Use production, or `core`, `topics`, `topic-exchange` or `file-service` |
+| `unsupported_capability` from `api read` in staging | That API publishes no staging host for this region | Use production, or `core` (us, eu, ap), `topics` or `topic-exchange` (us, ap), or `file-service` (us) |
 | `policy_denied … does not name a project` | Caller restricted to projects; operation is not project-bound | Use a project-bound operation, or an unrestricted operator |
 | `rate_limited` | Bridge or Trimble limit | Wait `retry_after_seconds` |
 | `audit chain broken` | Log edited or records removed mid-file | Preserve the file and investigate; see the threat model (T-15) |
@@ -178,7 +179,7 @@ git diff --stat
 If Trimble publishes a new definition, `make catalog` stops with `unclassified definition …`. Classify it, then rerun:
 
 - a Trimble Connect SwaggerHub definition goes in `sourceClass` in `cmd/trimble-catalog/main.go` (production, variant, internal or empty);
-- anything else gets a rule in `cmd/trimble-catalog/sources-other.json` (reference, excluded or identity, with family, product, auth, access and requires).
+- anything else gets a rule in `cmd/trimble-catalog/sources-other.json` (reference, excluded or identity, with family, product, auth, access and requires). A definition that Trimble links but that fails to download goes in `unavailable` with the reason; a new App Xchange connector page goes in `app_xchange.connectors` (help.trimble.com challenges automated clients, so that list is checked with curl and is never fetched by evading the challenge).
 
 The generator also stops on:
 

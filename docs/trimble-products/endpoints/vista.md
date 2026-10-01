@@ -7,7 +7,7 @@
 - **Authentication:** X-Application-Key header (API key). Declared security schemes: none declared.
 - **Access:** Cloud-hosted Vista customers who purchase the Vista API; 2,000 requests per minute per key.
 - **To call it you would need:** a Vista API application key and subscriber code for api.xchange.trimble.com or api-ap-au.xchange.trimble.com.
-- **Documented servers:** `https://api.xchange.trimble.com/connect/v1/`, `https://{apiHost}/connect/v1/` (template: the customer's host).
+- **Documented servers:** `https://{apiHost}/connect/v1/` (template: the customer's host).
 - **Definitions:** 18, one section each below.
 
 ## Definitions
@@ -16,7 +16,7 @@ This API is large, so each definition has its own page.
 
 | Definition | Operations | Page |
 |---|---|---|
-| Vista Accounts Payable v2 Direct API | 143 | [vista--accounts-payable.md](vista--accounts-payable.md) |
+| Vista Accounts Payable v2 Direct API | 150 | [vista--accounts-payable.md](vista--accounts-payable.md) |
 | Vista Accounts Receivable v2 Direct API | 77 | [vista--accounts-receivable.md](vista--accounts-receivable.md) |
 | Vista Document Management v2 Direct API | 25 | [vista--document-management.md](vista--document-management.md) |
 | Vista Equipment Management v2 Direct API | 218 | [vista--equipment-management.md](vista--equipment-management.md) |

@@ -23,5 +23,7 @@ Adapter: `internal/trimble/connect`. Every wire field the adapter reads is liste
 
 | Endpoint | Reason |
 |---|---|
-| `GET /users/me` | Response fields verified only for the Workspace (JS) API |
-| Download URL, upload, versions | Deferred to the Level 1 and Level 3 phases, which need the approval framework |
+| `GET /users/me` | No typed tool. It is documented as the `me` alias of `GET /users/{userId}` (response `UserDetailsResponse`) and is reachable as `core:GET /users/{userId}` with `userId=me` through `trimble_api_read` |
+| File versions | No typed tool; `core:GET /files/{fileId}/versions` is a catalogue read through `trimble_api_read` |
+| Download URL | Excluded: presigned content URLs (content access needs the approval framework, Level 1) |
+| Upload and other changes | Dry-run plans only (`trimble_api_plan`); execution needs the approval framework (Level 3) |

@@ -4,6 +4,8 @@ Every command-line interface that Trimble documents or publishes is accounted fo
 
 Only the Trimble Connect for Windows link (section 1) is supported. The bridge exposes no shell or process-launching tool, handles no credentials, and never changes a host. Every other command below is therefore excluded, with the reason.
 
+The page also lists the app-to-app URL launchers of CoPilot and Trimble Mobile Manager (sections 19 and 20). They are not command lines, but they start and control a local program just as the Connect link does. Where an official page could not be read directly, its entry says so.
+
 ## 1. Trimble Connect for Windows command line (supported)
 
 Source: https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line (verified 2026-09-23).
@@ -15,7 +17,7 @@ Syntax, as documented: `"trimbleconnect:/projects/[project-id]?show=[view parame
 | Build the link (no side effects) | `trimble_build_desktop_link` | `trimblectl desktop link` |
 | Open the link on this Windows machine (opt-in, dry run by default) | `trimble_open_in_desktop` | `trimblectl desktop open` |
 
-Every documented combination is supported. Omitting both values gives the documented default, `3D,models` (the documented example opens ToDos "instead of the models tab").
+Every documented combination is supported. Omitting both values makes the bridge emit `3D,models`, a documented combination. The page documents no default: its only example opens ToDos "instead of the models tab", which implies that models is the usual panel. 3D as the default view is [assumption A-9](../requirements/assumptions.md).
 
 | View | Panel | Link |
 |---|---|---|
@@ -58,6 +60,8 @@ The official installation and sign-in pages describe only an interactive applica
 ## 4. Web links (not a command line)
 
 The Workspace API documents the web viewer path `https://web.connect.trimble.com/projects/:projectId/viewer/3d` and an embedded viewer (`?isEmbedded=true`). These are browser integrations, not command-line tools, so they are not built by the bridge. Their query parameters beyond the path are documented only for the embedded JavaScript API.
+
+Other Trimble products document app-to-app URL launchers on a device: CoPilot's `copilot://` URLs (section 19) and Trimble Mobile Manager's Android intents and iOS and Windows URL schemes (section 20). They are excluded there, with their reasons.
 
 ## 5. `trimblectl` (this project's CLI)
 
@@ -154,11 +158,515 @@ Source: https://help.sketchup.com/en/sketchup/performing-silent-install-sketchup
 | `/FEATURES=<list>` | Chooses features, for example `fr,scan_essentials,revit_importer` | Excluded: same |
 | `/INSTALLDIR=<path>` | Chooses the installation folder | Excluded: same |
 
-## 10. Checked, with no official command line
+## 10. SketchUp start-up switches and developer tooling, excluded
+
+Sources (verified 2026-09-29):
+
+- https://github.com/SketchUp/sketchup-ruby-debugger/blob/main/README.md, section "Command-line arguments".
+- https://github.com/SketchUp/testup-2/blob/main/README.md, the TestUp 2 continuous-integration examples.
+- https://ruby.sketchup.com/file.ReleaseNotes.html, the SketchUp 2018 M0 and SketchUp 7 notes.
+- https://github.com/SketchUp/rubocop-sketchup (Ruby gem `rubocop-sketchup` 2.1.1, authors "Trimble Inc, SketchUp Team", RubyGems owners `sketchup` and `thomthom`).
+
+These switches are passed to `SketchUp.exe`, or to the macOS binary `SketchUp.app/Contents/MacOS/SketchUp`. The SketchUp installer is section 9.
+
+**Why it is excluded:** every switch makes SketchUp run Ruby code at start-up, or opens a debugger port that accepts connections from an IDE. With `wait`, SketchUp freezes until an IDE attaches. `rubocop-sketchup` is a developer's static-analysis tool that reads a source tree and writes report files. The bridge runs no local programs and has no filesystem tool.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `SketchUp.exe -rdebug "ide [port=<number>] [wait]"` (Windows, with `SURubyDebugger.dll` copied into the SketchUp folder) | Starts the Ruby debugger listener for a `ruby-debug-ide` IDE. `port` defaults to 1234; `wait` blocks start-up until an IDE attaches | Excluded: opens a debug port through which code runs |
+| `/Applications/SketchUp\ 2024/SketchUp.app/Contents/MacOS/SketchUp -rdebug "ide port=6123"`, or `open -a /Applications/SketchUp\ 2024/SketchUp.app --args -rdebug "ide port=6123"` (macOS, with `SURubyDebugger.dylib` in the bundle's Frameworks folder) | The same on macOS | Excluded: same |
+| `SketchUp.exe -RubyStartupArg "TestUp:CI:Path: <dir>" > results.json` (macOS: `'/Applications/SketchUp 2023/SketchUp.app/Contents/MacOS/sketchup' -RubyStartupArg '...'`) | Passes a string to Ruby at start-up. TestUp 2 reads it, runs the test suite in `<dir>` and writes JSON results to standard output | Excluded: runs Ruby code (test suites) |
+| `SketchUp.exe -RubyStartupArg "TestUp:CI:Config: <Config.yml>"` | TestUp 2 runs the suite described by a YAML file (`Path`, `Output`, `%CONFIG_DIR%`) | Excluded: runs Ruby code; reads and writes local files |
+| `-RubyStartup` | Known only from one release note (SketchUp 2018 M0: "Fixed a crash when using `-RubyStartup` command line argument with a file that raises errors while loading"). It evidently loads a Ruby file at start-up. No page documents its syntax | Excluded: runs Ruby code. Its syntax is undocumented, so it is never guessed |
+| `Sketchup.exe > myRubyLog.txt` | Sends Ruby console output (`puts`) to standard output, here redirected to a file (SketchUp 7 release notes) | Excluded: local process and file |
+| `rubocop --format json --out results.json` | `rubocop-sketchup` (installed with `gem install rubocop` and `gem install rubocop-sketchup`, configured in `.rubocop.yml`) analyses a SketchUp extension's source and writes JSON results | Excluded: developer tooling; reads a source tree and writes files |
+| `rubocop -f extension_review -o report.html` | The Extension Review formatter; writes an HTML report | Excluded: same |
+
+## 11. Tekla Tedds `TeddsCalcCommand.exe`, excluded
+
+Source: https://support.tekla.com/doc/tekla-tedds/2026/oth_teddscalccommand (verified 2026-09-29; the same page exists for 2024). Tekla describes it as "a utility application which allows the Tedds Calculator to be used in automation scenarios without having to use the Tekla Tedds API". It is in the Tedds program folder, typically `C:\Program Files\Tekla\Structural\Tedds`.
+
+Syntax, as documented: `TeddsCalcCommand.exe -lib <calculation_library_filename> -item <calculation_library_itemname> -varin <input_variables_filename> [-varout <output_variables_filename>] [-ui (enabled/disabled/hidden)]`.
+
+**Why it is excluded:** it runs engineering design calculations on the local machine from local input files and writes the results to local files. With `-ui disabled`, "no input validation will occur", and Tekla warns that the design is completed "regardless of whether that input or the calculated results are valid". Engineering results must be produced and checked by a qualified person. The bridge runs no local programs and has no filesystem tool.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `-lib <calculation_library_filename>` | Required. Full path, in quotes, of the Calc Library file that holds the calculation | Excluded: local file path |
+| `-item <calculation_library_itemname>` | Required. Short name of the Calc Item to run from that library | Excluded: runs an engineering calculation |
+| `-varin <input_variables_filename>` | Required. Tedds variables XML file with the input variables (exported from Tedds for Word or created with the Tedds API) | Excluded: reads a local file |
+| `-varout <output_variables_filename>` | Optional. Tedds variables XML file saved when the calculation finishes | Excluded: writes a local file |
+| `-ui enabled` | Shows the calculation's user interface; the user must satisfy every input validation check. This is the default when `-ui` is omitted | Excluded: launches a desktop application |
+| `-ui hidden` | Hides the user interface and simulates progress through it; shows it if validation fails | Excluded: same |
+| `-ui disabled` | No user interface and no input validation; the design completes whatever the input | Excluded: skips input validation, so the results may be invalid (safety) |
+
+## 12. Tekla installers, licensing and servers, excluded
+
+Sources (verified 2026-09-29):
+
+- Tekla Structures: https://support.tekla.com/article/centralized-distribution-of-tekla-structures-2026, and the page it links for the Switzerland environment, https://support.tekla.com/article/switzerland-environment-installation-using-command-prompt.
+- Tekla Structural Designer, Tedds, Tedds for Word, Portal Frame Designer and Connection Designer: https://support.tekla.com/article/is-there-a-way-to-silently-install-tekla-structural-design-products.
+- Tekla PowerFab: https://support.tekla.com/article/tekla-powerfab-silent-installation-guide.
+- Tekla licence server: https://support.tekla.com/doc/tekla-structures/not-version-specific/lic_installing_tekla_structures_license_server_manually.
+- Tekla Structures Multiuser Server: https://support.tekla.com/article/setting-up-multiple-instances-of-tekla-structures-multiuser-server.
+
+**Why it is excluded:** each command installs or removes software, a Windows service or a server, needs administrator rights, and changes the host. Host changes are out of scope for an agent (safety Level 5), as for the Trimble Connect installer in section 2. Some also set licensing, or start a service that listens on a network port.
+
+Tekla Structures (the properties go inside `/v"..."` for the `.exe`, or on the `msiexec` command line):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `TeklaStructures2026.exe /s /v"/qn /lvoicewarmupx TS2026_logfile.log"` | Silent installation of the software, with a verbose log. `/s` is silent; `/v` passes the quoted settings to the MSI | Excluded: installs software (a host change) |
+| `INSTALLDIR=<path>` | Software installation folder | Excluded: same |
+| `TSMODELDIR=<path>` | Default model folder | Excluded: same |
+| `CREATELAUNCHER=False` | Does not create the Tekla Launcher shortcut | Excluded: same |
+| `INSTALLDEFAULT=true` | Also installs the Default environment | Excluded: same |
+| `INSTALLASSISTANT=False` | Does not copy Trimble Assistant for Tekla | Excluded: same |
+| `MODELASSISTANT=False` | Does not copy the Tekla Model Assistant package (shown on the service pack installer, 2026 SP2 and later) | Excluded: same |
+| `Env_Default_2026.exe /s /v"/qn /lvoicewarmupx TS2026Default_logfile.log"` | Silent installation of the Default environment | Excluded: same |
+| `TeklaStructures2026.exe /a"<folder>"` | Administrative extraction of the MSI package; the prerequisites go to `<folder>` | Excluded: prepares a deployment; needs administrator rights |
+| `msiexec /i "Tekla Structures 2026.msi" /qn [INSTALLDIR=... TSMODELDIR=...] /lvoicewarmupx <log>` | MSI installation of the software | Excluded: installs software |
+| `msiexec /i "Tekla Structures 2026 Default Env.msi" /qn /lvoicewarmupx <log>` | MSI installation of the Default environment | Excluded: same |
+| `Env_Switzerland_2021.exe /v"ADDLOCAL=Switzerland_GER,Switzerland_FRA,Switzerland_ITA"` (any subset; `/s /v"/qn ADDLOCAL=..."` for silent) | Installs only the chosen language content of the Switzerland environment | Excluded: same |
+
+Tekla Structural Designer, Tedds, Tedds for Word, Portal Frame Designer and Connection Designer:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `msiexec /a <package>.msi` | The administrative installation described in Tekla's Distribution Deployment document | Excluded: prepares a deployment |
+| `msiexec /i <package>.msi /qn`, for example `msiexec /i TeklaTedds.msi /qn TEKLA_LICENSE_METHOD=#18 TEKLA_LICENSE_SERVER=licserve01` | Silent installation. The page adds that standard MSI properties such as `INSTALLDIR` also work, without listing them | Excluded: installs software |
+| `TEKLA_LICENSE_METHOD=#17`, `#33`, `#18`, `#68` or `#65535` | Licensing method: Local, USB, Server, Tekla Online or Automatic | Excluded: changes licensing configuration |
+| `TEKLA_LICENSE_SERVER=<server>` | Name, or static IP address, of the licence server | Excluded: same |
+
+Tekla PowerFab, licence server and Multiuser Server:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `TeklaPowerFab[version].exe /S` | Silent client installation, or silent update of an existing installation | Excluded: installs software |
+| `/INSTTYPE=Server` | Server installation. Tekla warns that running it on an existing PowerFab server "could lead to data loss" | Excluded: installs a server; risk of data loss |
+| `/D=<directory>` | Custom installation folder; must be the last part of the command | Excluded: installs software |
+| `installanchorservice.exe` (run from `%SYSTEMDRIVE%\Tekla\License\Server` in an administrator command prompt) | Installs FlexNet Licensing Service for a manually installed Tekla licence server | Excluded: installs a Windows service |
+| `uninstallanchorservice.exe` | Uninstalls FlexNet Licensing Service | Excluded: removes a Windows service |
+| `MUSaaS_Install.cmd` (run as administrator from the Multiuser Server folder) | Creates another Tekla Structures Multiuser Server instance: prompts for an identifier (default 2) and a TCP port (default 1239), creates a folder and a Windows service, and starts it | Excluded: creates and starts a network service |
+| `MUSaaS_Uninstall.cmd` | Deletes an instance created by `MUSaaS_Install.cmd` | Excluded: removes a service |
+
+## 13. Tekla extension packaging, excluded
+
+Sources (verified 2026-09-29):
+
+- https://developer.tekla.com/tsep-2025-modernization-tsep-and-signing-process, sections "Signing Recommendation" and "Command line refactorings".
+- https://developer.tekla.com/tekla-structures/documentation/tekla-structures-2017-open-api-release-notes.
+- NuGet package `AzureTrustedSignTool` (https://www.nuget.org/packages/AzureTrustedSignTool), a dotnet tool owned by `buildmaster_Tekla`, now at version 2.0.0; Tekla's page cites 1.0.0.
+
+The full switch list of the TSEP builder is not public. The 2017 release notes point to the "TSEP documentation in Tekla Open API startup package", and both https://developer.tekla.com/documentation/complete-guide-tsep-creating-tekla-structures-extension-packages and https://developer.tekla.com/documentation/tekla-structures-extension-package-tsep show "This content is available only after signing in". Only the switches below are publicly documented.
+
+**Why it is excluded:** these are build and code-signing tools on a developer's machine. The builder writes `.tsep` packages and logs. The signing tool uses an Azure Trusted Signing account and certificate profile, which are signing credentials. The bridge runs no local programs and handles no credentials.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| TSEP batch builder (Tekla's pages call it "Batch builder" and the "command line TSEP builder"; the public pages do not name its executable) | Builds a `.tsep` package from a manifest XML file | Excluded: build tooling; writes files |
+| `-o <output path>` | Output path. Optional since TSEP 2025, when the `.tsep` is created next to the manifest; no longer needs a full path | Excluded with the builder |
+| `--verbose` | New in TSEP 2025: shows every log message on the console | Excluded with the builder |
+| Version options (Tekla Structures 2017) | "Options to modify extension product version, and to append product version to the .tsep file name". Their names are only in the sign-in documentation, so they are not listed | Excluded with the builder |
+| `dotnet tool install --global AzureTrustedSignTool` | Installs the signing tool | Excluded: installs software |
+| `AzureTrustedSignTool sign --filePath --accountname AccountName --profilename ProfileName` | Signs a `.tsep` with Azure Trusted Signing; it wraps `dotnet/sign` | Excluded: uses code-signing credentials; writes files |
+
+The same page also installs `Knapcode.CertificateExtractor` and `sign --prerelease`, which are third-party tools, not Trimble command lines. The NuGet owner `buildmaster_Tekla` publishes one more dotnet tool, `CxxSonarQubeRunner` 3.8.1. It has no documentation (its description is "Package Description"), so it has no documented command to list, and it is build tooling in any case. That owner's third tool, `teklaenv`, is section 7.
+
+## 14. Trimble Business Center deployment, excluded
+
+Sources (verified 2026-09-29):
+
+- https://help.fieldsystems.trimble.com/tbc/deploy-setupexe.htm (Setup.exe).
+- https://help.fieldsystems.trimble.com/tbc/tbc-deployment-options.htm (MSI properties and removal).
+- https://help.fieldsystems.trimble.com/tbc/deploy-individual-packages.htm (each package).
+- https://help.fieldsystems.trimble.com/tbc/deploy-software-updates.htm (updates and patches).
+
+**Why it is excluded:** these commands install, repair, update or remove software, Windows services and licensing runtimes machine-wide, and need administrator rights. Host changes are out of scope for an agent (safety Level 5). Some packages also install machine-control exporters or configure GNSS receivers for machine control.
+
+TBC's in-application CAD command line (https://help.fieldsystems.trimble.com/tbc/23380.htm, "CAD Command Line Quick Reference Guide") is not an operating-system command line. It is a prompt inside TBC's CAD view, with command aliases such as `BR` (Break Line), `CHA` (Chamfer) and `CL` (Clip Lines), and keyword shortcuts. It belongs to the desktop user interface, which the bridge does not drive, so it is outside this page.
+
+Setup.exe (`setup.exe /<parameter>`; parameters can be combined):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `/silent` | Installs without a user interface | Excluded: installs software (a host change) |
+| `/ISCacheDir:<path>` | Package cache folder (default `C:\Programdata\Trimble\Package Cache`) | Excluded: same |
+| `/remove` | Uninstalls the installed TBC | Excluded: removes software |
+| `/repair` | Repairs the installed TBC | Excluded: changes software |
+| `/ISFeatureInstall:<features>` | Comma-separated program features, for example `TBC,CSM` (all features by default) | Excluded: installs software |
+| `/language:<lcid>` | Default installation language | Excluded: same |
+| `/ISLanguage<Language>:true` | Adds a language; `<Language>` is ChineseSimplified, Czech, Danish, Dutch, EnglishAU, EnglishUK, EnglishUS, Finnish, French, German, Italian, Japanese, Korean, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish or Ukrainian | Excluded: same |
+| `/ISInstallDir_TBC:<path>` | TBC installation folder | Excluded: same |
+| `/ISDesktop_TBC:""` | No desktop shortcut | Excluded: same |
+| `/ISInstallDir_FDM:<path>` | Feature Definition Manager folder | Excluded: same |
+| `/ISInstallDir_POS:<path>` | POSPac Command-line TBC Subscription folder | Excluded: same |
+| `/ISInstallDir_SDM:<path>` | SCS Data Manager folder | Excluded: same |
+| `/ISInstallState_MM:false` | Disables the Mobile Mapping commands | Excluded: same |
+| `/ISInstallState_RCP:false` | Disables RCP export for Autodesk ReCap | Excluded: same |
+| `/ISInstallState_SDX:false` | Disables GPU rendering of point clouds and imagery | Excluded: same |
+| `/ISInstallState_WOV:false` | Does not install Work Order Viewer | Excluded: same |
+| `/ISInstallState_FD:false` | Disables export of job-site design files for GCS and SCS. It appears only as the example for the MSI property `FD` | Excluded: same |
+| `/ISMachineAddon:true` | Installs the GCS900 12.5 to 12.8 machine-control exporters | Excluded: same; machine-control output |
+
+`TrimbleBusinessCenter.msi <parameter>=<value> /qn` (`/qn` is silent), and Windows Installer commands:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `INSTALLDIR=<path>` | Installation folder | Excluded: installs software |
+| `ProductLanguage=<lcid>` | Default language | Excluded: same |
+| `ADDLOCAL=<features>` | Comma-separated features. `Trimble_Business_Center`, `Program_Files`, `Trimble_Modules` and `External_Modules` are required, plus `Program_Files_<Language>` for each extra language (Chinese, Czech, Danish, Dutch, EnglishAU, EnglishUK, EnglishUS, Finnish, French, German, Italian, Japanese, Korean, Norwegian, Polish, Portuguese, Russian, Spanish, Swedish, Ukrainian) | Excluded: same |
+| `DESKTOP=""` | No desktop shortcut | Excluded: same |
+| `FD=false` | Disables job-site design export | Excluded: same |
+| `ICM=false` | Does not install the Bentley i-model importers | Excluded: same |
+| `MM=false` | Disables the Mobile Mapping commands | Excluded: same |
+| `RCP=false` | Disables RCP export | Excluded: same |
+| `SDX=false` | Disables GPU rendering | Excluded: same |
+| `VC90=true` | Installs the GCS900 12.5 to 12.8 machine-control exporters | Excluded: same; machine-control output |
+| `WOV=false` | Does not install Work Order Viewer | Excluded: same |
+| `TRIMBLE_SYNCHRONIZER_DATA=<path>` | Sync root folder (default `C:\Trimble Synchronizer Data`) | Excluded: same |
+| `msiexec /x <package>.msi /qn`, for example `msiexec /x TrimbleBusinessCenter.msi /qn` | Silent removal | Excluded: removes software |
+| `msiexec /i <package>.msi /qn` | Deploys a full update package saved from Help > Check for Updates | Excluded: installs software |
+| `msiexec /p <package>.msp /qn` | Deploys a patch package | Excluded: changes software |
+
+Individual packages, in the recommended installation order, with each command line as documented. All are excluded because they install software (a host change).
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `ndp48-x86-x64-allos-enu.exe /q /norestart` | Microsoft .NET Framework 4.8 (required) | Excluded: installs software |
+| `ndp48-x86-x64-allos-<iso>.exe /q /norestart` | .NET Framework 4.8 language pack (required) | Excluded: same |
+| `VC_redist.x86.exe /q /norestart` | Visual C++ v14 Redistributable, x86 (required) | Excluded: same |
+| `VC_redist.x64.exe /q /norestart` | Visual C++ v14 Redistributable, x64 (required) | Excluded: same |
+| `vcredist_x64.exe /q /rorestart` (sic) | Visual C++ 2013 Redistributable, x64, for POSPac (required) | Excluded: same |
+| `vcredist_x86.exe /q /rorestart` (sic) | Visual C++ 2008 Redistributable, x86, for the GCS900 exporters (optional) | Excluded: same |
+| `vstor_redist.exe /q:a /c:"install /q /l"` | Visual Studio 2010 Tools for Office Runtime (required) | Excluded: same |
+| `SQLSysClrTypes.msi /qn` | SQL Server 2014 System CLR Types, for POSPac (optional) | Excluded: same |
+| `ReportViewer.msi /qn` | Microsoft Report Viewer 2015, for POSPac (optional) | Excluded: same |
+| `HASP_Setup.msi /qn` | Sentinel HASP runtime (required) | Excluded: same; licensing runtime |
+| `SentinelHASPVendorLibrary.msi /qn` | Trimble HASP vendor library (required) | Excluded: same |
+| `OfficeComponents.msi ProductLanguage=<lcid> /qn` | Office Shared Components (required) | Excluded: same |
+| `IfcPlugin-<version>_x64.msi /qn` | IFC plug-in (optional) | Excluded: same |
+| `ANZToolbox_<version>.msi /qn` | ANZ Toolbox (optional) | Excluded: same |
+| `FAROLS.msi /qn` (the package is listed as `FARO.LS.msi`) | FARO LS point-cloud import (optional) | Excluded: same |
+| `CoordinateSystemManager.msi ProductLanguage=<lcid> /qn` | Coordinate System Manager (required) | Excluded: same |
+| `ConvertToRinex_v<version>.msi /qn` | Convert to RINEX (optional; its own command line is section 15) | Excluded: same |
+| `ConfigurationToolbox.msi /qn` | Configuration Toolbox, which configures Trimble GNSS receivers for machine control (optional) | Excluded: same; machine-control configuration |
+| `TensorFlowGPU.msi /qn` | TensorFlow GPU (optional) | Excluded: same |
+| `ExternalServiceAPI.msi /qn` | Trimble External Service API, a Windows service host (optional) | Excluded: same; installs a service |
+| `Trimble.Scs.LocalDatasetWorkspaces.API.Installer.msi /qn` | Trimble Local Dataset Workspaces API (optional) | Excluded: same |
+| `Trimble.Scs.Activities.API.Installer.msi /qn` (the package is listed as `Trimble.Scs.Activities.installer.msi`) | Trimble Activities API (optional) | Excluded: same |
+| `TrimbleDesktopUtility.msi /qn` | Trimble Desktop Utility, which provides authentication services to Trimble services on the device (optional) | Excluded: same; credential service |
+| `Trimble.Scs.LocalDatasetWorkspaces.Synchronization.Installer.msi /qn` | Synchronises dataset workspaces from the device to the cloud (optional) | Excluded: same |
+| `Trimble.Scs.Activities.Runner.Installer.msi /qn` | Trimble Activities Runner (optional) | Excluded: same |
+| `TrimbleBusinessCenter.msi <parameter> /qn` | Trimble Business Center (required; properties above) | Excluded: same |
+| `TBCHelpEnglish.msi /qn`, `TBCHelpFrench.msi /qn`, `TBCHelpGerman.msi /qn`, `TBCHelpJapanese.msi /qn`, `TBCHelpSpanish.msi /qn` | Offline help (optional) | Excluded: same |
+| `FeatureExtractionEngine.msi /qn` | Feature Extraction Engine (required) | Excluded: same |
+| `FeatureExtractionRulesets.msi /qn` | Feature Extraction Rulesets (required) | Excluded: same |
+| `pctcore.msi /qn` | Point Cloud Training Environment, Core (optional) | Excluded: same |
+| `pctcuda.msi /qn` | Point Cloud Training Environment, CUDA (optional) | Excluded: same |
+| `tmxfilter.msi /qn` | TMX Filter for the MX50 and MX60 mobile mapping systems (optional) | Excluded: same |
+| `FeatureDefinitionManager.msi ProductLanguage=<lcid> INSTALLDIR=<path> /qn` | Feature Definition Manager (optional) | Excluded: same |
+| `SCSDataManager.msi ProductLanguage=<lcid> INSTALLDIR=<app path> TRIMBLE_SYNCHRONIZER_DATA=<sync path> WOV=false /qn` | SCS Data Manager (optional) | Excluded: same |
+| `UASMaster-<version>.msi APPLICATIONFOLDER=<path> /qn` | UASMaster (optional) | Excluded: same |
+| `UASMaster-AddOn<version>.msi APPLICATIONFOLDER=<path> /qn` | UASMaster Add-On (optional) | Excluded: same |
+| `POSPacCommandLineTBCSubscription.msi INSTALLDIR=<path> /qn` | POSPac Command-Line TBC Subscription; needs MATLAB Runtime R2024b (optional) | Excluded: same |
+| `HaspLicenseUpdater.msi ProductLanguage=<lcid> /qn` | HASP License Updater (optional) | Excluded: same; licensing |
+| `Cleaner_x64.msi /qn` | Office Cleanup, which restores a clean state for reinstallation (optional) | Excluded: same |
+
+## 15. Trimble Convert to RINEX, excluded
+
+Source: "Trimble Convert to RINEX Utility Release Notes", version 1.0.1.32, September 2008 (Revision A), PDF author "Trimble Navigation Limited", section "Command line operation". The copy found is hosted by UNAVCO (now EarthScope), not by Trimble: https://kb.unavco.org/file.php?id=65 (verified 2026-09-29). It is 18 years old and third-party hosted, so current versions may differ. TBC still deploys the utility as `ConvertToRinex_v<version>.msi /qn` (section 14), but TBC's own help for it (https://help.fieldsystems.trimble.com/tbc/17261.htm) describes only the dialog.
+
+Syntax, as documented: `convertToRINEX input.dat [-p outputPath] [-r RUNBY] [-o OBSERVER] [-ag AGENCY] [-ac ANTENNACODE] [-an ANTENNANUMBER] [-h HEIGHT] [-n] [-rc RECEIVERCODE] [-rn RECEIVERNUMBER] [-mo MARKERNAME] [-mn MARKERNUMBER] [-v X.XX] [-k] [-d] [-s] [-m] [-t] [-c] [-g] [-co]`, or `convertToRINEX @ParamFile`.
+
+**Why it is excluded:** it converts local GNSS measurement files (DAT or T01) into RINEX files on disk. The bridge runs no local programs and has no filesystem tool. Antenna-height and clock-offset options also change survey observations, which a qualified person must check.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `convertToRINEX` with no arguments | Runs in interactive mode | Excluded: local program |
+| `input.dat` | The DAT or T01 file to convert | Excluded: local file path |
+| `-?` | Displays help | Excluded with the tool |
+| `-p outputPath` | Folder for the output files (OBS, NAV, MET and others) | Excluded: writes local files |
+| `-r RUNBY` | Person or agent performing the conversion | Excluded with the tool |
+| `-o OBSERVER` | Person performing the survey | Excluded with the tool |
+| `-ag AGENCY` | Observer's agency | Excluded with the tool |
+| `-v X.XX` | Output RINEX version (default 2.11) | Excluded with the tool |
+| `-ac ANTENNACODE` | One- or two-character antenna code, from `ANTENNA.INI` | Excluded: changes survey metadata |
+| `-an ANTENNANUMBER` | Value for the NUMBER field of "ANT # / TYPE" | Excluded: same |
+| `-h HEIGHT` | Adds HEIGHT, in metres, to all antenna heights | Excluded: changes observations |
+| `-n` | Skips the default antenna-height corrections | Excluded: changes observations |
+| `-k` | Marks the first observation as kinematic | Excluded: same |
+| `-ca` | Accounts for millisecond time steps in observations and time of observation (described, but not in the usage line) | Excluded: same |
+| `-co` | Includes receiver clock offsets in the OBS output | Excluded: same |
+| `-d` | Includes Doppler values | Excluded with the tool |
+| `-s` | Includes raw signal strengths | Excluded with the tool |
+| `-g` | Includes only GPS observations | Excluded with the tool |
+| `-m` | Writes a RINEX meteorological file if data are present | Excluded: writes local files |
+| `-t` | Writes a RINEX auxiliary file with tilt data if present | Excluded: writes local files |
+| `-mo MARKERNAME` | Value for the MARKER NAME field | Excluded with the tool |
+| `-mn MARKERNUMBER` | Value for the MARKER NUMBER field | Excluded with the tool |
+| `-rc RECEIVERCODE` | Receiver numeric code, from `RECEIVER.INI` | Excluded with the tool |
+| `-rn RECEIVERNUMBER` | Value for the NUMBER field of "REC # / TYPE / VER" | Excluded with the tool |
+| `-c` | In the usage line, with no description | Excluded; its meaning is undocumented |
+| `@ParamFile` | Reads `<ParameterName> = <Value>` lines instead of switches (`#` starts a comment). Parameters: `DatFile`, `ObsFile`, `NavFile`, `MetFile`, `RunBy`, `Observer`, `Agency`, `RinexVersion`, `GenMetFile`, `AntCode`, `AntNumber`, `AntType`, `CorrToBase`, `AntCorrect`, `AntOffset`, `RcvrCode`, `RcvrNumber`, `RcvrType`, `RcvrVersion`, `HdrMarkerName`, `HdrMarkerNumber`, `HdrMarkerXYZ`, `KinStart`, `LogDoppler`, `LogSNR`, `LogOnlyGPS`, `AddMSecOffsets`, `AddRcvrOffsets`, `AdjDisabled`, `AdjObservations` | Excluded: reads a local file |
+
+## 16. Trimble eCognition command-line tools, excluded
+
+Sources (verified 2026-09-29):
+
+- https://docs.ecognition.com/eCognition_documentation/Other%20Resources/eCognition%20SDK/Automation%20API/1.5%20Introduction%20to%20Remote%20Automation.htm ("Introduction to Remote Automation", eCognition 10.5). It says: "Provided are the DIACmdClient.exe, the DIACmdEngine.exe and DIAMkWksp tools. While these are not a programming interface, but command line tools, they do utilize the SOAP protocol interface".
+- Docker image `ecognition/linux_cle`, "Trimble eCognition Command-line engine for Linux": https://hub.docker.com/r/ecognition/linux_cle (updated 2026-09-01).
+
+**Why it is excluded:** these tools run image-analysis rule sets, which are code, on local or server engines. They read and write local image, project and workspace files, and submit jobs to an eCognition Server. `DIACmdClient -db user[:pwd]@storage` puts a password on the command line, where other local processes can see it. The bridge runs no local programs, has no filesystem tool and handles no credentials. The SOAP interface these tools use is a separate API and is not covered here.
+
+`DIACmdEngine`, the engine's command-line interface:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `DIACmdEngine image=<path> [image=<pathN>...] [thematic=<path>] ruleset=<path> [options]` | Analyses raster or point-cloud files (`.tif`, `.asc` and others), with optional thematic data (`.shp`, `gdb` and others), using a rule set (`.dcp`) | Excluded: runs a rule set on local files |
+| `DIACmdEngine image-dir=<path> import-connector=<name> [import-connector-file=<path>] [image=<extra>] [thematic=<extra>] ruleset=<path> [options]` | Analyses data imported with a predefined or custom (`.xml`) import connector. The parameter list calls the root folder `import-dir` | Excluded: same |
+| `DIACmdEngine dpr=<path> ruleset=<path> [options]` | Analyses an existing project (`.dpr`) | Excluded: same |
+| `DIACmdEngine image-dir=<path> scene-xml=<path> ruleset=<path> [options]` | Analyses several scenes from a scene file list in one run | Excluded: same |
+| `DIACmdEngine --update-ruleset <input_ruleset_path> <output_ruleset_path>` | Re-saves a rule set so that it uses the latest algorithm versions | Excluded: writes local files |
+| `param:<name>=<value>` | Sets a scene variable of the rule set; repeatable | Excluded with the engine |
+| `array-param:<name>=<value1>,<value2>,...` | Sets a rule-set array; repeatable | Excluded with the engine |
+| `output-dir=<path>` | Output folder for exports | Excluded: writes local files |
+| `license-token=<json>` | Additional licence information, in JSON | Excluded: licence data on the command line |
+| `save-dpr[=<path>]` | Saves the project file, by default to `{:Workspc.OutputRoot}\dpr\{:Project.Name}.v{:Project.Ver}.dpr` | Excluded: writes local files |
+| `--pause` | Pauses the application when done | Excluded with the engine |
+| `--map <path1>=<path2>` | Maps a local drive to a network path | Excluded with the engine |
+| `--log-file=<file>` | Log file path (default from `config/eCognition.cfg`) | Excluded: writes local files |
+
+`DIACmdClient`, which submits workspaces to the eCognition Job Scheduler and monitors them. Syntax: `DIACmdClient action [options] workspace_file [ruleset_file] [scene_name]`, or `DIACmdClient action [options] -db user[:pwd]@storage workspace_id [ruleset_id]`. The page's examples write the action with a leading dash, for example `DIACmdClient -sw test1.dpj fastrule.dcp`.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| action `s` | Submits the workspace for analysis | Excluded: submits server jobs |
+| action `p` | Submits the workspace for stitching | Excluded: same |
+| action `w` | Waits for the workspace to finish | Excluded with the client |
+| action `t` | Tests the state of the analysis | Excluded with the client |
+| action `r` | Rolls back the workspace and deletes results | Excluded: deletes data |
+| action `d` | Deletes a single run, with its results | Excluded: deletes data |
+| action `sw` | Submits for analysis and waits | Excluded: submits server jobs |
+| action `pw` | Submits for stitching and waits | Excluded: same |
+| `-p` | Analyses tiles only | Excluded with the client |
+| `-top` | Analyses top scenes only | Excluded with the client |
+| `-u <url>` | Job Scheduler URL | Excluded with the client |
+| `-t <sec>` | Maximum wait for the Job Scheduler to start | Excluded with the client |
+| `-run <name>` | Run name | Excluded with the client |
+| `-fsr` | Forces submission even if other runs have not finished | Excluded with the client |
+| `-scn <file>` | Submits only the scenes listed in the file | Excluded: reads a local file |
+| `-ro` | Read only: does not modify the workspace | Excluded with the client |
+| `-db` | Opens the workspace from Data Management storage instead of a file, with `user[:pwd]@storage` and IDs in place of file names | Excluded: password on the command line |
+| `-auth <url>` | Authentication Server URL, which checks the `-db` user name and password | Excluded: credential handling |
+
+`DIAMkWksp` and `DIAClient.exe`:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `DIAMkWksp wksp_file [input_fldr] [import_tmplt_name] [export_tmplt_file] [add_tmplt_fldr]` | Creates a workspace (`.dpj`), importing every image file found recursively in `input_fldr`, with an optional import template (defined in `Default.scm`), export template file and folder of extra import templates | Excluded: reads and writes local files |
+| `DIAClient.exe /image <file>` | Starts the client with an image loaded | Excluded: launches a desktop application |
+| `DIAClient.exe /ruleset <file>` | Starts the client with a rule set loaded | Excluded: same |
+| `DIAClient.exe /project <dpr>` | Starts the client with a project loaded | Excluded: same |
+| `DIAClient.exe /product <name>` | Product to start, for example `"eCognition Developer"` | Excluded: same |
+| `DIAClient.exe /portal <name>` | Portal to start, for example `"Rule Set Mode"` | Excluded: same |
+| `DIAClient.exe /workspace <dpj>` | Starts the client with a workspace loaded | Excluded: same |
+
+Docker image `ecognition/linux_cle` (it also contains `DIAMkWksp` and `DIACmdClient`, for use with the Job Scheduler image `ecognition/linux_js`):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `docker run -it -e "LM_LICENSE_FILE=@<licence server address>" -v <data>:/mnt ecognition/linux_cle:10.5.0` | Runs the Linux command-line engine interactively; needs an eCognition Server licence from the eCognition License Server | Excluded: runs containers; licensing |
+| `docker run ... ecognition/linux_cle:<tag> ./DIACmdEngine <arguments>` | Runs one analysis with the `DIACmdEngine` syntax above; returns 0 on success and -1 otherwise | Excluded: runs a rule set on local files |
+| `-e ECOG_CONFIG_logging="log path=/mnt/logs;trace level=Detailed"` | Logging configuration | Excluded with the container |
+
+## 17. PC\*MILER BatchPro, Rail-BatchPro and installer, excluded
+
+Sources (official Trimble Maps PC\*MILER support articles):
+
+- https://support.pcmiler.com/en/support/solutions/articles/19000076345-using-batchpro-from-the-command-line, also in the Trimble Transportation Learning Center help: https://learn.transportation.trimble.com/wp-content/uploads/tte/ebcbe19c93c746dd320c/olhlp/1a04aee3fa04/docs/Current/PCMilerBatchPro/3.13.10-UsingBatchProfromthe.html.
+- https://support.pcmiler.com/en/support/solutions/articles/19000087469-using-batchpro-rail-from-the-command-line.
+- https://support.pcmiler.com/en/support/solutions/articles/19000053641-is-there-a-command-line-option-available-for-pc-miler-rail-batchpro-.
+- https://support.pcmiler.com/en/support/solutions/articles/19000053111-installing-pc-miler-silent-installation-.
+
+**Not read directly.** On 2026-09-29, support.pcmiler.com and www.pcmiler.com returned HTTP 403 to automated clients, and learn.transportation.trimble.com redirected to its home page. The entries below were confirmed from search-engine extracts of these official pages. They need re-reading from a network that can open them, and the switch list may be incomplete until then.
+
+**Why it is excluded:** BatchPro and Rail-BatchPro are local batch programs that read input and configuration files and write output reports. `setup.exe` installs software (a host change). The bridge runs no local programs and has no filesystem tool. PC\*MILER Web Services is classified separately in [capability-matrix.md](capability-matrix.md).
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `batchw32.exe` | Runs BatchPro without its user interface, processing the input file with the settings in `pcmbatch.cfg`; can be called from a scheduler, another application or a batch file | Excluded: local program; reads and writes files |
+| `CommandLine=1` in `pcmbatch.cfg` | Turns on command-line mode (the default is 0). The `.cfg` file is by default in the same folder as `batchw32.exe` | Excluded with the program |
+| `batchw32.exe <file>.cfg` (a file name or a full path) | Runs BatchPro with an alternate configuration file | Excluded: same |
+| `batchrailcmd.exe "-input:<path>\railbatch.in" "-config:<path>\railbatch.cfg"` (one space between the arguments; in the PC\*MILER Rail `App` folder) | Runs Rail-BatchPro without a user interface. It writes the `.OUT` file next to the `.IN` file, and reports the number of entries processed or an error | Excluded: same |
+| `"-output:<name>"` | Optional base name of the output file, without `.OUT` | Excluded: writes local files |
+| `setup.exe -r` | Runs the installer and records the choices in `setup.iss`, in the Windows folder (copy it next to `setup.exe`) | Excluded: installs software |
+| `setup.exe /s` | Installs silently with the recorded choices | Excluded: same |
+
+## 18. Viewpoint Vista client installer, excluded
+
+Sources (verified 2026-09-29):
+
+- Trimble Help: https://help.trimble.com/doc/vista/vista/on-premises-deployments/installations/major-release-installation/vista-client-application/install-the-vista-client-on-a-workstation/silent-installation. It was read with a browser-like fetch; plain `curl` receives HTTP 202 with an empty body.
+- Trimble's ERP Cloud FAQ site for Vista and Spectrum: https://sites.google.com/trimble.com/vista-cloud-faq/home/vrl-explained/pre-configure-vista-vrl-client (updated 21 August 2024) and https://sites.google.com/trimble.com/vista-cloud-faq/home/vrl-explained/vista-command-line-silent-uninstall (updated 4 May 2021).
+
+**Why it is excluded:** these commands install or remove the Vista client and its prerequisites on workstations, which is a host change needing administrator rights (safety Level 5).
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `Vista_Client_2#.##.##.msi /qn` | Silent client installation (Trimble Help) | Excluded: installs software |
+| `msiexec.exe /S /v /qn /i "C:\Temp\VistaClient.23.1.0.883.msi" INSTALLINGBITNESS=0` | Silent 64-bit client installation. The FAQ explains `/s` as silent, `/v` as verbose and `/qn` as "additional options" | Excluded: same |
+| `msiexec.exe /S /v /qn /i "C:\Temp\VistaClient.23.1.0.883.msi"` | Silent 32-bit client installation (no `INSTALLINGBITNESS`) | Excluded: same |
+| `ndp48-x86-x64-allos-enu.exe /quiet /norestart /AcceptEULA` (`/passive` is also accepted) | .NET Framework 4.8 prerequisite, `.exe` version | Excluded: same |
+| `msiexec /i ndp48-x86-x64-allos-enu.msi /quiet /norestart /log "<file>"` | .NET Framework 4.8 prerequisite, Microsoft's `.msi` version | Excluded: same |
+| `msiexec /i CRRuntime_64bit_13_0_21.msi /qn` | SAP Crystal Reports Runtime 13 prerequisite | Excluded: same |
+| Silent uninstall with `msiexec` and the product GUIDs | The FAQ finds the Vista and Crystal Runtime GUIDs with `get-wmiobject Win32_Product \| Sort-Object -Property Name \|Format-Table IdentifyingNumber, Name, LocalPackage -AutoSize`, then says to run an `msiexec` command for each. The published page does not show that command | Excluded: removes software. The command is not shown, so it is not reconstructed |
+
+## 19. CoPilot URL launch (not a command line), excluded
+
+Sources (verified 2026-09-29):
+
+- https://developer.trimblemaps.com/copilot-navigation/feature-guide/advanced-features/url-launch2/ ("URL Launch (Single URL)", CoPilot 10.26.1.345 and later).
+- https://developer.trimblemaps.com/copilot-navigation/feature-guide/advanced-features/url-launch/ ("URL Launch (Multiple URLs)", last updated 9 February 2026).
+
+CoPilot's URL launch lets another application on the same device "launch and manage CoPilot". Like `trimbleconnect:`, it is a URL scheme rather than a command line, and it is listed because it starts and controls a local program.
+
+**Why it is excluded:** it controls a truck-navigation app on a driver's device. It activates licences, sets the vehicle and driver identity, changes configuration and restarts CoPilot, selects the vehicle routing profile that CoPilot uses "to generate a safe and legal route", and replaces the trip's stops. A wrong profile or stop changes a moving vehicle's route, so a person responsible for the dispatch must send it (safety: vehicle guidance). The bridge also cannot reach a driver's device, and a product key in a URL is a credential.
+
+Single URL (`copilot://options?type=TASKS&JSON=<Base64-encoded JSON>`), with its documented JSON fields:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `copilot://options?type=TASKS&JSON=<Base64 JSON>` | Runs several tasks from one Base64-encoded JSON object | Excluded: device-local app control |
+| `Ams`: `AssetID` and `CompanyID` (direct customers), or `AssetID`, `ExternalAccountID` and `PartnerID` (partners reselling CoPilot) | Activates an Account Manager licence | Excluded: licence activation |
+| `FleetPortal`: `DeviceID`, `PartnerID`, `DriverID`, `EnableCompliance`, `EnableFleetPortal`, `ForceSync` | Connects to Account Manager Fleet Settings; `ForceSync` syncs them without a restart | Excluded: changes device configuration |
+| `Trip.RoutingProfile` (`Name`) | Sets the active vehicle routing profile | Excluded: vehicle routing (safety) |
+| `Trip.Stops[]`: `Location` (`Label`; `Address` with `StreetAddress`, `City`, `State`, `Zip`, `County`, `Country`; `Coords` with `Lat`, `Lon`; `CustomPlaceID`), `StopType` (`Waypoint`), `PlannedDuration`, `EarliestArrivalTime`, `LatestArrivalTime`, `AtRiskThreshold` | Sends one or more stops. The current GPS location is inserted as, or replaces, the first stop | Excluded: changes a driver's route (safety) |
+| `Trip.ExternalTripId` | The caller's trip identifier, for RouteReporter compliance review | Excluded with the trip |
+| `ShowConfirmation` | Shows a confirmation message in CoPilot | Excluded with the URL |
+
+Multiple URLs, one task per URL:
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `copilot://options?type=CONFIG&CompanyID=<id>&AssetID=<id>&showconfirmation=true` | Activates a licence (direct customers) | Excluded: licence activation |
+| `copilot://options?type=CONFIG&PartnerID=<id>&ExternalAccountID=<id>&AssetID=<id>&showconfirmation=true` | Activates a licence (partners reselling CoPilot) | Excluded: same |
+| `copilot://options?type=Activation&ProductKey=<key>` | Activates a licence with a product key; must be sent on its own | Excluded: licence activation; a product key in a URL |
+| `copilot://options?type=CONFIG&VehicleID=<id>&DriverID=<id>` | Identifies the vehicle and driver | Excluded: changes device configuration |
+| `copilot://options?type=CONFIG&<ConfigName>=<ConfigValue>&...` | Sets any `user.cfg` or CPIK configuration setting, for example `FlowTrafficEnabled` or `FLOW_TRAFFIC_AVAILABILITY`, `DownloadDataOnSDCard` and `SayWelcome` | Excluded: same |
+| `showconfirmation=true` or `SETTINGS_CONFIRMATION_DIALOG=true` | Confirms that the settings were applied | Excluded with the URL |
+| `RestartCoPilot=true` or `RESTART_COPILOT=true` | Restarts CoPilot after the settings are applied | Excluded: restarts a navigation app |
+| `EnableCustomButton=true` and `AppLaunchBundleID=<bundle id>` | Adds a button that returns to the launching app (Android) | Excluded: changes device configuration |
+| `copilot://options?type=VehicleProfile&SelectByName=<name>` | Selects the vehicle routing profile; must be sent on its own | Excluded: vehicle routing (safety) |
+| `copilot://options?type=STOPS&stop=name\|address\|city\|zip\|juris\|state\|lat\|long&stop=...` (optional `&ExternalTripId=<id>`) | Replaces the trip's stops with fielded stops | Excluded: changes a driver's route (safety) |
+| `copilot://options?type=STOPS&query=<name>\|<search string>` | Adds stops found by a single-string search, which uses a web service | Excluded: same |
+| `copilot://options?type=STOPS&query=<customPlaceID>&IncludeCustomPlaceIdOnly=true` | Adds stops by the company's Place ID | Excluded: same |
+| `copilot://mydestination?type=LOCATION&action=<VIEW\|GOTO\|ADDNEXTSTOP>&lat=...&long=...&name=...&address=...&city=...&juris=...&state=...&zip=...` (also `customPlaceID` and `trimblePlaceID`; `copilotv9://` for CoPilot 9) | Shows a location on the map (`VIEW`), makes it the only destination after clearing the trip (`GOTO`), or adds it as the next stop (`ADDNEXTSTOP`) | Excluded: same |
+| `http://www.copilotlive.com/copilot/android?type=LOCATION&...` | The legacy Android form of the same | Excluded: same |
+| `https://copilotgps.com/copilotgps?<query>` (or `http://`) | The clickable form required on Android 12 and later | Excluded: same |
+| `geo:<lat>,<long>?q=<address>`, `geo:0,0?q=<lat>,<long>@<address>`, `geo:0,0?q=<lat>,<long>(<label>)` | Geo URI stops on Android | Excluded: same |
+| `copilot://options?type=FLEETPORTAL&action=Set&DriverID=<id>&DeviceID=<id>&PartnerID=<id>&EnableCompliance=<bool>&EnableFleetPortal=<bool>&showconfirmation=<bool>&ShowCompliancePopup=<bool>` | Connects to Account Manager Fleet Settings (`ShowCompliancePopup` is deprecated since 10.19.3.48) | Excluded: changes device configuration |
+
+## 20. Trimble Mobile Manager launch interfaces (not a command line), excluded
+
+Sources (verified 2026-09-29):
+
+- Android intents: https://developer.trimble.com/docs/mobile-manager/reference/android-intents/
+- iOS URL schemes: https://developer.trimble.com/docs/mobile-manager/reference/ios-url-schema/
+- Windows URI scheme: https://developer.trimble.com/docs/mobile-manager/reference/windows-request-schema/
+
+Trimble Mobile Manager (TMM) runs on a field device and connects its GNSS receiver. Other apps on the same device use these interfaces to open TMM pages, sign in, register, and find the ports of TMM's local REST and WebSocket APIs. That local REST API is catalogued in [endpoints/mobile-manager.md](endpoints/mobile-manager.md).
+
+**Why it is excluded:** these interfaces work only on the field device, which the bridge cannot reach. Several return Trimble ID tokens to the calling app (the ID token and access token, and on Android `LOGIN` also the refresh token), and the bridge never handles credentials. Those that open the correction source, configuration, antenna height, receiver selection, tilt, IMU or pole-bias calibration pages lead to changes of GNSS receiver, correction, antenna or calibration settings. They are **safety-excluded**, as the matching Mobile Manager operations are in the API catalogue: positioning that guides survey or machine work must be configured by a qualified person on the device.
+
+Android intents (`Intent` actions):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `com.trimble.tmm.CORRECTIONSOURCESETTINGS` | Opens the correction source settings page | Excluded (safety): correction settings |
+| `com.trimble.tmm.EBUBBLECALIBRATION` | Opens the eBubble tilt calibration page | Excluded (safety): calibration |
+| `com.trimble.tmm.GNSS_STATUS` | Opens the GNSS Status page | Excluded: device-local user interface |
+| `com.trimble.tmm.HERE` | Opens Point Measurement (inputs `distanceUnit`, `name`, `comment`, `antennaHeight`) and returns the measured point: latitude, longitude, height, elevation, antenna height, precisions, sample count, optional EPSG code and account | Excluded (safety): sets the antenna height of a survey measurement and returns a precise position |
+| `com.trimble.tmm.IMUBIASCALIBRATION` | Opens the IMU bias calibration page | Excluded (safety): calibration |
+| `com.trimble.tmm.LOGIN` | Downloads licences for the user and app (input `applicationID`) and returns the account name, ID token, access token, refresh token and Trimble Precision SDK version | Excluded: returns credentials |
+| `com.trimble.tmm.ONDEMAND` | Opens the On-Demand licensing page; returns the current claim and the time remaining | Excluded: licensing |
+| `com.trimble.tmm.OPENANTENNAHEIGHT` | Opens the Antenna Height page | Excluded (safety): antenna settings |
+| `com.trimble.tmm.OPENLASEROFFSET` | Opens the Laser Offset data-collection workflow; returns the geometry and ESRI-compatible feature attributes | Excluded: field data collection on the device |
+| `com.trimble.tmm.OPEN_TO_CONFIGURATION` | Opens the Configuration page | Excluded (safety): receiver and correction configuration |
+| `com.trimble.tmm.OPEN_TO_LOGIN` | Starts sign-in (input `applicationID`); returns the account name, TID, ID token, access token and Trimble Precision SDK version | Excluded: returns credentials |
+| `com.trimble.tmm.POLEBIASADJUSTMENT` | Opens the Pole Bias Adjustment page | Excluded (safety): calibration |
+| `com.trimble.tmm.PseudoSecureSocketServerPort` | Starts the pseudo-secure socket server activity (input `applicationID`); returns its port and the REST API and WebSocket ports | Excluded: device-local |
+| `com.trimble.tmm.RECEIVERSELECTION` | Starts receiver selection | Excluded (safety): changes the GNSS receiver |
+| `com.trimble.tmm.RefreshUserToken` | Refreshes the user token (input `applicationID`); returns `info` or `error` | Excluded: credential handling |
+| `com.trimble.tmm.REGISTER` | Registers the calling app for the REST API (input `applicationID`); returns the result and the REST API and WebSocket ports | Excluded: device-local registration |
+| `com.trimble.tmm.SKYPLOT` | Opens the Skyplot page | Excluded: device-local user interface |
+| `com.trimble.tmm.SocketServerPort` | Starts the socket server port activity (input `applicationID`); returns its port and the REST API and WebSocket ports | Excluded: device-local |
+| `com.trimble.tmm.STATUS` | Returns the account status (input `applicationID`): name, TID, ID token, access token, refresh recommendation, subscription name, expiry and precision thresholds, distance unit, whether the Catalyst service must be installed, and the device's hardware support level | Excluded: returns credentials |
+
+iOS URL schemes (parameters are a Base64-encoded JSON object; responses go to the caller's `returl`):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `tmm://` | Pings TMM to check that it is available | Excluded: device-local |
+| `tmmconnect://?<Base64 JSON>` (`application_id`, `returl`) | Signs in to Trimble ID through TMM; returns `UserTID`, `DeviceID` and `TPSDKVersion` | Excluded: sign-in |
+| `tmmlogin` (its documented request URL is `tmmconnect://?<Base64 JSON>`) | The same client login | Excluded: sign-in |
+| `tmmcorrectionsettings://` | Opens the configuration page to edit the correction settings | Excluded (safety): correction settings |
+| `tmmfilelocations://?<Base64 JSON>` (`returl`) | Returns the base location, correction-settings path and licence-report path | Excluded: device-local files |
+| `tmmondemand://?<Base64 JSON>` (`application_id`, `returl`) | Returns the current On-Demand claim and countdown | Excluded: licensing |
+| `TmmOpenLaserOffset://?<Base64 JSON>` (`returl`) | Opens the Laser Offset workflow; returns URL-encoded geometry and feature attributes | Excluded: field data collection on the device |
+| `TmmOpenToAntennaHeight://` | Opens the Antenna Height page | Excluded (safety): antenna settings |
+| `tmmopentoconfiguration://` | Opens the Configuration page | Excluded (safety): receiver and correction configuration |
+| `tmmopentologinpage://?<Base64 JSON>` (`application_id`, `returl`) | Opens the login page | Excluded: sign-in |
+| `tmmopentoreceiverselection://` | Opens receiver selection | Excluded (safety): changes the GNSS receiver |
+| `TmmOpenToSkyplot://` | Opens the Skyplot page | Excluded: device-local user interface |
+| `tmmpseudosecuresocketserver://?<Base64 JSON>` (`returl`) | Starts the pseudo-secure socket server; returns the REST API and WebSocket ports | Excluded: device-local |
+| `tmmrefreshusertoken://?<Base64 JSON>` (`application_id`, `returl`) | Refreshes the user token; returns a result code from 0 to 4 and a message | Excluded: credential handling |
+| `tmmregister://?<Base64 JSON>` (`application_id`, `returl`) | Registers the app; returns the result and the REST API and WebSocket ports | Excluded: device-local registration |
+| `tmmsocketserverport://?<Base64 JSON>` (`returl`) | Returns the REST API and WebSocket ports | Excluded: device-local |
+
+Windows URI scheme (`trimblemobilemanager://request/<request>?callback=<uri>`; TMM answers on the callback URI with `id`, `status` and `message`):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `tmmCorrectionSettings` | Opens the configuration page to edit the correction settings | Excluded (safety): correction settings |
+| `tmmOnDemand` | Opens the On Demand page; returns the current claim and countdown (its description on the page repeats the receiver-selection text) | Excluded: licensing |
+| `tmmOpenLaserOffset` | Opens the Laser Offset workflow; returns the geometry and feature attributes | Excluded: field data collection on the device |
+| `tmmOpenToAntennaHeight` | Opens the Antenna Height page | Excluded (safety): antenna settings |
+| `tmmOpenToConfiguration` | Opens the Configuration page | Excluded (safety): receiver and correction configuration |
+| `tmmOpenToLoginPage` (`applicationId`) | Opens the login page; returns the user's TID and TPSDK version | Excluded: sign-in |
+| `tmmOpenToReceiverSelection` | Opens receiver selection | Excluded (safety): changes the GNSS receiver |
+| `tmmOpenToSkyplot` | Opens the Skyplot page | Excluded: device-local user interface |
+| `tmmRegister` (`applicationId`) | Registers the app; returns the result and the REST API and WebSocket ports | Excluded: device-local registration |
+| `tmmSocketServerPort` | Returns the REST API and WebSocket ports | Excluded: device-local |
+
+## 21. Trimble-published npm executables, excluded
+
+Source: the npm organisation `trimble-oss` (https://www.npmjs.com/org/trimble-oss; package list https://registry.npmjs.org/-/org/trimble-oss/package), and each package's registry record and readme (verified 2026-09-29). Of the organisation's 18 packages, these four declare executables; the other 14 declare none.
+
+**Disposition:** design-system developer tooling, not a Trimble product interface. These tools run in a developer's project, install packages and write files, or start local MCP servers for coding assistants. None of them reaches a Trimble product's data.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `modus-wc init` (package `@trimble-oss/modus-wc-cli` 0.0.3, executable `modus-wc`) | Sets up Modus Web Components in a project: installs the framework wrapper and Tailwind CSS, edits `index.html`, `vite.config.ts` and styles, and can configure an MCP server and Cursor rules | Excluded: design-system developer tooling; installs packages and writes files |
+| `modus-wc add [ids...]`, with `--all` and `--pattern` | Adds UI templates or patterns (102 patterns) to the project | Excluded: same |
+| `modus-wc help add [--pattern]` | Lists the available templates or patterns | Excluded: same |
+| `modus-wc setup mcp` | Writes `.cursor/mcp.json`, `.cursor/rules/modus-wc.mdc` and `.cursor/skills/modus-wc/SKILL.md` | Excluded: same |
+| `modus-wc info` | Shows the project's setup status | Excluded: same |
+| `modus-wc docs [component]`, with `--open` | Shows component documentation; `--open` opens Storybook | Excluded: same |
+| `modus-mcp-server` (package `@trimble-oss/modus-mcp-server` 1.0.2, author "Trimble") | A stdio MCP server with Modus component documentation and icon search (tools `getting_started_guidelines`, `get_list_of_all_modus_components`, `get_component_details`, `get_modus_icons_by_char`) | Excluded: design-system developer tooling |
+| `moduswebcomponents-mcp` (package `@trimble-oss/moduswebcomponents-mcp` 1.19.0) | "MCP server for Modus Web Components documentation". The package has no readme, so no usage is documented | Excluded: same |
+| `cem analyze` or `custom-elements-manifest analyze` (package `@trimble-oss/custom-elements-manifest-analyzer` 0.0.4, a Trimble-maintained fork of `@custom-elements-manifest/analyzer`) | Generates a custom elements manifest. Options: `--config`, `--globs`, `--exclude`, `--outdir`, `--dependencies`, `--packagejson`, `--watch`, `--dev`, `--quiet`, `--litelement`, `--fast`, `--stencil`, `--catalyst`, `--catalyst-major-2` | Excluded: same; writes files |
+
+The `@trimble-oss/modus-mcp-server` readme installs and runs the unscoped name `modus-mcp-server` (`npm install -g modus-mcp-server`, `npx -y modus-mcp-server@latest`). npm shows that unscoped name as unpublished since 2025-07-14, so those commands do not fetch Trimble's scoped package.
+
+## 22. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
-- **Trimble Business Center:** search results mention command-line use, but no official command-line documentation was found (unverified; re-check on the next review).
-- **SketchUp, Tekla Structural Designer, Tedds, PowerFab, Trimble Access, CoPilot, PC\*MILER:** automated through SDKs or APIs, not documented command lines. See [capability-matrix.md](capability-matrix.md).
-- **Not product command lines:** `@trimble-oss/modus-wc-cli`, a CLI for the Modus design system's web components, and the open-source tools in the `trimble-oss` GitHub organisation (for example DBA Dash). These are not Trimble product interfaces.
+- **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer, Connection Designer and PowerFab (section 12). Otherwise they are automated through SDKs or APIs.
+- **Also automated through SDKs or APIs:** besides the command lines above, SketchUp, Tekla Structures, Tedds, CoPilot and PC\*MILER have SDKs or APIs. Trimble Access has no documented command line and is automated through its SDK. See [capability-matrix.md](capability-matrix.md).
+- **POSPac Command-line TBC Subscription:** installed by TBC (section 14). No public page documents its own command line.
+- **TSEP Manifest Generator** (https://github.com/TrimbleSolutionsCorporation/TSEPManifestGenerator): a GUI tool; its readme documents no command line.
+- **Not product command lines:** the Trimble-published npm executables (section 21), the open-source tools in the `trimble-oss` GitHub organisation (for example DBA Dash), and `CxxSonarQubeRunner` (section 13). These are not Trimble product interfaces.
+- **Needs re-reading:** the PC\*MILER entries (section 17), from a network that can open support.pcmiler.com.
 
 Command-line access to Trimble APIs in general goes through `trimblectl` (section 5). `trimblectl api operations` searches every catalogued operation of every product. `trimblectl api read` calls Trimble Connect reads, and `trimblectl api plan` prepares dry-run requests for Trimble Connect changes and other products' reference operations.

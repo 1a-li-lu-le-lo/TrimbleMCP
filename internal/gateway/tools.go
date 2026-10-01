@@ -142,9 +142,9 @@ func (g *Gateway) buildTools() []*tool {
 				Title: "Search the Trimble API catalogue",
 				Description: "Searches every operation in every published Trimble API definition: the Trimble Connect APIs (Core, Model, " +
 					"Model Feature, Org, Property Set, Topics/BCF, Topics Exchange, Issues, Support, Drive, File Service) and the other " +
-					"products with public definitions (Vista, ProjectSight, Unity Construct, Unity Maintain/Permit, Accubid Anywhere, " +
-					"Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, Trimble Maps Places, " +
-					"PTx FarmENGAGE). Each has a disposition: read (Trimble Connect, executable with trimble_api_read), plan (Trimble " +
+					"products with public definitions (Vista, ProjectSight, Viewpoint For Projects, Unity Construct, Unity Maintain/Permit, " +
+					"Accubid Anywhere, Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, " +
+					"Transporeon, Trimble Maps, PC*MILER, PTx FarmENGAGE). Each has a disposition: read (Trimble Connect, executable with trimble_api_read), plan (Trimble " +
 					"Connect change, dry-run with trimble_api_plan), reference (another product: documented and plannable, never " +
 					"called), variant (same call as covered_by) or excluded (with the reason). Pass key for one operation's full " +
 					"parameters. No upstream call.",
@@ -219,7 +219,7 @@ func desktopSchema(launch bool) string {
     ` + productProp + `,
     "project_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$", "description": "Project ID from trimble_list_projects."},
     "view": {"type": "string", "maxLength": 16, "description": "Case-insensitive; one of ` + strings.Join(desktop.Views(), ", ") + `."},
-    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Give view and panel together, or neither for the documented default ` + desktop.DefaultView + `,` + desktop.DefaultPanel + `.", "maxLength": 16}`
+    "panel": {"type": "string", "description": "Case-insensitive; one of ` + strings.Join(desktop.Panels(), ", ") + `. Give view and panel together, or neither; neither emits ` + desktop.DefaultView + `,` + desktop.DefaultPanel + `, a documented combination (the page names no default).", "maxLength": 16}`
 	if launch {
 		s += `,
     "dry_run": {"type": "boolean", "default": true, "description": "When true (default) nothing is opened."},

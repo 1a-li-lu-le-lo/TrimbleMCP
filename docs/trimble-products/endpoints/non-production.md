@@ -5,8 +5,10 @@
 Every operation in a definition that is not a Trimble Connect production API or another product's reference API:
 
 - Trimble Connect staging, integration, QA, test, draft, internal or empty definitions. `variant` operations are the same call as the production operation they name; `excluded` operations exist only outside production or in Trimble-internal APIs.
-- Definitions that are publicly reachable but not linked from Trimble documentation, or that are placeholders. The bridge does not use undocumented endpoints.
+- Definitions that Trimble marks as internal (App Xchange connector definitions), push or webhook contracts that the customer implements, and definitions that are undocumented, deprecated, credential-only or placeholders.
 - Trimble Identity endpoints, which carry credentials and are never agent-callable.
+
+Definitions with many operations are listed on their own page, linked from their section.
 
 ## IssueMgmt-Stage@1.0 (variant)
 
@@ -93,11 +95,11 @@ placeholder example served from a personal GitHub Pages site (noel-tw.github.io)
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `GET` | `/data` | `excluded` | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
-| `GET` | `/encode` | `excluded` | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
-| `GET` | `/jwt` | `excluded` | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
-| `GET` | `/path/to/endpoint` | `excluded` | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
-| `POST` | `/data` | `excluded` | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
+| `GET` | `/data` | `excluded` | the definition's reason (above) |
+| `GET` | `/encode` | `excluded` | the definition's reason (above) |
+| `GET` | `/jwt` | `excluded` | the definition's reason (above) |
+| `GET` | `/path/to/endpoint` | `excluded` | the definition's reason (above) |
+| `POST` | `/data` | `excluded` | the definition's reason (above) |
 
 ## custom-attribute-stage@v1 (internal)
 
@@ -105,18 +107,18 @@ staging-only definition served from localhost; no production host. 12 operations
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `GET` | `/context/{contextId}/libs` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}/defs` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}/versions` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}/versions/{ver}` | `excluded` | staging-only definition served from localhost; no production host |
-| `GET` | `/context/{contextId}/libs/{libId}/jobs/{jobId}` | `excluded` | staging-only definition served from localhost; no production host |
-| `PATCH` | `/context/{contextId}/libs/{libId}` | `excluded` | staging-only definition served from localhost; no production host |
-| `PATCH` | `/context/{contextId}/libs/{libId}/defs/{defId}` | `excluded` | staging-only definition served from localhost; no production host |
-| `POST` | `/context/{contextId}/libs` | `excluded` | staging-only definition served from localhost; no production host |
-| `POST` | `/context/{contextId}/libs/{libId}/publish` | `excluded` | staging-only definition served from localhost; no production host |
-| `POST` | `/context/{contextId}/libs/{libId}/unpublish` | `excluded` | staging-only definition served from localhost; no production host |
+| `GET` | `/context/{contextId}/libs` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}/defs` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}/versions` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}/defs/{defId}/versions/{ver}` | `excluded` | the definition's reason (above) |
+| `GET` | `/context/{contextId}/libs/{libId}/jobs/{jobId}` | `excluded` | the definition's reason (above) |
+| `PATCH` | `/context/{contextId}/libs/{libId}` | `excluded` | the definition's reason (above) |
+| `PATCH` | `/context/{contextId}/libs/{libId}/defs/{defId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/context/{contextId}/libs` | `excluded` | the definition's reason (above) |
+| `POST` | `/context/{contextId}/libs/{libId}/publish` | `excluded` | the definition's reason (above) |
+| `POST` | `/context/{contextId}/libs/{libId}/unpublish` | `excluded` | the definition's reason (above) |
 
 ## files-int@1.0 (variant)
 
@@ -187,10 +189,11 @@ staging copy. 14 operations. Definition: [model-stage@v1](https://api.swaggerhub
 
 ## org-stage-us-east-1@v1 (variant)
 
-staging copy. 35 operations. Definition: [org-stage-us-east-1@v1](https://api.swaggerhub.com/apis/Trimble-Connect/org-stage-us-east-1/v1).
+staging copy. 36 operations. Definition: [org-stage-us-east-1@v1](https://api.swaggerhub.com/apis/Trimble-Connect/org-stage-us-east-1/v1).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
+| `ANY` | `/{proxy+}` | `excluded` | only in org-stage-us-east-1@v1 (staging copy); not published for production |
 | `DELETE` | `/forests/{forestId}/trees/{treeId}` | `variant` | covered by `org:DELETE /forests/{forestId}/trees/{treeId}` |
 | `DELETE` | `/forests/{forestId}/trees/{treeId}/nodes/{nodeId}` | `variant` | covered by `org:DELETE /forests/{forestId}/trees/{treeId}/nodes/{nodeId}` |
 | `DELETE` | `/forests/{forestId}/trees/{treeId}/nodes/{nodeId}/geometry` | `variant` | covered by `org:DELETE /forests/{forestId}/trees/{treeId}/nodes/{nodeId}/geometry` |
@@ -313,10 +316,11 @@ staging copy. 38 operations. Definition: [pset-stage@v1](https://api.swaggerhub.
 
 ## support-stage@v1 (variant)
 
-staging copy. 5 operations. Definition: [support-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/support-stage/v1).
+staging copy. 6 operations. Definition: [support-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/support-stage/v1).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
+| `ANY` | `/{proxy+}` | `excluded` | only in support-stage@v1 (staging copy); not published for production |
 | `GET` | `/` | `variant` | covered by `support:GET /` |
 | `GET` | `/me` | `variant` | covered by `support:GET /me` |
 | `GET` | `/tickets` | `variant` | covered by `support:GET /tickets` |
@@ -327,946 +331,43 @@ staging copy. 5 operations. Definition: [support-stage@v1](https://api.swaggerhu
 
 integration copy. 188 operations. Definition: [tcps-int@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-int/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/clashsets/{clashId}` | `variant` | covered by `core:DELETE /clashsets/{clashId}` |
-| `DELETE` | `/comments/{commentId}` | `variant` | covered by `core:DELETE /comments/{commentId}` |
-| `DELETE` | `/comments/{commentId}/attachments` | `variant` | covered by `core:DELETE /comments/{commentId}/attachments` |
-| `DELETE` | `/comments/{commentId}/reactions/{reactionId}` | `variant` | covered by `core:DELETE /comments/{commentId}/reactions/{reactionId}` |
-| `DELETE` | `/companies/{companyId}/domains` | `variant` | covered by `core:DELETE /companies/{companyId}/domains` |
-| `DELETE` | `/companies/{companyId}/users` | `variant` | covered by `core:DELETE /companies/{companyId}/users` |
-| `DELETE` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:DELETE /companies/{companyId}/users/{userId}` |
-| `DELETE` | `/files/{fileId}` | `variant` | covered by `core:DELETE /files/{fileId}` |
-| `DELETE` | `/files/{fileId}/alignment` | `variant` | covered by `core:DELETE /files/{fileId}/alignment` |
-| `DELETE` | `/folders/{folderId}` | `variant` | covered by `core:DELETE /folders/{folderId}` |
-| `DELETE` | `/folders/{folderId}/delete` | `variant` | covered by `core:DELETE /folders/{folderId}/delete` |
-| `DELETE` | `/groups/{groupId}` | `variant` | covered by `core:DELETE /groups/{groupId}` |
-| `DELETE` | `/groups/{groupId}/users` | `variant` | covered by `core:DELETE /groups/{groupId}/users` |
-| `DELETE` | `/objectlink/{linkId}` | `variant` | covered by `core:DELETE /objectlink/{linkId}` |
-| `DELETE` | `/projects/{projectId}` | `variant` | covered by `core:DELETE /projects/{projectId}` |
-| `DELETE` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:DELETE /projects/{projectId}/users/{userId}` |
-| `DELETE` | `/releases/{releaseId}` | `variant` | covered by `core:DELETE /releases/{releaseId}` |
-| `DELETE` | `/releases/{releaseId}/files` | `variant` | covered by `core:DELETE /releases/{releaseId}/files` |
-| `DELETE` | `/shares/{shareId}` | `variant` | covered by `core:DELETE /shares/{shareId}` |
-| `DELETE` | `/tags/{tagId}` | `variant` | covered by `core:DELETE /tags/{tagId}` |
-| `DELETE` | `/tags/{tagId}/objects` | `variant` | covered by `core:DELETE /tags/{tagId}/objects` |
-| `DELETE` | `/todos/{todoId}` | `variant` | covered by `core:DELETE /todos/{todoId}` |
-| `DELETE` | `/todos/{todoId}/attachments` | `variant` | covered by `core:DELETE /todos/{todoId}/attachments` |
-| `DELETE` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:DELETE /viewgroups/{viewGroupId}` |
-| `DELETE` | `/views/{viewId}` | `variant` | covered by `core:DELETE /views/{viewId}` |
-| `DELETE` | `/views/{viewId}/markups/{markupId}` | `variant` | covered by `core:DELETE /views/{viewId}/markups/{markupId}` |
-| `DELETE` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:DELETE /views/{viewId}/sectionbox` |
-| `DELETE` | `/views/{viewId}/sectionplanes/{sectionplaneId}` | `variant` | covered by `core:DELETE /views/{viewId}/sectionplanes/{sectionplaneId}` |
-| `DELETE` | `/views2d/{viewId}` | `variant` | covered by `core:DELETE /views2d/{viewId}` |
-| `GET` | `/2.1/folders/by_path` | `variant` | covered by `core:GET /2.1/folders/by_path` |
-| `GET` | `/2.1/folders/{folderId}/items` | `variant` | covered by `core:GET /2.1/folders/{folderId}/items` |
-| `GET` | `/2.1/projects` | `variant` | covered by `core:GET /2.1/projects` |
-| `GET` | `/2.1/projects/{projectId}/files/{fileId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/files/{fileId}/versions` |
-| `GET` | `/2.1/projects/{projectId}/folders/{folderId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/folders/{folderId}/versions` |
-| `GET` | `/activities` | `variant` | covered by `core:GET /activities` |
-| `GET` | `/activities/exports/{exportId}` | `variant` | covered by `core:GET /activities/exports/{exportId}` |
-| `GET` | `/activities/{activityId}` | `variant` | covered by `core:GET /activities/{activityId}` |
-| `GET` | `/activities/{activityId}/logs` | `variant` | covered by `core:GET /activities/{activityId}/logs` |
-| `GET` | `/clashsets` | `variant` | covered by `core:GET /clashsets` |
-| `GET` | `/clashsets/{clashId}` | `variant` | covered by `core:GET /clashsets/{clashId}` |
-| `GET` | `/clashsets/{clashId}/items` | `variant` | covered by `core:GET /clashsets/{clashId}/items` |
-| `GET` | `/comments` | `variant` | covered by `core:GET /comments` |
-| `GET` | `/comments/{commentId}` | `variant` | covered by `core:GET /comments/{commentId}` |
-| `GET` | `/comments/{commentId}/attachments` | `variant` | covered by `core:GET /comments/{commentId}/attachments` |
-| `GET` | `/comments/{commentId}/reactions` | `variant` | covered by `core:GET /comments/{commentId}/reactions` |
-| `GET` | `/companies` | `variant` | covered by `core:GET /companies` |
-| `GET` | `/companies/{companyId}` | `variant` | covered by `core:GET /companies/{companyId}` |
-| `GET` | `/companies/{companyId}/users` | `variant` | covered by `core:GET /companies/{companyId}/users` |
-| `GET` | `/files/export/{exportId}` | `variant` | covered by `core:GET /files/export/{exportId}` |
-| `GET` | `/files/formats` | `variant` | covered by `core:GET /files/formats` |
-| `GET` | `/files/fs/snapshot` | `variant` | covered by `core:GET /files/fs/snapshot` |
-| `GET` | `/files/fs/upload` | `variant` | covered by `core:GET /files/fs/upload` |
-| `GET` | `/files/fs/uploadstatus` | `variant` | covered by `core:GET /files/fs/uploadstatus` |
-| `GET` | `/files/fs/{fileId}/downloadurl` | `variant` | covered by `core:GET /files/fs/{fileId}/downloadurl` |
-| `GET` | `/files/{fileId}` | `variant` | covered by `core:GET /files/{fileId}` |
-| `GET` | `/files/{fileId}/alignment` | `variant` | covered by `core:GET /files/{fileId}/alignment` |
-| `GET` | `/files/{fileId}/permissions` | `variant` | covered by `core:GET /files/{fileId}/permissions` |
-| `GET` | `/files/{fileId}/status` | `variant` | covered by `core:GET /files/{fileId}/status` |
-| `GET` | `/files/{fileId}/versions` | `variant` | covered by `core:GET /files/{fileId}/versions` |
-| `GET` | `/folders/by_path` | `variant` | covered by `core:GET /folders/by_path` |
-| `GET` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:GET /folders/fs/{folderId}/permissions` |
-| `GET` | `/folders/jobs/{jobId}` | `variant` | covered by `core:GET /folders/jobs/{jobId}` |
-| `GET` | `/folders/{folderId}` | `variant` | covered by `core:GET /folders/{folderId}` |
-| `GET` | `/folders/{folderId}/item` | `variant` | covered by `core:GET /folders/{folderId}/item` |
-| `GET` | `/folders/{folderId}/items` | `variant` | covered by `core:GET /folders/{folderId}/items` |
-| `GET` | `/folders/{folderId}/versions` | `variant` | covered by `core:GET /folders/{folderId}/versions` |
-| `GET` | `/groups` | `variant` | covered by `core:GET /groups` |
-| `GET` | `/groups/{groupId}` | `variant` | covered by `core:GET /groups/{groupId}` |
-| `GET` | `/groups/{groupId}/users` | `variant` | covered by `core:GET /groups/{groupId}/users` |
-| `GET` | `/objectlink` | `variant` | covered by `core:GET /objectlink` |
-| `GET` | `/objectlink/target` | `variant` | covered by `core:GET /objectlink/target` |
-| `GET` | `/projects` | `variant` | covered by `core:GET /projects` |
-| `GET` | `/projects/clones/{cloneId}` | `variant` | covered by `core:GET /projects/clones/{cloneId}` |
-| `GET` | `/projects/me` | `variant` | covered by `core:GET /projects/me` |
-| `GET` | `/projects/{projectId}` | `variant` | covered by `core:GET /projects/{projectId}` |
-| `GET` | `/projects/{projectId}/license` | `variant` | covered by `core:GET /projects/{projectId}/license` |
-| `GET` | `/projects/{projectId}/metrics` | `variant` | covered by `core:GET /projects/{projectId}/metrics` |
-| `GET` | `/projects/{projectId}/objects` | `variant` | covered by `core:GET /projects/{projectId}/objects` |
-| `GET` | `/projects/{projectId}/roles` | `variant` | covered by `core:GET /projects/{projectId}/roles` |
-| `GET` | `/projects/{projectId}/settings` | `variant` | covered by `core:GET /projects/{projectId}/settings` |
-| `GET` | `/projects/{projectId}/status` | `variant` | covered by `core:GET /projects/{projectId}/status` |
-| `GET` | `/projects/{projectId}/users` | `variant` | covered by `core:GET /projects/{projectId}/users` |
-| `GET` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:GET /projects/{projectId}/users/{userId}` |
-| `GET` | `/regions` | `variant` | covered by `core:GET /regions` |
-| `GET` | `/releases` | `variant` | covered by `core:GET /releases` |
-| `GET` | `/releases/{releaseId}` | `variant` | covered by `core:GET /releases/{releaseId}` |
-| `GET` | `/releases/{releaseId}/files` | `variant` | covered by `core:GET /releases/{releaseId}/files` |
-| `GET` | `/search` | `variant` | covered by `core:GET /search` |
-| `GET` | `/shares` | `variant` | covered by `core:GET /shares` |
-| `GET` | `/shares/token/{stoken}` | `variant` | covered by `core:GET /shares/token/{stoken}` |
-| `GET` | `/shares/{shareId}` | `variant` | covered by `core:GET /shares/{shareId}` |
-| `GET` | `/tags` | `variant` | covered by `core:GET /tags` |
-| `GET` | `/tags/{tagId}` | `variant` | covered by `core:GET /tags/{tagId}` |
-| `GET` | `/tags/{tagId}/objects` | `variant` | covered by `core:GET /tags/{tagId}/objects` |
-| `GET` | `/todos` | `variant` | covered by `core:GET /todos` |
-| `GET` | `/todos/types` | `variant` | covered by `core:GET /todos/types` |
-| `GET` | `/todos/{todoId}` | `variant` | covered by `core:GET /todos/{todoId}` |
-| `GET` | `/todos/{todoId}/attachments` | `variant` | covered by `core:GET /todos/{todoId}/attachments` |
-| `GET` | `/users/languages` | `variant` | covered by `core:GET /users/languages` |
-| `GET` | `/users/licenses` | `variant` | covered by `core:GET /users/licenses` |
-| `GET` | `/users/timezones` | `variant` | covered by `core:GET /users/timezones` |
-| `GET` | `/users/{userId}` | `variant` | covered by `core:GET /users/{userId}` |
-| `GET` | `/viewgroups` | `variant` | covered by `core:GET /viewgroups` |
-| `GET` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:GET /viewgroups/{viewGroupId}` |
-| `GET` | `/views` | `variant` | covered by `core:GET /views` |
-| `GET` | `/views/{viewId}` | `variant` | covered by `core:GET /views/{viewId}` |
-| `GET` | `/views/{viewId}/camera` | `variant` | covered by `core:GET /views/{viewId}/camera` |
-| `GET` | `/views/{viewId}/image` | `variant` | covered by `core:GET /views/{viewId}/image` |
-| `GET` | `/views/{viewId}/markups` | `variant` | covered by `core:GET /views/{viewId}/markups` |
-| `GET` | `/views/{viewId}/presentation` | `variant` | covered by `core:GET /views/{viewId}/presentation` |
-| `GET` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:GET /views/{viewId}/sectionbox` |
-| `GET` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:GET /views/{viewId}/sectionplanes` |
-| `GET` | `/views2d` | `variant` | covered by `core:GET /views2d` |
-| `GET` | `/views2d/{viewId}` | `variant` | covered by `core:GET /views2d/{viewId}` |
-| `PATCH` | `/clashsets/{clashId}` | `variant` | covered by `core:PATCH /clashsets/{clashId}` |
-| `PATCH` | `/comments/{commentId}` | `variant` | covered by `core:PATCH /comments/{commentId}` |
-| `PATCH` | `/companies/{companyId}` | `variant` | covered by `core:PATCH /companies/{companyId}` |
-| `PATCH` | `/companies/{companyId}/domains` | `variant` | covered by `core:PATCH /companies/{companyId}/domains` |
-| `PATCH` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:PATCH /companies/{companyId}/users/{userId}` |
-| `PATCH` | `/files/{fileId}` | `variant` | covered by `core:PATCH /files/{fileId}` |
-| `PATCH` | `/files/{fileId}/permissions` | `variant` | covered by `core:PATCH /files/{fileId}/permissions` |
-| `PATCH` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:PATCH /folders/fs/{folderId}/permissions` |
-| `PATCH` | `/folders/{folderId}` | `variant` | covered by `core:PATCH /folders/{folderId}` |
-| `PATCH` | `/groups/{groupId}` | `variant` | covered by `core:PATCH /groups/{groupId}` |
-| `PATCH` | `/objectlink/{linkId}` | `variant` | covered by `core:PATCH /objectlink/{linkId}` |
-| `PATCH` | `/projects/{projectId}` | `variant` | covered by `core:PATCH /projects/{projectId}` |
-| `PATCH` | `/projects/{projectId}/license` | `variant` | covered by `core:PATCH /projects/{projectId}/license` |
-| `PATCH` | `/projects/{projectId}/settings` | `variant` | covered by `core:PATCH /projects/{projectId}/settings` |
-| `PATCH` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:PATCH /projects/{projectId}/users/{userId}` |
-| `PATCH` | `/releases/{releaseId}` | `variant` | covered by `core:PATCH /releases/{releaseId}` |
-| `PATCH` | `/shares/{shareId}` | `variant` | covered by `core:PATCH /shares/{shareId}` |
-| `PATCH` | `/tags/{tagId}` | `variant` | covered by `core:PATCH /tags/{tagId}` |
-| `PATCH` | `/todos/{todoId}` | `variant` | covered by `core:PATCH /todos/{todoId}` |
-| `PATCH` | `/users/{userId}` | `variant` | covered by `core:PATCH /users/{userId}` |
-| `PATCH` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:PATCH /viewgroups/{viewGroupId}` |
-| `PATCH` | `/views/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views/multiparts/{viewId}` |
-| `PATCH` | `/views/{viewId}` | `variant` | covered by `core:PATCH /views/{viewId}` |
-| `PATCH` | `/views/{viewId}/camera` | `variant` | covered by `core:PATCH /views/{viewId}/camera` |
-| `PATCH` | `/views/{viewId}/markups` | `variant` | covered by `core:PATCH /views/{viewId}/markups` |
-| `PATCH` | `/views/{viewId}/presentation` | `variant` | covered by `core:PATCH /views/{viewId}/presentation` |
-| `PATCH` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:PATCH /views/{viewId}/sectionplanes` |
-| `PATCH` | `/views2d/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views2d/multiparts/{viewId}` |
-| `PATCH` | `/views2d/{viewId}` | `variant` | covered by `core:PATCH /views2d/{viewId}` |
-| `POST` | `/activities/exports` | `variant` | covered by `core:POST /activities/exports` |
-| `POST` | `/activities/list` | `variant` | covered by `core:POST /activities/list` |
-| `POST` | `/clashsets` | `variant` | covered by `core:POST /clashsets` |
-| `POST` | `/comments` | `variant` | covered by `core:POST /comments` |
-| `POST` | `/comments/{commentId}/attachments` | `variant` | covered by `core:POST /comments/{commentId}/attachments` |
-| `POST` | `/comments/{commentId}/reactions` | `variant` | covered by `core:POST /comments/{commentId}/reactions` |
-| `POST` | `/companies/{companyId}/image` | `variant` | covered by `core:POST /companies/{companyId}/image` |
-| `POST` | `/companies/{companyId}/users` | `variant` | covered by `core:POST /companies/{companyId}/users` |
-| `POST` | `/files` | `variant` | covered by `core:POST /files` |
-| `POST` | `/files/export` | `variant` | covered by `core:POST /files/export` |
-| `POST` | `/files/fs/commit` | `variant` | covered by `core:POST /files/fs/commit` |
-| `POST` | `/files/fs/initiate` | `variant` | covered by `core:POST /files/fs/initiate` |
-| `POST` | `/files/fs/upload` | `variant` | covered by `core:POST /files/fs/upload` |
-| `POST` | `/files/fs/upload/{uploadId}/complete` | `variant` | covered by `core:POST /files/fs/upload/{uploadId}/complete` |
-| `POST` | `/files/{fileId}/alignment/matrix` | `variant` | covered by `core:POST /files/{fileId}/alignment/matrix` |
-| `POST` | `/files/{fileId}/checkin` | `variant` | covered by `core:POST /files/{fileId}/checkin` |
-| `POST` | `/files/{fileId}/checkout` | `variant` | covered by `core:POST /files/{fileId}/checkout` |
-| `POST` | `/folders` | `variant` | covered by `core:POST /folders` |
-| `POST` | `/groups` | `variant` | covered by `core:POST /groups` |
-| `POST` | `/groups/{groupId}/users` | `variant` | covered by `core:POST /groups/{groupId}/users` |
-| `POST` | `/objectlink` | `variant` | covered by `core:POST /objectlink` |
-| `POST` | `/objectlink/objectlinks` | `variant` | covered by `core:POST /objectlink/objectlinks` |
-| `POST` | `/projects` | `variant` | covered by `core:POST /projects` |
-| `POST` | `/projects/accessRequests` | `variant` | covered by `core:POST /projects/accessRequests` |
-| `POST` | `/projects/clones` | `variant` | covered by `core:POST /projects/clones` |
-| `POST` | `/projects/{projectId}/image` | `variant` | covered by `core:POST /projects/{projectId}/image` |
-| `POST` | `/projects/{projectId}/users` | `variant` | covered by `core:POST /projects/{projectId}/users` |
-| `POST` | `/releases` | `variant` | covered by `core:POST /releases` |
-| `POST` | `/releases/downloadFiles` | `variant` | covered by `core:POST /releases/downloadFiles` |
-| `POST` | `/releases/{releaseId}/files` | `variant` | covered by `core:POST /releases/{releaseId}/files` |
-| `POST` | `/shares` | `variant` | covered by `core:POST /shares` |
-| `POST` | `/tags` | `variant` | covered by `core:POST /tags` |
-| `POST` | `/tags/{tagId}/objects` | `variant` | covered by `core:POST /tags/{tagId}/objects` |
-| `POST` | `/todos` | `variant` | covered by `core:POST /todos` |
-| `POST` | `/todos/{todoId}/attachments` | `variant` | covered by `core:POST /todos/{todoId}/attachments` |
-| `POST` | `/viewgroups` | `variant` | covered by `core:POST /viewgroups` |
-| `POST` | `/views` | `variant` | covered by `core:POST /views` |
-| `POST` | `/views/multiparts` | `variant` | covered by `core:POST /views/multiparts` |
-| `POST` | `/views/{viewId}/image` | `variant` | covered by `core:POST /views/{viewId}/image` |
-| `POST` | `/views/{viewId}/markups` | `variant` | covered by `core:POST /views/{viewId}/markups` |
-| `POST` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:POST /views/{viewId}/sectionplanes` |
-| `POST` | `/views2d` | `variant` | covered by `core:POST /views2d` |
-| `POST` | `/views2d/multiparts` | `variant` | covered by `core:POST /views2d/multiparts` |
-| `PUT` | `/files/{fileId}/alignment` | `variant` | covered by `core:PUT /files/{fileId}/alignment` |
-| `PUT` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:PUT /views/{viewId}/sectionbox` |
+Operations: [non-production--tcps-int-2.0.md](non-production--tcps-int-2.0.md).
 
 ## tcps-qa@2.0 (variant)
 
 QA copy. 188 operations. Definition: [tcps-qa@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-qa/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/clashsets/{clashId}` | `variant` | covered by `core:DELETE /clashsets/{clashId}` |
-| `DELETE` | `/comments/{commentId}` | `variant` | covered by `core:DELETE /comments/{commentId}` |
-| `DELETE` | `/comments/{commentId}/attachments` | `variant` | covered by `core:DELETE /comments/{commentId}/attachments` |
-| `DELETE` | `/comments/{commentId}/reactions/{reactionId}` | `variant` | covered by `core:DELETE /comments/{commentId}/reactions/{reactionId}` |
-| `DELETE` | `/companies/{companyId}/domains` | `variant` | covered by `core:DELETE /companies/{companyId}/domains` |
-| `DELETE` | `/companies/{companyId}/users` | `variant` | covered by `core:DELETE /companies/{companyId}/users` |
-| `DELETE` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:DELETE /companies/{companyId}/users/{userId}` |
-| `DELETE` | `/files/{fileId}` | `variant` | covered by `core:DELETE /files/{fileId}` |
-| `DELETE` | `/files/{fileId}/alignment` | `variant` | covered by `core:DELETE /files/{fileId}/alignment` |
-| `DELETE` | `/folders/{folderId}` | `variant` | covered by `core:DELETE /folders/{folderId}` |
-| `DELETE` | `/folders/{folderId}/delete` | `variant` | covered by `core:DELETE /folders/{folderId}/delete` |
-| `DELETE` | `/groups/{groupId}` | `variant` | covered by `core:DELETE /groups/{groupId}` |
-| `DELETE` | `/groups/{groupId}/users` | `variant` | covered by `core:DELETE /groups/{groupId}/users` |
-| `DELETE` | `/objectlink/{linkId}` | `variant` | covered by `core:DELETE /objectlink/{linkId}` |
-| `DELETE` | `/projects/{projectId}` | `variant` | covered by `core:DELETE /projects/{projectId}` |
-| `DELETE` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:DELETE /projects/{projectId}/users/{userId}` |
-| `DELETE` | `/releases/{releaseId}` | `variant` | covered by `core:DELETE /releases/{releaseId}` |
-| `DELETE` | `/releases/{releaseId}/files` | `variant` | covered by `core:DELETE /releases/{releaseId}/files` |
-| `DELETE` | `/shares/{shareId}` | `variant` | covered by `core:DELETE /shares/{shareId}` |
-| `DELETE` | `/tags/{tagId}` | `variant` | covered by `core:DELETE /tags/{tagId}` |
-| `DELETE` | `/tags/{tagId}/objects` | `variant` | covered by `core:DELETE /tags/{tagId}/objects` |
-| `DELETE` | `/todos/{todoId}` | `variant` | covered by `core:DELETE /todos/{todoId}` |
-| `DELETE` | `/todos/{todoId}/attachments` | `variant` | covered by `core:DELETE /todos/{todoId}/attachments` |
-| `DELETE` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:DELETE /viewgroups/{viewGroupId}` |
-| `DELETE` | `/views/{viewId}` | `variant` | covered by `core:DELETE /views/{viewId}` |
-| `DELETE` | `/views/{viewId}/markups/{markupId}` | `variant` | covered by `core:DELETE /views/{viewId}/markups/{markupId}` |
-| `DELETE` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:DELETE /views/{viewId}/sectionbox` |
-| `DELETE` | `/views/{viewId}/sectionplanes/{sectionplaneId}` | `variant` | covered by `core:DELETE /views/{viewId}/sectionplanes/{sectionplaneId}` |
-| `DELETE` | `/views2d/{viewId}` | `variant` | covered by `core:DELETE /views2d/{viewId}` |
-| `GET` | `/2.1/folders/by_path` | `variant` | covered by `core:GET /2.1/folders/by_path` |
-| `GET` | `/2.1/folders/{folderId}/items` | `variant` | covered by `core:GET /2.1/folders/{folderId}/items` |
-| `GET` | `/2.1/projects` | `variant` | covered by `core:GET /2.1/projects` |
-| `GET` | `/2.1/projects/{projectId}/files/{fileId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/files/{fileId}/versions` |
-| `GET` | `/2.1/projects/{projectId}/folders/{folderId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/folders/{folderId}/versions` |
-| `GET` | `/activities` | `variant` | covered by `core:GET /activities` |
-| `GET` | `/activities/exports/{exportId}` | `variant` | covered by `core:GET /activities/exports/{exportId}` |
-| `GET` | `/activities/{activityId}` | `variant` | covered by `core:GET /activities/{activityId}` |
-| `GET` | `/activities/{activityId}/logs` | `variant` | covered by `core:GET /activities/{activityId}/logs` |
-| `GET` | `/clashsets` | `variant` | covered by `core:GET /clashsets` |
-| `GET` | `/clashsets/{clashId}` | `variant` | covered by `core:GET /clashsets/{clashId}` |
-| `GET` | `/clashsets/{clashId}/items` | `variant` | covered by `core:GET /clashsets/{clashId}/items` |
-| `GET` | `/comments` | `variant` | covered by `core:GET /comments` |
-| `GET` | `/comments/{commentId}` | `variant` | covered by `core:GET /comments/{commentId}` |
-| `GET` | `/comments/{commentId}/attachments` | `variant` | covered by `core:GET /comments/{commentId}/attachments` |
-| `GET` | `/comments/{commentId}/reactions` | `variant` | covered by `core:GET /comments/{commentId}/reactions` |
-| `GET` | `/companies` | `variant` | covered by `core:GET /companies` |
-| `GET` | `/companies/{companyId}` | `variant` | covered by `core:GET /companies/{companyId}` |
-| `GET` | `/companies/{companyId}/users` | `variant` | covered by `core:GET /companies/{companyId}/users` |
-| `GET` | `/files/export/{exportId}` | `variant` | covered by `core:GET /files/export/{exportId}` |
-| `GET` | `/files/formats` | `variant` | covered by `core:GET /files/formats` |
-| `GET` | `/files/fs/snapshot` | `variant` | covered by `core:GET /files/fs/snapshot` |
-| `GET` | `/files/fs/upload` | `variant` | covered by `core:GET /files/fs/upload` |
-| `GET` | `/files/fs/uploadstatus` | `variant` | covered by `core:GET /files/fs/uploadstatus` |
-| `GET` | `/files/fs/{fileId}/downloadurl` | `variant` | covered by `core:GET /files/fs/{fileId}/downloadurl` |
-| `GET` | `/files/{fileId}` | `variant` | covered by `core:GET /files/{fileId}` |
-| `GET` | `/files/{fileId}/alignment` | `variant` | covered by `core:GET /files/{fileId}/alignment` |
-| `GET` | `/files/{fileId}/permissions` | `variant` | covered by `core:GET /files/{fileId}/permissions` |
-| `GET` | `/files/{fileId}/status` | `variant` | covered by `core:GET /files/{fileId}/status` |
-| `GET` | `/files/{fileId}/versions` | `variant` | covered by `core:GET /files/{fileId}/versions` |
-| `GET` | `/folders/by_path` | `variant` | covered by `core:GET /folders/by_path` |
-| `GET` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:GET /folders/fs/{folderId}/permissions` |
-| `GET` | `/folders/jobs/{jobId}` | `variant` | covered by `core:GET /folders/jobs/{jobId}` |
-| `GET` | `/folders/{folderId}` | `variant` | covered by `core:GET /folders/{folderId}` |
-| `GET` | `/folders/{folderId}/item` | `variant` | covered by `core:GET /folders/{folderId}/item` |
-| `GET` | `/folders/{folderId}/items` | `variant` | covered by `core:GET /folders/{folderId}/items` |
-| `GET` | `/folders/{folderId}/versions` | `variant` | covered by `core:GET /folders/{folderId}/versions` |
-| `GET` | `/groups` | `variant` | covered by `core:GET /groups` |
-| `GET` | `/groups/{groupId}` | `variant` | covered by `core:GET /groups/{groupId}` |
-| `GET` | `/groups/{groupId}/users` | `variant` | covered by `core:GET /groups/{groupId}/users` |
-| `GET` | `/objectlink` | `variant` | covered by `core:GET /objectlink` |
-| `GET` | `/objectlink/target` | `variant` | covered by `core:GET /objectlink/target` |
-| `GET` | `/projects` | `variant` | covered by `core:GET /projects` |
-| `GET` | `/projects/clones/{cloneId}` | `variant` | covered by `core:GET /projects/clones/{cloneId}` |
-| `GET` | `/projects/me` | `variant` | covered by `core:GET /projects/me` |
-| `GET` | `/projects/{projectId}` | `variant` | covered by `core:GET /projects/{projectId}` |
-| `GET` | `/projects/{projectId}/license` | `variant` | covered by `core:GET /projects/{projectId}/license` |
-| `GET` | `/projects/{projectId}/metrics` | `variant` | covered by `core:GET /projects/{projectId}/metrics` |
-| `GET` | `/projects/{projectId}/objects` | `variant` | covered by `core:GET /projects/{projectId}/objects` |
-| `GET` | `/projects/{projectId}/roles` | `variant` | covered by `core:GET /projects/{projectId}/roles` |
-| `GET` | `/projects/{projectId}/settings` | `variant` | covered by `core:GET /projects/{projectId}/settings` |
-| `GET` | `/projects/{projectId}/status` | `variant` | covered by `core:GET /projects/{projectId}/status` |
-| `GET` | `/projects/{projectId}/users` | `variant` | covered by `core:GET /projects/{projectId}/users` |
-| `GET` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:GET /projects/{projectId}/users/{userId}` |
-| `GET` | `/regions` | `variant` | covered by `core:GET /regions` |
-| `GET` | `/releases` | `variant` | covered by `core:GET /releases` |
-| `GET` | `/releases/{releaseId}` | `variant` | covered by `core:GET /releases/{releaseId}` |
-| `GET` | `/releases/{releaseId}/files` | `variant` | covered by `core:GET /releases/{releaseId}/files` |
-| `GET` | `/search` | `variant` | covered by `core:GET /search` |
-| `GET` | `/shares` | `variant` | covered by `core:GET /shares` |
-| `GET` | `/shares/token/{stoken}` | `variant` | covered by `core:GET /shares/token/{stoken}` |
-| `GET` | `/shares/{shareId}` | `variant` | covered by `core:GET /shares/{shareId}` |
-| `GET` | `/tags` | `variant` | covered by `core:GET /tags` |
-| `GET` | `/tags/{tagId}` | `variant` | covered by `core:GET /tags/{tagId}` |
-| `GET` | `/tags/{tagId}/objects` | `variant` | covered by `core:GET /tags/{tagId}/objects` |
-| `GET` | `/todos` | `variant` | covered by `core:GET /todos` |
-| `GET` | `/todos/types` | `variant` | covered by `core:GET /todos/types` |
-| `GET` | `/todos/{todoId}` | `variant` | covered by `core:GET /todos/{todoId}` |
-| `GET` | `/todos/{todoId}/attachments` | `variant` | covered by `core:GET /todos/{todoId}/attachments` |
-| `GET` | `/users/languages` | `variant` | covered by `core:GET /users/languages` |
-| `GET` | `/users/licenses` | `variant` | covered by `core:GET /users/licenses` |
-| `GET` | `/users/timezones` | `variant` | covered by `core:GET /users/timezones` |
-| `GET` | `/users/{userId}` | `variant` | covered by `core:GET /users/{userId}` |
-| `GET` | `/viewgroups` | `variant` | covered by `core:GET /viewgroups` |
-| `GET` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:GET /viewgroups/{viewGroupId}` |
-| `GET` | `/views` | `variant` | covered by `core:GET /views` |
-| `GET` | `/views/{viewId}` | `variant` | covered by `core:GET /views/{viewId}` |
-| `GET` | `/views/{viewId}/camera` | `variant` | covered by `core:GET /views/{viewId}/camera` |
-| `GET` | `/views/{viewId}/image` | `variant` | covered by `core:GET /views/{viewId}/image` |
-| `GET` | `/views/{viewId}/markups` | `variant` | covered by `core:GET /views/{viewId}/markups` |
-| `GET` | `/views/{viewId}/presentation` | `variant` | covered by `core:GET /views/{viewId}/presentation` |
-| `GET` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:GET /views/{viewId}/sectionbox` |
-| `GET` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:GET /views/{viewId}/sectionplanes` |
-| `GET` | `/views2d` | `variant` | covered by `core:GET /views2d` |
-| `GET` | `/views2d/{viewId}` | `variant` | covered by `core:GET /views2d/{viewId}` |
-| `PATCH` | `/clashsets/{clashId}` | `variant` | covered by `core:PATCH /clashsets/{clashId}` |
-| `PATCH` | `/comments/{commentId}` | `variant` | covered by `core:PATCH /comments/{commentId}` |
-| `PATCH` | `/companies/{companyId}` | `variant` | covered by `core:PATCH /companies/{companyId}` |
-| `PATCH` | `/companies/{companyId}/domains` | `variant` | covered by `core:PATCH /companies/{companyId}/domains` |
-| `PATCH` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:PATCH /companies/{companyId}/users/{userId}` |
-| `PATCH` | `/files/{fileId}` | `variant` | covered by `core:PATCH /files/{fileId}` |
-| `PATCH` | `/files/{fileId}/permissions` | `variant` | covered by `core:PATCH /files/{fileId}/permissions` |
-| `PATCH` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:PATCH /folders/fs/{folderId}/permissions` |
-| `PATCH` | `/folders/{folderId}` | `variant` | covered by `core:PATCH /folders/{folderId}` |
-| `PATCH` | `/groups/{groupId}` | `variant` | covered by `core:PATCH /groups/{groupId}` |
-| `PATCH` | `/objectlink/{linkId}` | `variant` | covered by `core:PATCH /objectlink/{linkId}` |
-| `PATCH` | `/projects/{projectId}` | `variant` | covered by `core:PATCH /projects/{projectId}` |
-| `PATCH` | `/projects/{projectId}/license` | `variant` | covered by `core:PATCH /projects/{projectId}/license` |
-| `PATCH` | `/projects/{projectId}/settings` | `variant` | covered by `core:PATCH /projects/{projectId}/settings` |
-| `PATCH` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:PATCH /projects/{projectId}/users/{userId}` |
-| `PATCH` | `/releases/{releaseId}` | `variant` | covered by `core:PATCH /releases/{releaseId}` |
-| `PATCH` | `/shares/{shareId}` | `variant` | covered by `core:PATCH /shares/{shareId}` |
-| `PATCH` | `/tags/{tagId}` | `variant` | covered by `core:PATCH /tags/{tagId}` |
-| `PATCH` | `/todos/{todoId}` | `variant` | covered by `core:PATCH /todos/{todoId}` |
-| `PATCH` | `/users/{userId}` | `variant` | covered by `core:PATCH /users/{userId}` |
-| `PATCH` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:PATCH /viewgroups/{viewGroupId}` |
-| `PATCH` | `/views/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views/multiparts/{viewId}` |
-| `PATCH` | `/views/{viewId}` | `variant` | covered by `core:PATCH /views/{viewId}` |
-| `PATCH` | `/views/{viewId}/camera` | `variant` | covered by `core:PATCH /views/{viewId}/camera` |
-| `PATCH` | `/views/{viewId}/markups` | `variant` | covered by `core:PATCH /views/{viewId}/markups` |
-| `PATCH` | `/views/{viewId}/presentation` | `variant` | covered by `core:PATCH /views/{viewId}/presentation` |
-| `PATCH` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:PATCH /views/{viewId}/sectionplanes` |
-| `PATCH` | `/views2d/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views2d/multiparts/{viewId}` |
-| `PATCH` | `/views2d/{viewId}` | `variant` | covered by `core:PATCH /views2d/{viewId}` |
-| `POST` | `/activities/exports` | `variant` | covered by `core:POST /activities/exports` |
-| `POST` | `/activities/list` | `variant` | covered by `core:POST /activities/list` |
-| `POST` | `/clashsets` | `variant` | covered by `core:POST /clashsets` |
-| `POST` | `/comments` | `variant` | covered by `core:POST /comments` |
-| `POST` | `/comments/{commentId}/attachments` | `variant` | covered by `core:POST /comments/{commentId}/attachments` |
-| `POST` | `/comments/{commentId}/reactions` | `variant` | covered by `core:POST /comments/{commentId}/reactions` |
-| `POST` | `/companies/{companyId}/image` | `variant` | covered by `core:POST /companies/{companyId}/image` |
-| `POST` | `/companies/{companyId}/users` | `variant` | covered by `core:POST /companies/{companyId}/users` |
-| `POST` | `/files` | `variant` | covered by `core:POST /files` |
-| `POST` | `/files/export` | `variant` | covered by `core:POST /files/export` |
-| `POST` | `/files/fs/commit` | `variant` | covered by `core:POST /files/fs/commit` |
-| `POST` | `/files/fs/initiate` | `variant` | covered by `core:POST /files/fs/initiate` |
-| `POST` | `/files/fs/upload` | `variant` | covered by `core:POST /files/fs/upload` |
-| `POST` | `/files/fs/upload/{uploadId}/complete` | `variant` | covered by `core:POST /files/fs/upload/{uploadId}/complete` |
-| `POST` | `/files/{fileId}/alignment/matrix` | `variant` | covered by `core:POST /files/{fileId}/alignment/matrix` |
-| `POST` | `/files/{fileId}/checkin` | `variant` | covered by `core:POST /files/{fileId}/checkin` |
-| `POST` | `/files/{fileId}/checkout` | `variant` | covered by `core:POST /files/{fileId}/checkout` |
-| `POST` | `/folders` | `variant` | covered by `core:POST /folders` |
-| `POST` | `/groups` | `variant` | covered by `core:POST /groups` |
-| `POST` | `/groups/{groupId}/users` | `variant` | covered by `core:POST /groups/{groupId}/users` |
-| `POST` | `/objectlink` | `variant` | covered by `core:POST /objectlink` |
-| `POST` | `/objectlink/objectlinks` | `variant` | covered by `core:POST /objectlink/objectlinks` |
-| `POST` | `/projects` | `variant` | covered by `core:POST /projects` |
-| `POST` | `/projects/accessRequests` | `variant` | covered by `core:POST /projects/accessRequests` |
-| `POST` | `/projects/clones` | `variant` | covered by `core:POST /projects/clones` |
-| `POST` | `/projects/{projectId}/image` | `variant` | covered by `core:POST /projects/{projectId}/image` |
-| `POST` | `/projects/{projectId}/users` | `variant` | covered by `core:POST /projects/{projectId}/users` |
-| `POST` | `/releases` | `variant` | covered by `core:POST /releases` |
-| `POST` | `/releases/downloadFiles` | `variant` | covered by `core:POST /releases/downloadFiles` |
-| `POST` | `/releases/{releaseId}/files` | `variant` | covered by `core:POST /releases/{releaseId}/files` |
-| `POST` | `/shares` | `variant` | covered by `core:POST /shares` |
-| `POST` | `/tags` | `variant` | covered by `core:POST /tags` |
-| `POST` | `/tags/{tagId}/objects` | `variant` | covered by `core:POST /tags/{tagId}/objects` |
-| `POST` | `/todos` | `variant` | covered by `core:POST /todos` |
-| `POST` | `/todos/{todoId}/attachments` | `variant` | covered by `core:POST /todos/{todoId}/attachments` |
-| `POST` | `/viewgroups` | `variant` | covered by `core:POST /viewgroups` |
-| `POST` | `/views` | `variant` | covered by `core:POST /views` |
-| `POST` | `/views/multiparts` | `variant` | covered by `core:POST /views/multiparts` |
-| `POST` | `/views/{viewId}/image` | `variant` | covered by `core:POST /views/{viewId}/image` |
-| `POST` | `/views/{viewId}/markups` | `variant` | covered by `core:POST /views/{viewId}/markups` |
-| `POST` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:POST /views/{viewId}/sectionplanes` |
-| `POST` | `/views2d` | `variant` | covered by `core:POST /views2d` |
-| `POST` | `/views2d/multiparts` | `variant` | covered by `core:POST /views2d/multiparts` |
-| `PUT` | `/files/{fileId}/alignment` | `variant` | covered by `core:PUT /files/{fileId}/alignment` |
-| `PUT` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:PUT /views/{viewId}/sectionbox` |
+Operations: [non-production--tcps-qa-2.0.md](non-production--tcps-qa-2.0.md).
 
 ## tcps-stage@2.0 (variant)
 
 staging copy. 188 operations. Definition: [tcps-stage@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-stage/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/clashsets/{clashId}` | `variant` | covered by `core:DELETE /clashsets/{clashId}` |
-| `DELETE` | `/comments/{commentId}` | `variant` | covered by `core:DELETE /comments/{commentId}` |
-| `DELETE` | `/comments/{commentId}/attachments` | `variant` | covered by `core:DELETE /comments/{commentId}/attachments` |
-| `DELETE` | `/comments/{commentId}/reactions/{reactionId}` | `variant` | covered by `core:DELETE /comments/{commentId}/reactions/{reactionId}` |
-| `DELETE` | `/companies/{companyId}/domains` | `variant` | covered by `core:DELETE /companies/{companyId}/domains` |
-| `DELETE` | `/companies/{companyId}/users` | `variant` | covered by `core:DELETE /companies/{companyId}/users` |
-| `DELETE` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:DELETE /companies/{companyId}/users/{userId}` |
-| `DELETE` | `/files/{fileId}` | `variant` | covered by `core:DELETE /files/{fileId}` |
-| `DELETE` | `/files/{fileId}/alignment` | `variant` | covered by `core:DELETE /files/{fileId}/alignment` |
-| `DELETE` | `/folders/{folderId}` | `variant` | covered by `core:DELETE /folders/{folderId}` |
-| `DELETE` | `/folders/{folderId}/delete` | `variant` | covered by `core:DELETE /folders/{folderId}/delete` |
-| `DELETE` | `/groups/{groupId}` | `variant` | covered by `core:DELETE /groups/{groupId}` |
-| `DELETE` | `/groups/{groupId}/users` | `variant` | covered by `core:DELETE /groups/{groupId}/users` |
-| `DELETE` | `/objectlink/{linkId}` | `variant` | covered by `core:DELETE /objectlink/{linkId}` |
-| `DELETE` | `/projects/{projectId}` | `variant` | covered by `core:DELETE /projects/{projectId}` |
-| `DELETE` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:DELETE /projects/{projectId}/users/{userId}` |
-| `DELETE` | `/releases/{releaseId}` | `variant` | covered by `core:DELETE /releases/{releaseId}` |
-| `DELETE` | `/releases/{releaseId}/files` | `variant` | covered by `core:DELETE /releases/{releaseId}/files` |
-| `DELETE` | `/shares/{shareId}` | `variant` | covered by `core:DELETE /shares/{shareId}` |
-| `DELETE` | `/tags/{tagId}` | `variant` | covered by `core:DELETE /tags/{tagId}` |
-| `DELETE` | `/tags/{tagId}/objects` | `variant` | covered by `core:DELETE /tags/{tagId}/objects` |
-| `DELETE` | `/todos/{todoId}` | `variant` | covered by `core:DELETE /todos/{todoId}` |
-| `DELETE` | `/todos/{todoId}/attachments` | `variant` | covered by `core:DELETE /todos/{todoId}/attachments` |
-| `DELETE` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:DELETE /viewgroups/{viewGroupId}` |
-| `DELETE` | `/views/{viewId}` | `variant` | covered by `core:DELETE /views/{viewId}` |
-| `DELETE` | `/views/{viewId}/markups/{markupId}` | `variant` | covered by `core:DELETE /views/{viewId}/markups/{markupId}` |
-| `DELETE` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:DELETE /views/{viewId}/sectionbox` |
-| `DELETE` | `/views/{viewId}/sectionplanes/{sectionplaneId}` | `variant` | covered by `core:DELETE /views/{viewId}/sectionplanes/{sectionplaneId}` |
-| `DELETE` | `/views2d/{viewId}` | `variant` | covered by `core:DELETE /views2d/{viewId}` |
-| `GET` | `/2.1/folders/by_path` | `variant` | covered by `core:GET /2.1/folders/by_path` |
-| `GET` | `/2.1/folders/{folderId}/items` | `variant` | covered by `core:GET /2.1/folders/{folderId}/items` |
-| `GET` | `/2.1/projects` | `variant` | covered by `core:GET /2.1/projects` |
-| `GET` | `/2.1/projects/{projectId}/files/{fileId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/files/{fileId}/versions` |
-| `GET` | `/2.1/projects/{projectId}/folders/{folderId}/versions` | `variant` | covered by `core:GET /2.1/projects/{projectId}/folders/{folderId}/versions` |
-| `GET` | `/activities` | `variant` | covered by `core:GET /activities` |
-| `GET` | `/activities/exports/{exportId}` | `variant` | covered by `core:GET /activities/exports/{exportId}` |
-| `GET` | `/activities/{activityId}` | `variant` | covered by `core:GET /activities/{activityId}` |
-| `GET` | `/activities/{activityId}/logs` | `variant` | covered by `core:GET /activities/{activityId}/logs` |
-| `GET` | `/clashsets` | `variant` | covered by `core:GET /clashsets` |
-| `GET` | `/clashsets/{clashId}` | `variant` | covered by `core:GET /clashsets/{clashId}` |
-| `GET` | `/clashsets/{clashId}/items` | `variant` | covered by `core:GET /clashsets/{clashId}/items` |
-| `GET` | `/comments` | `variant` | covered by `core:GET /comments` |
-| `GET` | `/comments/{commentId}` | `variant` | covered by `core:GET /comments/{commentId}` |
-| `GET` | `/comments/{commentId}/attachments` | `variant` | covered by `core:GET /comments/{commentId}/attachments` |
-| `GET` | `/comments/{commentId}/reactions` | `variant` | covered by `core:GET /comments/{commentId}/reactions` |
-| `GET` | `/companies` | `variant` | covered by `core:GET /companies` |
-| `GET` | `/companies/{companyId}` | `variant` | covered by `core:GET /companies/{companyId}` |
-| `GET` | `/companies/{companyId}/users` | `variant` | covered by `core:GET /companies/{companyId}/users` |
-| `GET` | `/files/export/{exportId}` | `variant` | covered by `core:GET /files/export/{exportId}` |
-| `GET` | `/files/formats` | `variant` | covered by `core:GET /files/formats` |
-| `GET` | `/files/fs/snapshot` | `variant` | covered by `core:GET /files/fs/snapshot` |
-| `GET` | `/files/fs/upload` | `variant` | covered by `core:GET /files/fs/upload` |
-| `GET` | `/files/fs/uploadstatus` | `variant` | covered by `core:GET /files/fs/uploadstatus` |
-| `GET` | `/files/fs/{fileId}/downloadurl` | `variant` | covered by `core:GET /files/fs/{fileId}/downloadurl` |
-| `GET` | `/files/{fileId}` | `variant` | covered by `core:GET /files/{fileId}` |
-| `GET` | `/files/{fileId}/alignment` | `variant` | covered by `core:GET /files/{fileId}/alignment` |
-| `GET` | `/files/{fileId}/permissions` | `variant` | covered by `core:GET /files/{fileId}/permissions` |
-| `GET` | `/files/{fileId}/status` | `variant` | covered by `core:GET /files/{fileId}/status` |
-| `GET` | `/files/{fileId}/versions` | `variant` | covered by `core:GET /files/{fileId}/versions` |
-| `GET` | `/folders/by_path` | `variant` | covered by `core:GET /folders/by_path` |
-| `GET` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:GET /folders/fs/{folderId}/permissions` |
-| `GET` | `/folders/jobs/{jobId}` | `variant` | covered by `core:GET /folders/jobs/{jobId}` |
-| `GET` | `/folders/{folderId}` | `variant` | covered by `core:GET /folders/{folderId}` |
-| `GET` | `/folders/{folderId}/item` | `variant` | covered by `core:GET /folders/{folderId}/item` |
-| `GET` | `/folders/{folderId}/items` | `variant` | covered by `core:GET /folders/{folderId}/items` |
-| `GET` | `/folders/{folderId}/versions` | `variant` | covered by `core:GET /folders/{folderId}/versions` |
-| `GET` | `/groups` | `variant` | covered by `core:GET /groups` |
-| `GET` | `/groups/{groupId}` | `variant` | covered by `core:GET /groups/{groupId}` |
-| `GET` | `/groups/{groupId}/users` | `variant` | covered by `core:GET /groups/{groupId}/users` |
-| `GET` | `/objectlink` | `variant` | covered by `core:GET /objectlink` |
-| `GET` | `/objectlink/target` | `variant` | covered by `core:GET /objectlink/target` |
-| `GET` | `/projects` | `variant` | covered by `core:GET /projects` |
-| `GET` | `/projects/clones/{cloneId}` | `variant` | covered by `core:GET /projects/clones/{cloneId}` |
-| `GET` | `/projects/me` | `variant` | covered by `core:GET /projects/me` |
-| `GET` | `/projects/{projectId}` | `variant` | covered by `core:GET /projects/{projectId}` |
-| `GET` | `/projects/{projectId}/license` | `variant` | covered by `core:GET /projects/{projectId}/license` |
-| `GET` | `/projects/{projectId}/metrics` | `variant` | covered by `core:GET /projects/{projectId}/metrics` |
-| `GET` | `/projects/{projectId}/objects` | `variant` | covered by `core:GET /projects/{projectId}/objects` |
-| `GET` | `/projects/{projectId}/roles` | `variant` | covered by `core:GET /projects/{projectId}/roles` |
-| `GET` | `/projects/{projectId}/settings` | `variant` | covered by `core:GET /projects/{projectId}/settings` |
-| `GET` | `/projects/{projectId}/status` | `variant` | covered by `core:GET /projects/{projectId}/status` |
-| `GET` | `/projects/{projectId}/users` | `variant` | covered by `core:GET /projects/{projectId}/users` |
-| `GET` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:GET /projects/{projectId}/users/{userId}` |
-| `GET` | `/regions` | `variant` | covered by `core:GET /regions` |
-| `GET` | `/releases` | `variant` | covered by `core:GET /releases` |
-| `GET` | `/releases/{releaseId}` | `variant` | covered by `core:GET /releases/{releaseId}` |
-| `GET` | `/releases/{releaseId}/files` | `variant` | covered by `core:GET /releases/{releaseId}/files` |
-| `GET` | `/search` | `variant` | covered by `core:GET /search` |
-| `GET` | `/shares` | `variant` | covered by `core:GET /shares` |
-| `GET` | `/shares/token/{stoken}` | `variant` | covered by `core:GET /shares/token/{stoken}` |
-| `GET` | `/shares/{shareId}` | `variant` | covered by `core:GET /shares/{shareId}` |
-| `GET` | `/tags` | `variant` | covered by `core:GET /tags` |
-| `GET` | `/tags/{tagId}` | `variant` | covered by `core:GET /tags/{tagId}` |
-| `GET` | `/tags/{tagId}/objects` | `variant` | covered by `core:GET /tags/{tagId}/objects` |
-| `GET` | `/todos` | `variant` | covered by `core:GET /todos` |
-| `GET` | `/todos/types` | `variant` | covered by `core:GET /todos/types` |
-| `GET` | `/todos/{todoId}` | `variant` | covered by `core:GET /todos/{todoId}` |
-| `GET` | `/todos/{todoId}/attachments` | `variant` | covered by `core:GET /todos/{todoId}/attachments` |
-| `GET` | `/users/languages` | `variant` | covered by `core:GET /users/languages` |
-| `GET` | `/users/licenses` | `variant` | covered by `core:GET /users/licenses` |
-| `GET` | `/users/timezones` | `variant` | covered by `core:GET /users/timezones` |
-| `GET` | `/users/{userId}` | `variant` | covered by `core:GET /users/{userId}` |
-| `GET` | `/viewgroups` | `variant` | covered by `core:GET /viewgroups` |
-| `GET` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:GET /viewgroups/{viewGroupId}` |
-| `GET` | `/views` | `variant` | covered by `core:GET /views` |
-| `GET` | `/views/{viewId}` | `variant` | covered by `core:GET /views/{viewId}` |
-| `GET` | `/views/{viewId}/camera` | `variant` | covered by `core:GET /views/{viewId}/camera` |
-| `GET` | `/views/{viewId}/image` | `variant` | covered by `core:GET /views/{viewId}/image` |
-| `GET` | `/views/{viewId}/markups` | `variant` | covered by `core:GET /views/{viewId}/markups` |
-| `GET` | `/views/{viewId}/presentation` | `variant` | covered by `core:GET /views/{viewId}/presentation` |
-| `GET` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:GET /views/{viewId}/sectionbox` |
-| `GET` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:GET /views/{viewId}/sectionplanes` |
-| `GET` | `/views2d` | `variant` | covered by `core:GET /views2d` |
-| `GET` | `/views2d/{viewId}` | `variant` | covered by `core:GET /views2d/{viewId}` |
-| `PATCH` | `/clashsets/{clashId}` | `variant` | covered by `core:PATCH /clashsets/{clashId}` |
-| `PATCH` | `/comments/{commentId}` | `variant` | covered by `core:PATCH /comments/{commentId}` |
-| `PATCH` | `/companies/{companyId}` | `variant` | covered by `core:PATCH /companies/{companyId}` |
-| `PATCH` | `/companies/{companyId}/domains` | `variant` | covered by `core:PATCH /companies/{companyId}/domains` |
-| `PATCH` | `/companies/{companyId}/users/{userId}` | `variant` | covered by `core:PATCH /companies/{companyId}/users/{userId}` |
-| `PATCH` | `/files/{fileId}` | `variant` | covered by `core:PATCH /files/{fileId}` |
-| `PATCH` | `/files/{fileId}/permissions` | `variant` | covered by `core:PATCH /files/{fileId}/permissions` |
-| `PATCH` | `/folders/fs/{folderId}/permissions` | `variant` | covered by `core:PATCH /folders/fs/{folderId}/permissions` |
-| `PATCH` | `/folders/{folderId}` | `variant` | covered by `core:PATCH /folders/{folderId}` |
-| `PATCH` | `/groups/{groupId}` | `variant` | covered by `core:PATCH /groups/{groupId}` |
-| `PATCH` | `/objectlink/{linkId}` | `variant` | covered by `core:PATCH /objectlink/{linkId}` |
-| `PATCH` | `/projects/{projectId}` | `variant` | covered by `core:PATCH /projects/{projectId}` |
-| `PATCH` | `/projects/{projectId}/license` | `variant` | covered by `core:PATCH /projects/{projectId}/license` |
-| `PATCH` | `/projects/{projectId}/settings` | `variant` | covered by `core:PATCH /projects/{projectId}/settings` |
-| `PATCH` | `/projects/{projectId}/users/{userId}` | `variant` | covered by `core:PATCH /projects/{projectId}/users/{userId}` |
-| `PATCH` | `/releases/{releaseId}` | `variant` | covered by `core:PATCH /releases/{releaseId}` |
-| `PATCH` | `/shares/{shareId}` | `variant` | covered by `core:PATCH /shares/{shareId}` |
-| `PATCH` | `/tags/{tagId}` | `variant` | covered by `core:PATCH /tags/{tagId}` |
-| `PATCH` | `/todos/{todoId}` | `variant` | covered by `core:PATCH /todos/{todoId}` |
-| `PATCH` | `/users/{userId}` | `variant` | covered by `core:PATCH /users/{userId}` |
-| `PATCH` | `/viewgroups/{viewGroupId}` | `variant` | covered by `core:PATCH /viewgroups/{viewGroupId}` |
-| `PATCH` | `/views/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views/multiparts/{viewId}` |
-| `PATCH` | `/views/{viewId}` | `variant` | covered by `core:PATCH /views/{viewId}` |
-| `PATCH` | `/views/{viewId}/camera` | `variant` | covered by `core:PATCH /views/{viewId}/camera` |
-| `PATCH` | `/views/{viewId}/markups` | `variant` | covered by `core:PATCH /views/{viewId}/markups` |
-| `PATCH` | `/views/{viewId}/presentation` | `variant` | covered by `core:PATCH /views/{viewId}/presentation` |
-| `PATCH` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:PATCH /views/{viewId}/sectionplanes` |
-| `PATCH` | `/views2d/multiparts/{viewId}` | `variant` | covered by `core:PATCH /views2d/multiparts/{viewId}` |
-| `PATCH` | `/views2d/{viewId}` | `variant` | covered by `core:PATCH /views2d/{viewId}` |
-| `POST` | `/activities/exports` | `variant` | covered by `core:POST /activities/exports` |
-| `POST` | `/activities/list` | `variant` | covered by `core:POST /activities/list` |
-| `POST` | `/clashsets` | `variant` | covered by `core:POST /clashsets` |
-| `POST` | `/comments` | `variant` | covered by `core:POST /comments` |
-| `POST` | `/comments/{commentId}/attachments` | `variant` | covered by `core:POST /comments/{commentId}/attachments` |
-| `POST` | `/comments/{commentId}/reactions` | `variant` | covered by `core:POST /comments/{commentId}/reactions` |
-| `POST` | `/companies/{companyId}/image` | `variant` | covered by `core:POST /companies/{companyId}/image` |
-| `POST` | `/companies/{companyId}/users` | `variant` | covered by `core:POST /companies/{companyId}/users` |
-| `POST` | `/files` | `variant` | covered by `core:POST /files` |
-| `POST` | `/files/export` | `variant` | covered by `core:POST /files/export` |
-| `POST` | `/files/fs/commit` | `variant` | covered by `core:POST /files/fs/commit` |
-| `POST` | `/files/fs/initiate` | `variant` | covered by `core:POST /files/fs/initiate` |
-| `POST` | `/files/fs/upload` | `variant` | covered by `core:POST /files/fs/upload` |
-| `POST` | `/files/fs/upload/{uploadId}/complete` | `variant` | covered by `core:POST /files/fs/upload/{uploadId}/complete` |
-| `POST` | `/files/{fileId}/alignment/matrix` | `variant` | covered by `core:POST /files/{fileId}/alignment/matrix` |
-| `POST` | `/files/{fileId}/checkin` | `variant` | covered by `core:POST /files/{fileId}/checkin` |
-| `POST` | `/files/{fileId}/checkout` | `variant` | covered by `core:POST /files/{fileId}/checkout` |
-| `POST` | `/folders` | `variant` | covered by `core:POST /folders` |
-| `POST` | `/groups` | `variant` | covered by `core:POST /groups` |
-| `POST` | `/groups/{groupId}/users` | `variant` | covered by `core:POST /groups/{groupId}/users` |
-| `POST` | `/objectlink` | `variant` | covered by `core:POST /objectlink` |
-| `POST` | `/objectlink/objectlinks` | `variant` | covered by `core:POST /objectlink/objectlinks` |
-| `POST` | `/projects` | `variant` | covered by `core:POST /projects` |
-| `POST` | `/projects/accessRequests` | `variant` | covered by `core:POST /projects/accessRequests` |
-| `POST` | `/projects/clones` | `variant` | covered by `core:POST /projects/clones` |
-| `POST` | `/projects/{projectId}/image` | `variant` | covered by `core:POST /projects/{projectId}/image` |
-| `POST` | `/projects/{projectId}/users` | `variant` | covered by `core:POST /projects/{projectId}/users` |
-| `POST` | `/releases` | `variant` | covered by `core:POST /releases` |
-| `POST` | `/releases/downloadFiles` | `variant` | covered by `core:POST /releases/downloadFiles` |
-| `POST` | `/releases/{releaseId}/files` | `variant` | covered by `core:POST /releases/{releaseId}/files` |
-| `POST` | `/shares` | `variant` | covered by `core:POST /shares` |
-| `POST` | `/tags` | `variant` | covered by `core:POST /tags` |
-| `POST` | `/tags/{tagId}/objects` | `variant` | covered by `core:POST /tags/{tagId}/objects` |
-| `POST` | `/todos` | `variant` | covered by `core:POST /todos` |
-| `POST` | `/todos/{todoId}/attachments` | `variant` | covered by `core:POST /todos/{todoId}/attachments` |
-| `POST` | `/viewgroups` | `variant` | covered by `core:POST /viewgroups` |
-| `POST` | `/views` | `variant` | covered by `core:POST /views` |
-| `POST` | `/views/multiparts` | `variant` | covered by `core:POST /views/multiparts` |
-| `POST` | `/views/{viewId}/image` | `variant` | covered by `core:POST /views/{viewId}/image` |
-| `POST` | `/views/{viewId}/markups` | `variant` | covered by `core:POST /views/{viewId}/markups` |
-| `POST` | `/views/{viewId}/sectionplanes` | `variant` | covered by `core:POST /views/{viewId}/sectionplanes` |
-| `POST` | `/views2d` | `variant` | covered by `core:POST /views2d` |
-| `POST` | `/views2d/multiparts` | `variant` | covered by `core:POST /views2d/multiparts` |
-| `PUT` | `/files/{fileId}/alignment` | `variant` | covered by `core:PUT /files/{fileId}/alignment` |
-| `PUT` | `/views/{viewId}/sectionbox` | `variant` | covered by `core:PUT /views/{viewId}/sectionbox` |
+Operations: [non-production--tcps-stage-2.0.md](non-production--tcps-stage-2.0.md).
 
 ## tcps.internal-int@2.0 (internal)
 
 Trimble-internal API (integration). 83 operations. Definition: [tcps.internal-int@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps.internal-int/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (integration) |
-| `DELETE` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (integration) |
-| `DELETE` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (integration) |
-| `DELETE` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (integration) |
-| `DELETE` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (integration) |
-| `DELETE` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/apps` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/apps/categories` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/apps/{appId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/attributes` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/companies/me` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/files/alignment` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/files/installer` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/files/{fileId}/thumbnail` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/jobs` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/imports` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/formexports/{id}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/forms/{id}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/spatialworkspaces` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/connectFileId/{fileId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/{id}/image` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/subscription` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templates/deltas` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}/latest` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/support/jobs/stats` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/sync/settings` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/sync/{parentId}/folders` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/sync/{projectId}/syncsessionid` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/tools` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/viewpoints` | `excluded` | Trimble-internal API (integration) |
-| `GET` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/jobs` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (integration) |
-| `PATCH` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/activities` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/activities/publish` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/apps/apikey` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/attributes` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/auth/apps/token` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/emails/publish` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/partial` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/representation` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/status` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/thumbnail` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/files/{fileId}/process` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/jobs` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/imports` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/access` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/activities` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/forms/_query` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/sync/process` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/sync/settings` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/sync/{sync_session_id}/{fileId}` | `excluded` | Trimble-internal API (integration) |
-| `POST` | `/viewpoints` | `excluded` | Trimble-internal API (integration) |
-| `PUT` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (integration) |
-| `PUT` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (integration) |
-| `PUT` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (integration) |
-| `PUT` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (integration) |
+Operations: [non-production--tcps.internal-int-2.0.md](non-production--tcps.internal-int-2.0.md).
 
 ## tcps.internal-qa@2.0 (internal)
 
 Trimble-internal API (QA). 83 operations. Definition: [tcps.internal-qa@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps.internal-qa/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (QA) |
-| `DELETE` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (QA) |
-| `DELETE` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (QA) |
-| `DELETE` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (QA) |
-| `DELETE` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (QA) |
-| `DELETE` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/apps` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/apps/categories` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/apps/{appId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/attributes` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/companies/me` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/files/alignment` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/files/installer` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/files/{fileId}/thumbnail` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/jobs` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/imports` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/formexports/{id}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/forms/{id}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/spatialworkspaces` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/connectFileId/{fileId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/{id}/image` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/subscription` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templates/deltas` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}/latest` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/support/jobs/stats` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/sync/settings` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/sync/{parentId}/folders` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/sync/{projectId}/syncsessionid` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/tools` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/viewpoints` | `excluded` | Trimble-internal API (QA) |
-| `GET` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/jobs` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (QA) |
-| `PATCH` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/activities` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/activities/publish` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/apps/apikey` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/attributes` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/auth/apps/token` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/emails/publish` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/partial` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/representation` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/status` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/thumbnail` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/files/{fileId}/process` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/jobs` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/imports` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/access` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/activities` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/forms/_query` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/sync/process` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/sync/settings` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/sync/{sync_session_id}/{fileId}` | `excluded` | Trimble-internal API (QA) |
-| `POST` | `/viewpoints` | `excluded` | Trimble-internal API (QA) |
-| `PUT` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (QA) |
-| `PUT` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (QA) |
-| `PUT` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (QA) |
-| `PUT` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (QA) |
+Operations: [non-production--tcps.internal-qa-2.0.md](non-production--tcps.internal-qa-2.0.md).
 
 ## tcps.internal-stage@2.0 (internal)
 
 Trimble-internal API (staging). 83 operations. Definition: [tcps.internal-stage@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps.internal-stage/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (staging) |
-| `DELETE` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (staging) |
-| `DELETE` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (staging) |
-| `DELETE` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (staging) |
-| `DELETE` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (staging) |
-| `DELETE` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/apps` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/apps/categories` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/apps/{appId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/attributes` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/companies/me` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/files/alignment` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/files/installer` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/files/{fileId}/thumbnail` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/jobs` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/imports` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/formexports/{id}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/forms/{id}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/spatialworkspaces` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/connectFileId/{fileId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/spatialworkspaces/{id}/image` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/subscription` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templates/deltas` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}/latest` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/support/jobs/stats` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/sync/settings` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/sync/{parentId}/folders` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/sync/{projectId}/syncsessionid` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/tools` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/viewpoints` | `excluded` | Trimble-internal API (staging) |
-| `GET` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/jobs` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/settings/users/{userId}` | `excluded` | Trimble-internal API (staging) |
-| `PATCH` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/activities` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/activities/publish` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/apps/apikey` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/attributes` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/auth/apps/token` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/emails/publish` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/partial` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/representation` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/status` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/thumbnail` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/files/{fileId}/process` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/jobs` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/imports` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/access` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/activities` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/forms/_query` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/sync/process` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/sync/settings` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/sync/{sync_session_id}/{fileId}` | `excluded` | Trimble-internal API (staging) |
-| `POST` | `/viewpoints` | `excluded` | Trimble-internal API (staging) |
-| `PUT` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API (staging) |
-| `PUT` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API (staging) |
-| `PUT` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API (staging) |
-| `PUT` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API (staging) |
+Operations: [non-production--tcps.internal-stage-2.0.md](non-production--tcps.internal-stage-2.0.md).
 
 ## tcps.internal@2.0 (internal)
 
 Trimble-internal API ('TC Internal API'); not offered to integrators. 83 operations. Definition: [tcps.internal@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps.internal/2.0).
 
-| Method | Path | Disposition | Detail |
-|---|---|---|---|
-| `DELETE` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `DELETE` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `DELETE` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `DELETE` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `DELETE` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `DELETE` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/apps` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/apps/categories` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/apps/{appId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/attributes` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/companies/me` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/files/alignment` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/files/installer` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/files/{fileId}/thumbnail` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/jobs` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/imports` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/formexports/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/forms/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/spatialworkspaces` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/spatialworkspaces/connectFileId/{fileId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/spatialworkspaces/{id}/image` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/subscription` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templates/deltas` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templates/series/{seriesId}/latest` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/settings/users/{userId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/support/jobs/stats` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/sync/settings` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/sync/{parentId}/folders` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/sync/{projectId}/syncsessionid` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/tools` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/viewpoints` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `GET` | `/viewpoints/{guid}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/attributes/{attributeId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/jobs` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/projects/{projectId}/preferences` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/projects/{projectId}/settings` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/settings/projects/{projectId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/settings/users/{userId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PATCH` | `/support/jobs/{jobId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/activities` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/activities/publish` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/apps/apikey` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/attributes` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/auth/apps/token` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/emails/publish` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/partial` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/representation` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/status` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/thumbnail` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/files/{fileId}/process` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/jobs` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/imports` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/access` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/activities` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/formexports` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/forms/_query` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/templatepublications` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/projects/{projectId}/templates` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/sync/chunk/{syncSessionId}/{parentId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/sync/process` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/sync/settings` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/sync/{syncSessionId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/sync/{sync_session_id}/{fileId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `POST` | `/viewpoints` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PUT` | `/files/partial/{uploadId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PUT` | `/projects/{projectId}/templatepublications/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PUT` | `/projects/{projectId}/templates/{id}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
-| `PUT` | `/users/{userId}/preferences/{appId}` | `excluded` | Trimble-internal API ('TC Internal API'); not offered to integrators |
+Operations: [non-production--tcps.internal-2.0.md](non-production--tcps.internal-2.0.md).
 
 ## tdrive-int@1.0 (variant)
 
@@ -1311,19 +412,19 @@ development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `DELETE` | `/tickets/{Id}` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `DELETE` | `/tickets/{Id}/files/{fileId}` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `GET` | `/me` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `GET` | `/tickets` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `GET` | `/tickets/{Id}` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `GET` | `/tickets/{Id}/files` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `GET` | `/tickets/{Id}/files/{fileId}` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `PATCH` | `/tickets/{Id}` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `POST` | `/auth/atc` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `POST` | `/tickets` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `POST` | `/tickets/{Id}/files` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `POST` | `/tickets/{Id}/files/{fileId}/complete` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
-| `POST` | `/tickets/{Id}/notify` | `excluded` | development support-ticket API in the Tekla SwaggerHub organisation ('tsupport-v3-dev'); not linked from Tekla documentation |
+| `DELETE` | `/tickets/{Id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/tickets/{Id}/files/{fileId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/me` | `excluded` | the definition's reason (above) |
+| `GET` | `/tickets` | `excluded` | the definition's reason (above) |
+| `GET` | `/tickets/{Id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/tickets/{Id}/files` | `excluded` | the definition's reason (above) |
+| `GET` | `/tickets/{Id}/files/{fileId}` | `excluded` | the definition's reason (above) |
+| `PATCH` | `/tickets/{Id}` | `excluded` | the definition's reason (above) |
+| `POST` | `/auth/atc` | `excluded` | the definition's reason (above) |
+| `POST` | `/tickets` | `excluded` | the definition's reason (above) |
+| `POST` | `/tickets/{Id}/files` | `excluded` | the definition's reason (above) |
+| `POST` | `/tickets/{Id}/files/{fileId}/complete` | `excluded` | the definition's reason (above) |
+| `POST` | `/tickets/{Id}/notify` | `excluded` | the definition's reason (above) |
 
 ## test-api-key-temp-2@v1 (variant)
 
@@ -1381,90 +482,50 @@ staging copy. 6 operations. Definition: [topic-exchange-stage@v1](https://api.sw
 
 staging copy. 82 operations. Definition: [topic-stage@v2](https://api.swaggerhub.com/apis/Trimble-Connect/topic-stage/v2).
 
+Operations: [non-production--topic-stage-v2.md](non-production--topic-stage-v2.md).
+
+## transporeon/transporeon-carrier-interface-openapi-v1-swagger-push-json (excluded)
+
+push-notification contract that the carrier implements and Transporeon calls; not an API anyone calls at Transporeon. 12 operations. Definition: [transporeon/transporeon-carrier-interface-openapi-v1-swagger-push-json](https://xch.transporeon.com/carrier_interface/openapi/v1/swagger-push.json).
+
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `DELETE` | `/bcf/2.1/projects/{projectId}/topics/{topicId}` | `variant` | covered by `topics:DELETE /bcf/2.1/projects/{projectId}/topics/{topicId}` |
-| `DELETE` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` | `variant` | covered by `topics:DELETE /bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` |
-| `DELETE` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/document_references/{documentReferenceId}` | `variant` | covered by `topics:DELETE /bcf/2.1/projects/{projectId}/topics/{topicId}/document_references/{documentReferenceId}` |
-| `DELETE` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}` | `variant` | covered by `topics:DELETE /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}` |
-| `DELETE` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}` | `variant` | covered by `topics:DELETE /bcf/3.0/projects/{project_id}/topics/{topic_id}` |
-| `DELETE` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` | `variant` | covered by `topics:DELETE /bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` |
-| `DELETE` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references/{document_reference_id}` | `variant` | covered by `topics:DELETE /bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references/{document_reference_id}` |
-| `DELETE` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}` | `variant` | covered by `topics:DELETE /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}` |
-| `GET` | `/api/claims` | `variant` | covered by `topics:GET /api/claims` |
-| `GET` | `/bcf/2.1/auth` | `variant` | covered by `topics:GET /bcf/2.1/auth` |
-| `GET` | `/bcf/2.1/current-user` | `variant` | covered by `topics:GET /bcf/2.1/current-user` |
-| `GET` | `/bcf/2.1/projects` | `variant` | covered by `topics:GET /bcf/2.1/projects` |
-| `GET` | `/bcf/2.1/projects/{projectId}` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}` |
-| `GET` | `/bcf/2.1/projects/{projectId}/changes` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/changes` |
-| `GET` | `/bcf/2.1/projects/{projectId}/defaultextensions` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/defaultextensions` |
-| `GET` | `/bcf/2.1/projects/{projectId}/documents` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/documents` |
-| `GET` | `/bcf/2.1/projects/{projectId}/documents/{documentId}` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/documents/{documentId}` |
-| `GET` | `/bcf/2.1/projects/{projectId}/extensions` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/extensions` |
-| `GET` | `/bcf/2.1/projects/{projectId}/objects` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/objects` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/comments` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/comments` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/document_references` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/document_references` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/files` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/files` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/related_topics` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/related_topics` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/coloring` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/coloring` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/selection` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/selection` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/snapshot` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/snapshot` |
-| `GET` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/visibility` | `variant` | covered by `topics:GET /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints/{viewpointId}/visibility` |
-| `GET` | `/bcf/3.0/projects` | `variant` | covered by `topics:GET /bcf/3.0/projects` |
-| `GET` | `/bcf/3.0/projects/{project_id}` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}` |
-| `GET` | `/bcf/3.0/projects/{project_id}/defaultextensions` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/defaultextensions` |
-| `GET` | `/bcf/3.0/projects/{project_id}/documents` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/documents` |
-| `GET` | `/bcf/3.0/projects/{project_id}/documents/{document_id}` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/documents/{document_id}` |
-| `GET` | `/bcf/3.0/projects/{project_id}/extensions` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/extensions` |
-| `GET` | `/bcf/3.0/projects/{project_id}/files_information` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/files_information` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/comments` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/comments` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/files` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/files` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/related_topics` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/related_topics` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/coloring` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/coloring` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/selection` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/selection` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/snapshot` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/snapshot` |
-| `GET` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/visibility` | `variant` | covered by `topics:GET /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints/{viewpoint_id}/visibility` |
-| `GET` | `/bcf/versions` | `variant` | covered by `topics:GET /bcf/versions` |
-| `GET` | `/foundation/1.0/auth` | `variant` | covered by `topics:GET /foundation/1.0/auth` |
-| `GET` | `/foundation/1.0/current-user` | `variant` | covered by `topics:GET /foundation/1.0/current-user` |
-| `GET` | `/foundation/versions` | `variant` | covered by `topics:GET /foundation/versions` |
-| `PATCH` | `/bcf/2.1/projects/{projectId}/comments/batch` | `variant` | covered by `topics:PATCH /bcf/2.1/projects/{projectId}/comments/batch` |
-| `PATCH` | `/bcf/2.1/projects/{projectId}/topics/batch` | `variant` | covered by `topics:PATCH /bcf/2.1/projects/{projectId}/topics/batch` |
-| `POST` | `/bcf/2.1/projects/{projectId}/comments/batch` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/comments/batch` |
-| `POST` | `/bcf/2.1/projects/{projectId}/documents` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/documents` |
-| `POST` | `/bcf/2.1/projects/{projectId}/topics` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/topics` |
-| `POST` | `/bcf/2.1/projects/{projectId}/topics/batch` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/topics/batch` |
-| `POST` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/comments` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/topics/{topicId}/comments` |
-| `POST` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/document_references` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/topics/{topicId}/document_references` |
-| `POST` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints` | `variant` | covered by `topics:POST /bcf/2.1/projects/{projectId}/topics/{topicId}/viewpoints` |
-| `POST` | `/bcf/3.0/projects/{project_id}/documents` | `variant` | covered by `topics:POST /bcf/3.0/projects/{project_id}/documents` |
-| `POST` | `/bcf/3.0/projects/{project_id}/topics` | `variant` | covered by `topics:POST /bcf/3.0/projects/{project_id}/topics` |
-| `POST` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/comments` | `variant` | covered by `topics:POST /bcf/3.0/projects/{project_id}/topics/{topic_id}/comments` |
-| `POST` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references` | `variant` | covered by `topics:POST /bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references` |
-| `POST` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints` | `variant` | covered by `topics:POST /bcf/3.0/projects/{project_id}/topics/{topic_id}/viewpoints` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/extensions` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/extensions` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/topics/{topicId}` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/topics/{topicId}` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/topics/{topicId}/comments/{commentId}` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/document_references/{documentReferenceId}` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/topics/{topicId}/document_references/{documentReferenceId}` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/files` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/topics/{topicId}/files` |
-| `PUT` | `/bcf/2.1/projects/{projectId}/topics/{topicId}/related_topics` | `variant` | covered by `topics:PUT /bcf/2.1/projects/{projectId}/topics/{topicId}/related_topics` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/extensions` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/extensions` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/topics/{topic_id}` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/topics/{topic_id}/comments/{comment_id}` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references/{document_reference_id}` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/topics/{topic_id}/document_references/{document_reference_id}` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/files` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/topics/{topic_id}/files` |
-| `PUT` | `/bcf/3.0/projects/{project_id}/topics/{topic_id}/related_topics` | `variant` | covered by `topics:PUT /bcf/3.0/projects/{project_id}/topics/{topic_id}/related_topics` |
+| `POST` | `/v1/push-api/attachment` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/booking` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/delivery` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/files` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/nto/change/accepted` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/nto/change/declined` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/placedoffer` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/priceitem` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/process-status` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/settlement` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/shipmentconfirmation` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/push-api/transport` | `excluded` | the definition's reason (above) |
+
+## transporeon/transporeon-openapi-v2-swagger-push-json (excluded)
+
+push-notification contract that the shipper implements and Transporeon calls; not an API anyone calls at Transporeon. 11 operations. Definition: [transporeon/transporeon-openapi-v2-swagger-push-json](https://xch.transporeon.com/openapi/v2/swagger-push.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `POST` | `/v2/push-api/bookings` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/etas` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/files` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/offers` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/process_statuses` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/processing_results` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/settlement_decisions` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/surcharges` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/transport_assignments` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/transport_orders` | `excluded` | the definition's reason (above) |
+| `POST` | `/v2/push-api/vehicle_allocation_results` | `excluded` | the definition's reason (above) |
+
+## transporeon/transporeon-operations-v3-api-docs-transport-operations-outgoing (excluded)
+
+outgoing (webhook) contract that the customer implements at its own endpoint (the definition's server is a placeholder); Transporeon calls it. 410 operations. Definition: [transporeon/transporeon-operations-v3-api-docs-transport-operations-outgoing](https://api.transporeon.com/operations/v3/api-docs/Transport%20Operations%20Outgoing).
+
+Operations: [non-production--transporeon-transporeon-operations-v3-api-docs-transport-operations-outgoing.md](non-production--transporeon-transporeon-operations-v3-api-docs-transport-operations-outgoing.md).
 
 ## trimble-analytics-identity (excluded)
 
@@ -1488,44 +549,1421 @@ Endpoints from the OpenID Connect discovery document. The bridge's own sign-in (
 
 ## trimble-maps-contentapi (excluded)
 
-publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used. 19 operations. Definition: [trimble-maps-contentapi](https://contentapi.trimblemaps.com/swagger/v1/swagger.json).
+the ContentTools / Content API (beta) is deprecated by Trimble and replaced by the Places API (developer.trimblemaps.com/restful-apis/contenttools/); its documented host is content.trimblemaps.com. 19 operations. Definition: [trimble-maps-contentapi](https://contentapi.trimblemaps.com/swagger/v1/swagger.json).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `DELETE` | `/api/locations/v1/places/{placeId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `DELETE` | `/api/locations/v1/placesets/{setId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `DELETE` | `/api/locations/v1/sites/{siteId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/editor/url/places/{placeId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/places` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/places/search` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/places/{placeId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/places/{setId}/placeset` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/placesets` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/placesets/{setId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `GET` | `/api/locations/v1/sites/{siteId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `POST` | `/api/locations/v1/accounts/authenticate` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `POST` | `/api/locations/v1/places` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `POST` | `/api/locations/v1/placesets` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `POST` | `/api/locations/v1/sites` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `PUT` | `/api/locations/v1/places` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `PUT` | `/api/locations/v1/placesets/{setId}` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
-| `PUT` | `/api/locations/v1/sites` | `excluded` | publicly reachable (beta) but not linked from any Trimble documentation; undocumented endpoints are not used |
+| `DELETE` | `/api/locations/v1/places/{placeId}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/api/locations/v1/placesets/{setId}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/api/locations/v1/sites/{siteId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/editor/url/places/{placeId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/places` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/places/search` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/places/{placeId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/places/{setId}/placeset` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/placesets` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/placesets/{setId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/locations/v1/sites/{siteId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/locations/v1/accounts/authenticate` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/locations/v1/places` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/locations/v1/placesets` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/locations/v1/sites` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/locations/v1/places` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/locations/v1/placesets/{setId}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/locations/v1/sites` | `excluded` | the definition's reason (above) |
 
-## trimble-maps-routereporter (excluded)
+## trimble-maps-routereporter-service (excluded)
 
-publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints). 10 operations. Definition: [trimble-maps-routereporter](https://routereporterservice.trimblemaps.com/swagger/v1/swagger.json).
+the RouteReporter service host's own Swagger file; Trimble documents RouteReporter through developer.trimblemaps.com/restful-apis/api/routereporter.json (catalogued as trimble-maps-routereporter), and the operations only in this file are undocumented. 10 operations. Definition: [trimble-maps-routereporter-service](https://routereporterservice.trimblemaps.com/swagger/v1/swagger.json).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
-| `GET` | `/api/v1/trip` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `GET` | `/api/v1/trips` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v1/search` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/ai/feedback` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/gpspings` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/road_events` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/safety_events` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/search` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/stops` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
-| `POST` | `/api/v2/stopsByVehicleId` | `excluded` | publicly reachable but not linked from any Trimble documentation; undocumented endpoints are not used (safety rule: no private or undocumented endpoints) |
+| `GET` | `/api/v1/trip` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/trips` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/ai/feedback` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/gpspings` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/road_events` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/safety_events` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/stops` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/stopsByVehicleId` | `excluded` | the definition's reason (above) |
+
+## trimble-maps/authenticate-api-calls (excluded)
+
+credential endpoints (authenticate, refresh, whoami for Appian access tokens); agents never handle credentials, as for Trimble Identity. 3 operations. Definition: [trimble-maps/authenticate-api-calls](https://developer.trimblemaps.com/restful-apis/api/authenticate-api-calls.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `POST` | `/Identity/v1/authenticate` | `excluded` | the definition's reason (above) |
+| `POST` | `/Identity/v1/refresh` | `excluded` | the definition's reason (above) |
+| `POST` | `/Identity/v1/whoami` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/autodesk-cc-account-admin-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 11 operations. Definition: [xchange-connector/autodesk-cc-account-admin-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/account-admin/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/project-users/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/project-users/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/project-users/cache/id/{id}/{projectId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/project-users/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/projects/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/project-users/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/account-admin/1/data/projects/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/autodesk-cc-data-mgmt-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 33 operations. Definition: [xchange-connector/autodesk-cc-data-mgmt-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/data-mgmt/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/cache/id/{bucketKey}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/cache/id/{bucketKey}/{objectKey}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/actions/get-s3-url` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/buckets/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/actions/get-content` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/actions/get-parent` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/actions/modify` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/folders/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/actions/get-by-folder` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/actions/upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/items/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/actions/create-url` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/actions/upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/data-mgmt/1/data/objects/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/autodesk-cc-files-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 8 operations. Definition: [xchange-connector/autodesk-cc-files-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/files/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/actions/export-pdfs` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/actions/get-export` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/files/1/data/exports/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/autodesk-cc-rfis-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 21 operations. Definition: [xchange-connector/autodesk-cc-rfis-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/rfis/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-attachments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis-comments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/actions/update` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/rfis/1/data/rfis/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/autodesk-cc-submittals-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 38 operations. Definition: [xchange-connector/autodesk-cc-submittals-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/submittals/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-item-types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-item-types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-item-types/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-item-types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/specs/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-item-types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items-attachments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/actions/transition` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/actions/update` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-items/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-packages/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/autodesk-cc/submittals/1/data/submittal-responses/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/aws-s3-app-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/aws-s3-app-1](https://api.xchange.trimble.com/connect/v1/direct/aws-s3/app/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/cache/id/{Id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/actions/pre-signed-upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/aws-s3/app/1/data/files/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/b2w-ops-app-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 431 operations. Definition: [xchange-connector/b2w-ops-app-1](https://api.xchange.trimble.com/connect/v1/direct/b2w-ops/app/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-b2w-ops-app-1.md](non-production--xchange-connector-b2w-ops-app-1.md).
+
+## xchange-connector/bamboohr-app-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 62 operations. Definition: [xchange-connector/bamboohr-app-1](https://api.xchange.trimble.com/connect/v1/direct/bamboohr/app/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-bamboohr-app-1.md](non-production--xchange-connector-bamboohr-app-1.md).
+
+## xchange-connector/foundation-ap-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 12 operations. Definition: [xchange-connector/foundation-ap-1](https://api.xchange.trimble.com/connect/v1/direct/foundation/ap/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache/natural/{company_no}/{tax_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/vendors/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/vendors/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/vendors/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/vendors/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/sales_taxes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/ap/1/data/vendors/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/foundation-gl-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/foundation-gl-1](https://api.xchange.trimble.com/connect/v1/direct/foundation/gl/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/gl/1/data/accounts/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/gl/1/data/accounts/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/gl/1/data/accounts/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/gl/1/data/accounts/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/gl/1/data/accounts/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/foundation-jc-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 40 operations. Definition: [xchange-connector/foundation-jc-1](https://api.xchange.trimble.com/connect/v1/direct/foundation/jc/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_classes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_classes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_classes/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_classes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_codes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_codes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_codes/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_codes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache/natural/{company_no}/{job_no}/{phase_no}/{cost_code_no}/{cost_class_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache/natural/{company_no}/{job_no}/{phase_no}/{cost_code_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache/natural/{company_no}/{job_no}/{phase_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/jobs/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/jobs/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/jobs/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/jobs/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache/natural/{company_no}/{phase_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_classes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/cost_codes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_classes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_cost_codes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/job_phases/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/jobs/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/jc/1/data/phases/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/foundation-po-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 18 operations. Definition: [xchange-connector/foundation-po-1](https://api.xchange.trimble.com/connect/v1/direct/foundation/po/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/natural/{company_no}/{po_no}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache/row_unique_id/{row_unique_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/google-drive-files-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 18 operations. Definition: [xchange-connector/google-drive-files-1](https://api.xchange.trimble.com/connect/v1/direct/google-drive/files/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/cache-file` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/cache-list` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/copy` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/create-folder` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/delete` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/download` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/edit-metadata` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/list` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/move` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/actions/upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/google-drive/files/1/data/files/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/power-bi-powerbi-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 28 operations. Definition: [xchange-connector/power-bi-powerbi-1](https://api.xchange.trimble.com/connect/v1/direct/power-bi/powerbi/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/groups/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/groups/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/groups/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/groups/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/actions/get-datasets-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/actions/update-dataset-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/datasets/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/groups/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/actions/get-import-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/imports/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/actions/delete-rows-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/actions/get-tables-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/actions/post-dataset-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/actions/put-table-in-group` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/power-bi/powerbi/1/data/push-datasets/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/procorev2-procore-v2-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 0 operations. Definition: [xchange-connector/procorev2-procore-v2-1](https://api.xchange.trimble.com/connect/v1/direct/procorev2/procore-v2/1/swagger/openapi.json).
+
+**Unavailable:** linked from the Procore connector page but returned HTTP 500 on 2026-09-29 and 2026-10-01 (retrieval failed: HTTP Error 500: Internal Server Error).
+
+## xchange-connector/projectsightv2-projectsightv2-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 373 operations. Definition: [xchange-connector/projectsightv2-projectsightv2-1](https://api.xchange.trimble.com/connect/v1/direct/projectsightv2/projectsightv2/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-projectsightv2-projectsightv2-1.md](non-production--xchange-connector-projectsightv2-projectsightv2-1.md).
+
+## xchange-connector/quickbooks-online-accounting-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 112 operations. Definition: [xchange-connector/quickbooks-online-accounting-1](https://api.xchange.trimble.com/connect/v1/direct/quickbooks-online/accounting/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-quickbooks-online-accounting-1.md](non-production--xchange-connector-quickbooks-online-accounting-1.md).
+
+## xchange-connector/sage100-ap-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 29 operations. Definition: [xchange-connector/sage100-ap-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/ap/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_order_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_order_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_order_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_order_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_orders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_orders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_orders/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_orders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendor_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendor_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendor_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendor_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendors/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendors/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendors/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendors/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/actions/add_attachment` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/actions/add_v2` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/invoices/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_order_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/purchase_orders/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendor_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ap/2/data/vendors/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage100-ar-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 25 operations. Definition: [xchange-connector/sage100-ar-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/ar/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/client_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/client_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/client_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/client_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/job_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/job_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/job_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/job_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/client_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/actions/change` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/clients/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/job_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/actions/change` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/ar/2/data/jobs/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage100-dm-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/sage100-dm-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/dm/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/dm/2/data/attachments/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage100-em-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 14 operations. Definition: [xchange-connector/sage100-em-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/em/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache/equip_id/{equip_id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/actions/change` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/em/2/data/equipment_types/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage100-pm-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 28 operations. Definition: [xchange-connector/sage100-pm-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/pm/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/budgets/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/budgets/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/budgets/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/budgets/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_codes/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_codes/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_codes/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_codes/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_types/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/subcontracts/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/subcontracts/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/subcontracts/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/subcontracts/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/budgets/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/actions/change` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/change_orders/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_codes/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/cost_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pm/2/data/subcontracts/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage100-pr-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 23 operations. Definition: [xchange-connector/sage100-pr-2](https://api.xchange.trimble.com/connect/v1/direct/sage100/pr/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employee_positions/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employee_positions/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employee_positions/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employee_positions/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employees/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employees/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employees/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employees/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/pay_groups/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/pay_groups/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/pay_groups/cache/idnum/{idnum}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/pay_groups/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/actions/add_many` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/daily_payrolls/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employee_positions/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/employees/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage100/pr/2/data/pay_groups/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage300-ap-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 52 operations. Definition: [xchange-connector/sage300-ap-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/ap/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-sage300-ap-1.md](non-production--xchange-connector-sage300-ap-1.md).
+
+## xchange-connector/sage300-eq-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 0 operations. Definition: [xchange-connector/sage300-eq-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/eq/1/swagger/openapi.json).
+
+**Unavailable:** linked from the Sage 300 CRE connector page but returned HTTP 500 on 2026-10-01 (retrieval failed: HTTP Error 500: Internal Server Error).
+
+## xchange-connector/sage300-gl-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 16 operations. Definition: [xchange-connector/sage300-gl-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/gl/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_a/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_a/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_a/cache/account_prefix_a/{Account_Prefix_A}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_a/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_ab/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_ab/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_ab/cache/account_prefix_ab/{Account_Prefix_AB}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_ab/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/fiscal_controls/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/fiscal_controls/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/fiscal_controls/cache/fiscal_entity/{Fiscal_Entity}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/fiscal_controls/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_a/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/account_prefix_ab/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/gl/1/data/fiscal_controls/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage300-jc-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 79 operations. Definition: [xchange-connector/sage300-jc-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/jc/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-sage300-jc-1.md](non-production--xchange-connector-sage300-jc-1.md).
+
+## xchange-connector/sage300-pj-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/sage300-pj-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/pj/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/pj/1/data/commitment_co/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/pj/1/data/commitment_co/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/pj/1/data/commitment_co/cache/natural/{Commitment_CO_Index}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/pj/1/data/commitment_co/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/pj/1/data/commitment_co/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/sage300-pr-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 141 operations. Definition: [xchange-connector/sage300-pr-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/pr/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-sage300-pr-1.md](non-production--xchange-connector-sage300-pr-1.md).
+
+## xchange-connector/sage300-xmlapi-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 12 operations. Definition: [xchange-connector/sage300-xmlapi-1](https://api.xchange.trimble.com/connect/v1/direct/sage300/xmlapi/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/cache/batchid/{ID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessaginginvoice/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessaginginvoice/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessaginginvoice/cache/invoiceid/{ID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessaginginvoice/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/actions/process` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessagingbatch/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/sage300/xmlapi/1/data/apmessaginginvoice/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/salesforce-crm-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 48 operations. Definition: [xchange-connector/salesforce-crm-1](https://api.xchange.trimble.com/connect/v1/direct/salesforce/crm/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-salesforce-crm-1.md](non-production--xchange-connector-salesforce-crm-1.md).
+
+## xchange-connector/salesforce-identity-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/salesforce-identity-1](https://api.xchange.trimble.com/connect/v1/direct/salesforce/identity/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/salesforce/identity/1/data/users/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/salesforce/identity/1/data/users/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/salesforce/identity/1/data/users/cache/id/{Id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/salesforce/identity/1/data/users/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/salesforce/identity/1/data/users/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-ap-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 89 operations. Definition: [xchange-connector/spectrum-ap-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/ap/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-spectrum-ap-1.md](non-production--xchange-connector-spectrum-ap-1.md).
+
+## xchange-connector/spectrum-ar-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 79 operations. Definition: [xchange-connector/spectrum-ar-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/ar/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-spectrum-ar-1.md](non-production--xchange-connector-spectrum-ar-1.md).
+
+## xchange-connector/spectrum-cm-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 11 operations. Definition: [xchange-connector/spectrum-cm-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/cm/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_accounts/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_accounts/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_accounts/cache/natural/{Company_Code}/{Bank_Account_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_accounts/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_acct_card_dets/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_acct_card_dets/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_acct_card_dets/cache/natural/{Company_Code}/{Bank_Account_Code}/{Card_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_acct_card_dets/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_accounts/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/cm/1/data/bank_acct_card_dets/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-ec-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 38 operations. Definition: [xchange-connector/spectrum-ec-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/ec/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/cost_categories/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/cost_categories/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/cost_categories/cache/natural/{Company_Code}/{Cost_Category_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/cost_categories/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/cache/natural/{Company_Code}/{Equipment_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_status/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_status/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_status/cache/natural/{Company_Code}/{Equipment_Status}/{Status_Type}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_status/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_types/cache/natural/{Company_Code}/{Equipment_Type}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_yards/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_yards/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_yards/cache/natural/{Company_Code}/{Yard_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_yards/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/cache/natural/{__concatenatedKey}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_readings/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_readings/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_readings/cache/natural/{__concatenatedKey}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_readings/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/cost_categories/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_status/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_types/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/equipment_yards/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_histories/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ec/1/data/meter_readings/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-em-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/spectrum-em-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/em/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/em/1/data/cost_centers/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/em/1/data/cost_centers/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/em/1/data/cost_centers/cache/natural/{Company_Code}/{Cost_Center_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/em/1/data/cost_centers/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/em/1/data/cost_centers/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-gl-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 22 operations. Definition: [xchange-connector/spectrum-gl-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/gl/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/accounts/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/accounts/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/accounts/cache/natural/{Company_Code}/{GL_Account}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/accounts/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/departments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/departments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/departments/cache/natural/{Company_Code}/{Department_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/departments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/cache/natural/{Company_Code}/{Year}/{Gl_Period}/{Journal_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/processing_dates/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/processing_dates/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/processing_dates/cache/natural/{Company_Code}/{Module_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/processing_dates/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/accounts/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/departments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/journal_entries/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/gl/1/data/processing_dates/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-hilti-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/spectrum-hilti-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/hilti/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/cache/natural/{Company_Code}/{ID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hilti/1/data/eq_loc_transfer/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-hr-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 18 operations. Definition: [xchange-connector/spectrum-hr-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/hr/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/cache/natural/{Company_Code}/{Employee_Code}/{Employee_Dependent_Seq}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep_crypto/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep_crypto/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep_crypto/cache/natural/{Company_Code}/{Employee_Code}/{Employee_Dependent_Seq}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep_crypto/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/cache/natural/{Company_Code}/{Employee_Code}/{Dependent_Sequence}/{Insurance_Type}/{Insurance_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/actions/upsert` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/empl_dep_crypto/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/actions/upsert` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/hr/1/data/employee_insurance/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-ic-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 34 operations. Definition: [xchange-connector/spectrum-ic-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/ic/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/gl_departments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/gl_departments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/gl_departments/cache/natural/{Company_Code}/{GL_Department}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/gl_departments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/cache/natural/{Company_Code}/{Transfer_Type}/{Transaction_Reference}/{Transaction_Sequence}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_category/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_category/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_category/cache/natural/{Company_Code}/{Item_Category}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_category/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/cache/natural/{Company_Code}/{Item_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/cache/natural/{Company_Code}/{Transfer_Type}/{Transaction_Reference}/{Requisition_Sequence}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/warehouses/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/warehouses/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/warehouses/cache/natural/{Company_Code}/{Warehouse_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/warehouses/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/gl_departments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/actions/upsert` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inv_transactions/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_category/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/inventory_items/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/job_requisitions/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/ic/1/data/warehouses/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-jc-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 54 operations. Definition: [xchange-connector/spectrum-jc-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/jc/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-spectrum-jc-1.md](non-production--xchange-connector-spectrum-jc-1.md).
+
+## xchange-connector/spectrum-oe-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/spectrum-oe-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/oe/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/oe/1/data/ship_vias/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/oe/1/data/ship_vias/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/oe/1/data/ship_vias/cache/natural/{Company_Code}/{Ship_Via_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/oe/1/data/ship_vias/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/oe/1/data/ship_vias/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-pa-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/spectrum-pa-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/pa/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/pa/1/data/company_information/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/pa/1/data/company_information/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/pa/1/data/company_information/cache/natural/{Company_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/pa/1/data/company_information/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/pa/1/data/company_information/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-po-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 39 operations. Definition: [xchange-connector/spectrum-po-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/po/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_batches/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_batches/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_batches/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_descriptions/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_descriptions/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_descriptions/cache/natural/{Company_Code}/{PO_Number}/{Detail_Sequence}/{Description_Sequence}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_descriptions/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_details/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_details/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_details/cache/natural/{Company_Code}/{PO_Number}/{Line_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_details/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/cache/natural/{Company_Code}/{PO_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_inquiries/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_inquiries/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_inquiries/cache/natural/{Company_Code}/{PO_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_inquiries/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/purchase_orders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/purchase_orders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/purchase_orders/cache/natural/{Company_Code}/{PO_Number}/{Vendor_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/purchase_orders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/ship_via/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/ship_via/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/ship_via/cache/natural/{Company_Code}/{Ship_Via_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/ship_via/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_batches/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_batches/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_descriptions/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_details/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/actions/pl_two_step` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/actions/refresh_cache` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/actions/refresh_many` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_headers/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/po_inquiries/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/purchase_orders/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/po/1/data/ship_via/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-pr-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 100 operations. Definition: [xchange-connector/spectrum-pr-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/pr/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-spectrum-pr-1.md](non-production--xchange-connector-spectrum-pr-1.md).
+
+## xchange-connector/spectrum-sa-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 11 operations. Definition: [xchange-connector/spectrum-sa-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/sa/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/company_information/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/company_information/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/company_information/cache/natural/{Company_Code}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/company_information/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/control_file/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/control_file/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/control_file/cache/natural/{Company_Code}/{Record_ID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/control_file/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/company_information/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/sa/1/data/control_file/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/spectrum-wo-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 13 operations. Definition: [xchange-connector/spectrum-wo-1](https://api.xchange.trimble.com/connect/v1/direct/spectrum/wo/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/cache/natural/{Company_Code}/{WO_Number}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/cache/natural/{Company_Code}/{Ship_To_ID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/actions/upsert` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_headers/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/actions/add` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/spectrum/wo/1/data/wo_sites/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/trimble-connect-file-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 10 operations. Definition: [xchange-connector/trimble-connect-file-1](https://api.xchange.trimble.com/connect/v1/direct/trimble-connect/file/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/complete-upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/fileupload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/list-items` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/upload-status` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/trimble-connect-folder-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 8 operations. Definition: [xchange-connector/trimble-connect-folder-1](https://api.xchange.trimble.com/connect/v1/direct/trimble-connect/folder/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/trimble-connect-project-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 8 operations. Definition: [xchange-connector/trimble-connect-project-1](https://api.xchange.trimble.com/connect/v1/direct/trimble-connect/project/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-construct-contacts-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 13 operations. Definition: [xchange-connector/tu-construct-contacts-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/contacts/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/cache/CompanyId/{CompanyId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/cache/contactId/{contactId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/actions/import` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/companies/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/actions/import` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/contacts/1/data/contacts/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-construct-costs-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 50 operations. Definition: [xchange-connector/tu-construct-costs-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/costs/1/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-tu-construct-costs-1.md](non-production--xchange-connector-tu-construct-costs-1.md).
+
+## xchange-connector/tu-construct-documents-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 9 operations. Definition: [xchange-connector/tu-construct-documents-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/documents/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/cache/FileId/{FileId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/actions/get-file` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/actions/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/actions/upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/documents/1/data/documents/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-construct-processes-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 21 operations. Definition: [xchange-connector/tu-construct-processes-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/processes/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/cache/commentId/{commentId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/cache/instanceId/{InstanceId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-types/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-types/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-types/cache/processId/{processId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-types/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/actions/post` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/comments/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/actions/attach-document` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/actions/upsert` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-instances/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/processes/1/data/process-types/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-construct-projects-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/tu-construct-projects-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/projects/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/cache/PortalId/{PortalId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/projects/1/data/projects/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-construct-users-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 6 operations. Definition: [xchange-connector/tu-construct-users-1](https://api.xchange.trimble.com/connect/v1/direct/tu-construct/users/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/users/1/data/users/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/users/1/data/users/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/users/1/data/users/cache/userId/{userId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-construct/users/1/data/users/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-construct/users/1/data/users/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-contractor-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/tu-maintain-contractor-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/contractor/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/cache/ContractorSid/{ContractorSid}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/contractor/1/data/contractors/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-equipment-cost-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 19 operations. Definition: [xchange-connector/tu-maintain-equipment-cost-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/equipment-cost/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/cache/EquipmentCostId/{EquipmentCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/cache/EquipmentCostId/{EquipmentCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/cache/EquipmentCostId/{EquipmentCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/ins-equipment-cost/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/sr-equipment-cost/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/equipment-cost/1/data/wo-equipment-cost/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-inspections-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/tu-maintain-inspections-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/inspections/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/cache/InspectionId/{InspectionId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/inspections/1/data/inspections/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-labor-cost-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 19 operations. Definition: [xchange-connector/tu-maintain-labor-cost-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/labor-cost/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/cache/LaborCostId/{LaborCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/cache/LaborCostId/{LaborCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/cache/LaborSid/{LaborSid}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/ins-labor-cost/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/sr-labor-cost/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/labor-cost/1/data/wo-labor-cost/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-material-cost-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/tu-maintain-material-cost-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/material-cost/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/cache/MaterialCostId/{MaterialCostId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/material-cost/1/data/material-cost/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-projects-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 8 operations. Definition: [xchange-connector/tu-maintain-projects-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/projects/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/cache/ProjectSid/{ProjectSid}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/actions/update` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/projects/1/data/projects/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-service-requests-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 14 operations. Definition: [xchange-connector/tu-maintain-service-requests-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/service-requests/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/problems/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/problems/cache/ProblemSid/{ProblemSid}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/problems/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/problems/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/cache/RequestId/{RequestId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/problems/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/actions/update` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/service-requests/1/data/service-request/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/tu-maintain-workorders-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 7 operations. Definition: [xchange-connector/tu-maintain-workorders-1](https://api.xchange.trimble.com/connect/v1/direct/tu-maintain/workorders/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/cache/WorkOrderSid/{WorkOrderSid}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/tu-maintain/workorders/1/data/work-orders/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/vista-ap-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 152 operations. Definition: [xchange-connector/vista-ap-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ap/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-ap-2.md](non-production--xchange-connector-vista-ap-2.md).
+
+## xchange-connector/vista-ar-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 77 operations. Definition: [xchange-connector/vista-ar-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ar/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-ar-2.md](non-production--xchange-connector-vista-ar-2.md).
+
+## xchange-connector/vista-dm-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 25 operations. Definition: [xchange-connector/vista-dm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/dm/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `variant` | covered by `vista:GET /direct/actions/{action_key_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/keyid/{KeyID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/keyid/{KeyID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/natural/{AttachmentID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/natural/{AttachmentID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/natural/{OnlyOneRow}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/natural/{OnlyOneRow}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/natural/{AttachmentTypeID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/natural/{AttachmentTypeID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/keyid/{KeyID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/keyid/{KeyID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/natural/{AttachmentID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/natural/{AttachmentID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/{ryvitId_value}` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/actions/cache_file` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/actions/cache_file` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_files/cache/search` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_options/cache/search` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachment_types/cache/search` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/actions/add` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/actions/add` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/dm/2/data/attachments/cache/search` |
+
+## xchange-connector/vista-em-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 218 operations. Definition: [xchange-connector/vista-em-2](https://api.xchange.trimble.com/connect/v1/direct/vista/em/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-em-2.md](non-production--xchange-connector-vista-em-2.md).
+
+## xchange-connector/vista-gl-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 74 operations. Definition: [xchange-connector/vista-gl-2](https://api.xchange.trimble.com/connect/v1/direct/vista/gl/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-gl-2.md](non-production--xchange-connector-vista-gl-2.md).
+
+## xchange-connector/vista-hq-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 156 operations. Definition: [xchange-connector/vista-hq-2](https://api.xchange.trimble.com/connect/v1/direct/vista/hq/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-hq-2.md](non-production--xchange-connector-vista-hq-2.md).
+
+## xchange-connector/vista-hr-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 99 operations. Definition: [xchange-connector/vista-hr-2](https://api.xchange.trimble.com/connect/v1/direct/vista/hr/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-hr-2.md](non-production--xchange-connector-vista-hr-2.md).
+
+## xchange-connector/vista-in-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 100 operations. Definition: [xchange-connector/vista-in-2](https://api.xchange.trimble.com/connect/v1/direct/vista/in/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-in-2.md](non-production--xchange-connector-vista-in-2.md).
+
+## xchange-connector/vista-jc-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 311 operations. Definition: [xchange-connector/vista-jc-2](https://api.xchange.trimble.com/connect/v1/direct/vista/jc/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-jc-2.md](non-production--xchange-connector-vista-jc-2.md).
+
+## xchange-connector/vista-ms-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 70 operations. Definition: [xchange-connector/vista-ms-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ms/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-ms-2.md](non-production--xchange-connector-vista-ms-2.md).
+
+## xchange-connector/vista-pm-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 159 operations. Definition: [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-pm-2.md](non-production--xchange-connector-vista-pm-2.md).
+
+## xchange-connector/vista-po-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 144 operations. Definition: [xchange-connector/vista-po-2](https://api.xchange.trimble.com/connect/v1/direct/vista/po/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-po-2.md](non-production--xchange-connector-vista-po-2.md).
+
+## xchange-connector/vista-pr-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 222 operations. Definition: [xchange-connector/vista-pr-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pr/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-pr-2.md](non-production--xchange-connector-vista-pr-2.md).
+
+## xchange-connector/vista-sl-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 70 operations. Definition: [xchange-connector/vista-sl-2](https://api.xchange.trimble.com/connect/v1/direct/vista/sl/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-sl-2.md](non-production--xchange-connector-vista-sl-2.md).
+
+## xchange-connector/vista-sm-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 117 operations. Definition: [xchange-connector/vista-sm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/sm/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-connector-vista-sm-2.md](non-production--xchange-connector-vista-sm-2.md).
+
+## xchange-connector/vista-ud-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 17 operations. Definition: [xchange-connector/vista-ud-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ud/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `variant` | covered by `vista:GET /direct/actions/{action_key_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/natural/{__TableName}/{KeyID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/natural/{__TableName}/{KeyID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/keyid/{KeyID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/keyid/{KeyID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/natural/{TableName}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/natural/{TableName}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/{ryvitId_value}` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/add` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/add` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/change` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/change` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/refresh_cache` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/refresh_many` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/refresh_many` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/remove` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/actions/remove` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_table_data/cache/search` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/ud/2/data/ud_tables/cache/search` |
 

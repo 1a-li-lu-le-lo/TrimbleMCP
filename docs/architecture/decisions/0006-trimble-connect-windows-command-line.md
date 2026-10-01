@@ -9,7 +9,7 @@
   - Tools:
     - `trimble_build_desktop_link`: scope `trimble:projects:read`.
     - `trimble_open_in_desktop`: new scope `trimble:desktop:launch`. It is listed only for the local operator principal (stdio or CLI), only when `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`, and only on a Windows host. It is a dry run by default, needs a `reason`, is rate-limited (6 per minute per caller, burst 2), and is audited.
-  - The URI is built only from a fixed prefix, a project ID matching `^[A-Za-z0-9_-]{1,64}$`, and enumerated view and panel values. Output is emitted in the documented spelling. Only the documented two-value form `show=[view],[panel]` is emitted: omitting both gives the documented default `3D,models`, and a single value is rejected.
+  - The URI is built only from a fixed prefix, a project ID matching `^[A-Za-z0-9_-]{1,64}$`, and enumerated view and panel values. Output is emitted in the documented spelling. Only the documented two-value form `show=[view],[panel]` is emitted: omitting both emits `3D,models`, a documented combination (the page names no default; see assumption A-9), and a single value is rejected.
   - The project ID is verified through `trimble-connect` `ListProjects` (up to 20 pages of 100) before a link is returned as verified. Launching refuses unverified projects, and a project that is absent from a complete listing is rejected as `project_not_found`.
   - On Windows the link is opened with `ShellExecuteW` ("open", NULL parameters and directory), after `CoInitializeEx(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)` as Microsoft recommends. Return code 31 is reported as "no handler registered". No command interpreter is used.
   - Rejected launch mechanisms:

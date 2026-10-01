@@ -56,7 +56,7 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `GET` | `/PCO/{databaseToken}/{PCOID}` | `reference` | Gets PCO info. | databaseToken* (path); pcoID* (path) |
+| `GET` | `/PCO/{databaseToken}/{PCOID}` | `reference` | Gets PCO info. | databaseToken* (path); PCOID* (path) |
 
 ## PCOs
 
