@@ -753,6 +753,13 @@ Source: the npm organisation `trimble-oss` (https://www.npmjs.com/org/trimble-os
 
 The `@trimble-oss/modus-mcp-server` readme installs and runs the unscoped name `modus-mcp-server` (`npm install -g modus-mcp-server`, `npx -y modus-mcp-server@latest`). npm shows that unscoped name as unpublished since 2025-07-14, so those commands do not fetch Trimble's scoped package.
 
+Other npm scopes checked on 2026-10-01: `trimble`, `trimble-construction` and `trimble-creative-strategy` (ownership inferred from the scope names and maintainer accounts).
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `cem` / `custom-elements-manifest` (package `@trimble-construction/custom-elements-manifest-analyzer` 0.0.3) | Another copy of the custom-elements-manifest analyzer fork above | Excluded: same as the `@trimble-oss` fork |
+| Executables of `@trimble-creative-strategy/contentful-migration-mxp` and `@trimble-creative-strategy/contentful-export-aws` | Trimble marketing-site tooling that migrates a Contentful space or exports it to AWS S3 with credentials | Excluded: website tooling with credentials, not a product interface |
+
 ## 22. Trimble Connect Object Manager (Quadri) `quadri.exe`, excluded
 
 Sources (verified 2026-10-01):
@@ -839,7 +846,67 @@ Every TruckMate program accepts these start-up parameters for automatic sign-in,
 | `\C:<schema>` (or `/C:`) | Database schema; must be used with `\I:` | Excluded: launches a desktop program |
 | `\I:<company ID>` (or `/I:`) | Company ID (an integer) for multi-company sign-in; must be used with `\C:` | Excluded: same |
 
-## 26. Checked, with no official command line
+## 26. Trimble Driver ROS (`trimble_driver_ros`), excluded
+
+Source: https://github.com/trimble-oss/trimble_driver_ros (README, verified 2026-10-01). The README says it is not an official Trimble product. It reads GSOF messages (https://receiverhelp.trimble.com/oem-gnss/index.html#gsof-messages-overview.html) from a Trimble GNSS receiver or INS over the network and publishes them in ROS 2.
+
+**Why it is excluded:** it runs a local program that connects to a field receiver over the network, and its live positions guide vehicles and robots, which is safety-relevant. The bridge runs no local programs, cannot reach field devices, and never feeds positioning to machines.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `ros2 launch trimble_driver gsof_client.py` | Starts the GSOF client node with its launch file | Excluded: local program; live positioning |
+| `ros2 run trimble_driver gsof_client_node --ros-args -p ip:=<address> -p port:=<port>` | Starts the node against a receiver's GSOF stream (example port 5017) | Excluded: same |
+| Parameters `ip`, `port`, `parent_frame`, `child_frame`, `publish_tf`, `publish_gsof_msgs`, `publish_ros_msgs`, `time_source` | Connection, frame and output settings | Excluded: same |
+| Services `get_origin`, `set_origin`, `reset_origin` | Read or change the tangent-plane origin of the published positions | Excluded: changes the positions that downstream vehicles or robots use |
+| `trimble_driver_pcap_test` | Build-time helper that replays captured packets | Excluded: developer tooling |
+
+## 27. Cityworks Public Access CLI installer (`PublicAccess.Installer.CLI.dll`), excluded
+
+Source: https://help.cityworks.com/InstallUpdate/PublicAccess/Install/7-0/Content/InstallUpdateCLI.htm (verified 2026-10-01; the 6.0 page documents the same installer). The installer is run with the .NET runtime from PowerShell or a command prompt, pointing at `PublicAccess.Installer.CLI.dll`.
+
+**Why it is excluded:** it installs a web application and changes IIS (a host change), it takes the Cityworks service password and payment-provider secrets on the command line (credentials), and it can switch live payment processing on. The bridge does none of these.
+
+| Option | What it does | Disposition |
+|---|---|---|
+| `-im, --installmode <Both|Files|IIS>` | Whether to run the IIS part of the install, the file part, or both. Possible values are IIS, Files, and Both. <Windows Only> [default: Both] | Excluded: part of the installer |
+| `-s, --site <site>` | Name of the website to install the application to in IIS. <Required for Windows if --mode is IIS or Both> | Excluded: part of the installer |
+| `-a, --alias <alias>` | Name of the application to install under the site in IIS. <Required for Windows if --mode is IIS or Both> | Excluded: part of the installer |
+| `-f, --folder <folder>` | Folder where site files will be installed. <Required for Windows if --mode is Files or Both. Required for Linux.> | Excluded: part of the installer |
+| `-sf, --sourcefolder <sourcefolder>` | Folder where site files will be installed from. Leave empty to install from the site files included with the installer. | Excluded: part of the installer |
+| `-fpi, --folderpermissionidentity <folderpermissionidentity>` | Windows identity to give site folder permissions. Defaults to the app pool identity. | Excluded: part of the installer |
+| `-surl, --serviceurl <serviceurl>` | Url for core Cityworks services. <Required for Windows if --mode is Files or Both. Required for Linux.>. e.g., https://MyServer/MyCityworksSite | Excluded: part of the installer |
+| `-suser, --serviceusername <serviceusername>` | User name for core Cityworks services. <Required for Windows if --mode is Files or Both. Required for Linux.> | Excluded: part of the installer |
+| `-spass, --servicepassword <servicepassword>` | User password for core Cityworks services. <Required for Windows if --mode is Files or Both. Required for Linux.> | Excluded: puts a credential on the command line |
+| `-t, --timeout <timeout>` | Timeout in minutes for the Public Access site. [default: 15] | Excluded: part of the installer |
+| `-ga, --guestaccess` | Allow users to login to the system as a guest. [default: False] | Excluded: part of the installer |
+| `cp, --credentialpass` | Allow user login credentials to be passed to site. [default: False] | Excluded: part of the installer |
+| `-afe, --allowedfileextensions <allowedfileextensions>` | List of file extension types users can upoad to the site. It must be a list of file extensions separated by the \| character. [default: gif\|jpg\|jpeg\|png\|tiff\|bmp\|pdf\|txt\|rtf\|csv\|doc\|docx\|xls\|xlsx\|ppt\|pptx] | Excluded: part of the installer |
+| `-gc, --gisconfig <gisconfig>` | Name of GIS Service configuration. [default: Public] | Excluded: part of the installer |
+| `-ug, --usegis` | Use GIS for location. [default: True] | Excluded: part of the installer |
+| `-rl, --requirelocation` | Require valid location from GIS. [default: False] | Excluded: part of the installer |
+| `-ma, --mapattachments` | Allow map drawing attachments. [default: False] | Excluded: part of the installer |
+| `-ur, --userecaptcha` | Use reCAPTCHA V3. [default: False] | Excluded: part of the installer |
+| `-rk, --recaptchakey <recaptchakey>` | reCAPTCHA Key. <Required if --userecaptcha is true> | Excluded: puts a credential on the command line |
+| `-rs, --recaptchasecret <recaptchasecret>` | reCAPTCHA Secret. <Required if --userecaptcha is true> | Excluded: puts a credential on the command line |
+| `-rm, --recaptchaminscore <recaptchaminscore>` | Minimum reCAPTCHA score. <Required if --userecaptcha is true> [default: 0.5] | Excluded: part of the installer |
+| `-pp, --paymentprovider` | Payment Provider. Possible values are None, Paypal, <AuthorizeNet\|None\|Paypal\|XpressBillPay> AuthorizeNet, and XpressBillPay. [default: None] | Excluded: part of the installer |
+| `-pm, --paymentmode <live|sandbox>` | Payment Mode. Possible values are sandbox and live. [default: sandbox] | Excluded: part of the installer |
+| `-op, --overpayments` | Allow payments over amount due. [default: False] | Excluded: part of the installer |
+| `-pl, --paymentlog` | Log info on calls to and from payment provider system. [default: True] | Excluded: part of the installer |
+| `-pc, --paypalclientid <paypalclientid>` | Paypal Client Id. <Required if --paymentprovider is Paypal> | Excluded: puts a credential on the command line |
+| `-pcc, --paypalcurrency <paypalcurrency>` | Paypal Currency Code. <Required if --paymentprovider is Paypal> [default: USD] | Excluded: part of the installer |
+| `-ps, --paypalsecret <paypalsecret>` | Paypal Client Secret. <Required if --paymentprovider is Paypal> | Excluded: puts a credential on the command line |
+| `-al, --authnetlogin <authnetlogin>` | Authorize.Net Api Login. <Required if --paymentprovider is AuthorizeNet> | Excluded: puts a credential on the command line |
+| `-at, --authnettrans <authnettrans>` | Authorize.Net Transaction Key. <Required if --paymentprovider is AuthorizeNet> | Excluded: puts a credential on the command line |
+| `-w, --webhooks` | Use Authorize.Net webhooks. [default: False] | Excluded: part of the installer |
+| `-as, --authnetsig <authnetsig>` | Authorize.Net Signature Key. <Required if --paymentprovider is AuthorizeNet and --webhooks is true> | Excluded: puts a credential on the command line |
+| `-xi, --xbpappid <xbpappid>` | XpressBillPay Application Id. <Required if --paymentprovider is XpressBillPay> | Excluded: puts a credential on the command line |
+| `-xk, --xbpappkey <xbpappkey>` | XpressBillPay Application Key. <Required if --paymentprovider is XpressBillPay> | Excluded: puts a credential on the command line |
+| `-xip, --xbpitemized` | Send Itemized Payments. [default: False] | Excluded: part of the installer |
+| `-xsi, --xbpitemid <xbpitemid>` | XpressBillPay Single Item Id. <Required if --paymentprovider is XpressBillPay and --xbpitemized is false> | Excluded: part of the installer |
+| `-?, -h, --help` | Show help and usage information | Excluded: part of the installer |
+
+## 28. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
 - **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.
