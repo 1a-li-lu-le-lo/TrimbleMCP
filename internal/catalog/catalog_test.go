@@ -296,7 +296,7 @@ func TestKeyShape(t *testing.T) {
 
 func TestIsCredentialName(t *testing.T) {
 	for _, n := range []string{"password", "LoginPassword", "TinaPassword", "ntripPassword", "client_secret", "X-Api-Key",
-		"apiKey", "access_token", "token", "GisToken", "mfaToken", "pwd", "Authorization", "privateKey"} {
+		"apiKey", "access_token", "token", "GisToken", "mfaToken", "pwd", "Authorization", "privateKey", "UserPwd", "LoginPwd"} {
 		if !IsCredentialName(n) {
 			t.Errorf("%s should be a credential name", n)
 		}

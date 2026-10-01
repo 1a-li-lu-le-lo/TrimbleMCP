@@ -24,7 +24,7 @@
     - a failed download;
     - a rule that matches nothing;
     - a path-item key that is neither an operation nor a documented field;
-    - webhooks or callbacks.
+    - webhooks or callbacks in a Trimble Connect definition (other products' OpenAPI 3.1 webhooks are catalogued as `excluded`: the provider calls the customer).
   - **New disposition `reference`.** Every operation of another product's API is catalogued, with that API's authentication, access model and "what calling it would need". Such operations are:
     - searchable with `trimble_api_operations` (filter with `family`);
     - validated by `trimble_api_plan` into a dry-run request that lists the documented servers verbatim and does not choose one. The plan takes no `product`, because the key names the API;
@@ -46,8 +46,8 @@
     - a placeholder example served from a personal site.
   - **Trimble Connect `/regions` services with no definition** are listed with a note. The generator fails on a new service it does not know.
   - **Products with no machine-readable definition** are classified in the capability matrix: SDKs, desktop APIs, prose-only, WCF help-only and Postman-only APIs.
-  - **Command-line tools and local launchers** are accounted for in `docs/trimble-products/cli-coverage.md`, command by command: Trimble Connect for Windows and its installer, App Xchange `xchange`, `teklaenv`, Tekla Structures start-up switches and Tekla installers, servers and packaging, SketchUp start-up and installer switches, Tedds `TeddsCalcCommand.exe`, eCognition, PC*MILER BatchPro, Trimble Business Center deployment, Convert to RINEX, the Vista client installer, the CoPilot and Mobile Manager URL launchers, and Trimble-published npm executables. Only the Trimble Connect for Windows link is supported (ADR-0006); the others are excluded because running local programs, changing a host or handling credentials is outside the bridge's scope.
-  - The catalogue is embedded gzip-compressed (`internal/catalog/catalog.json.gz`, about 340 KB). Large multi-definition APIs get one generated page per definition.
+  - **Command-line tools and local launchers** are accounted for in `docs/trimble-products/cli-coverage.md`, command by command (see that page for the full list of tools). Only the Trimble Connect for Windows link is supported (ADR-0006); the others are excluded because running local programs, changing a host or handling credentials is outside the bridge's scope.
+  - The catalogue is embedded gzip-compressed (`internal/catalog/catalog.json.gz`, about 600 KB). Large multi-definition APIs get one generated page per definition.
 - **Why not execute reference operations now:** executing them would need, for every product:
   - a credential model and a tenant binding;
   - a verified host per customer;

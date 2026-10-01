@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
+	"io"
 	"net/url"
 	"regexp"
 	"slices"
@@ -655,10 +657,14 @@ func refuseCredentials(in apiArgs) error {
 			return deny("parameter", k)
 		}
 	}
-	var found string
-	var walk func(v any, depth int)
-	walk = func(v any, depth int) {
-		if found != "" || depth > 16 {
+	var found, unparsed string
+	var walk func(v any, depth int, top bool)
+	walk = func(v any, depth int, top bool) {
+		if found != "" || unparsed != "" {
+			return
+		}
+		if depth > 16 {
+			unparsed = "the body is nested too deeply to inspect"
 			return
 		}
 		switch t := v.(type) {
@@ -668,44 +674,84 @@ func refuseCredentials(in apiArgs) error {
 					found = k
 					return
 				}
-				walk(x, depth+1)
+				walk(x, depth+1, false)
 			}
 		case []any:
 			for _, x := range t {
-				walk(x, depth+1)
+				walk(x, depth+1, false)
 			}
 		case string:
 			s := strings.TrimSpace(t)
 			var inner any
-			if (strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[")) && json.Unmarshal([]byte(s), &inner) == nil {
-				walk(inner, depth+1)
-				return
-			}
-			if strings.Contains(s, "=") {
-				if form, err := url.ParseQuery(s); err == nil {
-					for k, vals := range form {
-						if catalog.IsCredentialName(k) {
-							found = k
-							return
-						}
-						for _, x := range vals {
-							walk(x, depth+1)
-						}
+			switch {
+			case (strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[")) && json.Unmarshal([]byte(s), &inner) == nil:
+				walk(inner, depth+1, false)
+			case strings.HasPrefix(s, "<"):
+				if k, ok := xmlCredential(s); !ok {
+					unparsed = "an XML body that does not parse"
+				} else if k != "" {
+					found = k
+				}
+			case formBody.MatchString(s):
+				for _, pair := range strings.FieldsFunc(s, func(r rune) bool { return r == '&' || r == ';' }) {
+					k, val, _ := strings.Cut(pair, "=")
+					if k, _ = url.QueryUnescape(k); catalog.IsCredentialName(k) {
+						found = k
+						return
+					}
+					if val, err := url.QueryUnescape(val); err == nil {
+						walk(val, depth+1, false)
 					}
 				}
+			case top && s != "":
+				// A top-level string body that is neither JSON, XML nor
+				// form data (multipart, binary, free text) cannot be
+				// inspected, so it is refused (fail closed).
+				unparsed = "a string body that is not JSON, XML or form data"
 			}
 		}
 	}
 	if len(in.Body) > 0 {
 		var body any
 		if json.Unmarshal(in.Body, &body) == nil {
-			walk(body, 0)
+			walk(body, 0, true)
 		}
+	}
+	if unparsed != "" {
+		return errs.Newf(errs.PolicyDenied, "plans accept only bodies that can be checked for credentials; %s", unparsed)
 	}
 	if found != "" {
 		return deny("body field", found)
 	}
 	return nil
+}
+
+// formBody matches form-encoded data (name=value pairs joined by & or ;).
+var formBody = regexp.MustCompile(`^[^=&;\s]+=[^&;]*([&;][^=&;\s]+=[^&;]*)*$`)
+
+// xmlCredential returns the first XML element or attribute name in s that
+// is a credential; ok is false if s is not well-formed XML.
+func xmlCredential(s string) (name string, ok bool) {
+	d := xml.NewDecoder(strings.NewReader(s))
+	for {
+		tok, err := d.Token()
+		if err == io.EOF {
+			return "", true
+		}
+		if err != nil {
+			return "", false
+		}
+		if se, isStart := tok.(xml.StartElement); isStart {
+			if catalog.IsCredentialName(se.Name.Local) {
+				return se.Name.Local, true
+			}
+			for _, a := range se.Attr {
+				if catalog.IsCredentialName(a.Name.Local) {
+					return a.Name.Local, true
+				}
+			}
+		}
+	}
 }
 
 // vehicleAPIs are APIs outside the transportation and agriculture families

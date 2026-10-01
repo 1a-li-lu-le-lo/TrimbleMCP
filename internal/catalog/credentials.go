@@ -32,7 +32,7 @@ func IsCredentialName(name string) bool {
 	if n == "" || notCredentials[n] {
 		return false
 	}
-	if n == "pwd" || n == "authorization" || strings.HasSuffix(n, "token") {
+	if n == "authorization" || strings.HasSuffix(n, "token") || strings.HasSuffix(n, "pwd") {
 		return true
 	}
 	for _, p := range credentialParts {

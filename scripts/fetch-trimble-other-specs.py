@@ -266,7 +266,7 @@ def vista(index_url, errors):
     return merged
 
 
-DIRECT_UI = re.compile(r"""https://api\.xchange\.trimble\.com/connect/v1/direct/[^"'\s<>?#]+?/swagger/index\.html""")
+DIRECT_UI = re.compile(r"""https://api\.xchange\.trimble\.com/connect/v1/(?:direct|appnetwork)/[^"'\s<>?#]+?/swagger/index\.html""")
 
 
 def app_xchange(cfg, errors):
@@ -292,6 +292,15 @@ def app_xchange(cfg, errors):
     for c in cfg["connectors"]:
         for u in c["definitions"]:
             found.setdefault(u, set()).add(c["page"])
+    # Trimble's connector directory (appxchange.trimble.com) lists every
+    # connector's Direct API and App Network definitions; it is read
+    # directly and merged with the manifest's list.
+    try:
+        body = html.unescape(get(cfg["directory"]).decode("utf-8", "replace"))
+        for ui in sorted(set(DIRECT_UI.findall(body))):
+            found.setdefault(ui[: -len("index.html")] + "openapi.json", set()).add(cfg["directory"])
+    except Exception as e:
+        errors.append({"id": "app-xchange-directory", "spec_url": cfg["directory"], "doc_urls": [], "kind": "page", "error": str(e)})
     print(f"app xchange: {len(listed)} connector pages, {len(found)} definitions", file=sys.stderr)
     return found
 
@@ -391,7 +400,8 @@ def main():
     maps = man["maps"]
     fetch_defs(crawl_site(maps["base"], maps["seeds"], errors), lambda u, d: maps_id(u), "maps")
     fetch_defs(app_xchange(man["app_xchange"], errors),
-               lambda u, d: "xchange-connector/" + slug(u.split("/direct/", 1)[1].replace("/swagger/openapi.json", "")), "app-xchange")
+               lambda u, d: ("xchange-connector/" + slug(u.split("/direct/", 1)[1]) if "/direct/" in u else
+                             "xchange-appnetwork/" + slug(u.split("/appnetwork/", 1)[1])).removesuffix("-swagger-openapi-json"), "app-xchange")
 
     for c in man["confluence"]:
         linked, inline = confluence(c, errors)

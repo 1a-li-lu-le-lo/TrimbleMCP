@@ -731,6 +731,141 @@ legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively d
 | `POST` | `/api/v2/{enterpriseId}/ap/unapprovedinvoice` | `excluded` | the definition's reason (above) |
 | `POST` | `/api/v2/{enterpriseId}/blobstorage/uploadlink` | `excluded` | the definition's reason (above) |
 
+## xchange-appnetwork/autodesk-cc-relationships-1 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. 18 operations. Definition: [xchange-appnetwork/autodesk-cc-relationships-1](https://api.xchange.trimble.com/connect/v1/appnetwork/autodesk-cc/relationships/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/actions/queued` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/upsert` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/sync` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/autodesk-cc/relationships/1/data/relationships/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+
+## xchange-appnetwork/trimble-connect-file-1 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. 21 operations. Definition: [xchange-appnetwork/trimble-connect-file-1](https://api.xchange.trimble.com/connect/v1/appnetwork/trimble-connect/file/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/actions/queued` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/complete-upload` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/fileupload` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/list-items` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/actions/upload-status` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/upsert` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/sync` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/file/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+
+## xchange-appnetwork/trimble-connect-folder-1 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. 19 operations. Definition: [xchange-appnetwork/trimble-connect-folder-1](https://api.xchange.trimble.com/connect/v1/appnetwork/trimble-connect/folder/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/actions/queued` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/upsert` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/sync` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/folder/1/data/folders/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+
+## xchange-appnetwork/trimble-connect-project-1 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. 19 operations. Definition: [xchange-appnetwork/trimble-connect-project-1](https://api.xchange.trimble.com/connect/v1/appnetwork/trimble-connect/project/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/actions/queued` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/upsert` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/id/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/sync` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/trimble-connect/project/1/data/projects/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+
+## xchange-appnetwork/vista-cm-2 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. Operations also in the public Vista Direct API are variants of it. 17 operations. Definition: [xchange-appnetwork/vista-cm-2](https://api.xchange.trimble.com/connect/v1/appnetwork/vista/cm/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/keyid/{KeyID}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/actions/queued` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/keyid/{KeyID}` | `excluded` | the definition's reason (above) |
+| `GET` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/upsert` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/keyid/{KeyID}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/sync` | `excluded` | the definition's reason (above) |
+| `PUT` | `/appnetwork/subscribers/{subscriber_code}/vista/cm/2/data/accounts_lite/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+
+## xchange-appnetwork/vista-va-2 (excluded)
+
+App Xchange App Network system-interface definition listed in Trimble's connector directory; like the connector definitions, used by the platform rather than by end users. Operations also in the public Vista Direct API are variants of it. 70 operations. Definition: [xchange-appnetwork/vista-va-2](https://api.xchange.trimble.com/connect/v1/appnetwork/vista/va/2/swagger/openapi.json).
+
+Operations: [non-production--xchange-appnetwork-vista-va-2.md](non-production--xchange-appnetwork-vista-va-2.md).
+
 ## xchange-connector/autodesk-cc-account-admin-1 (excluded)
 
 App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 11 operations. Definition: [xchange-connector/autodesk-cc-account-admin-1](https://api.xchange.trimble.com/connect/v1/direct/autodesk-cc/account-admin/1/swagger/openapi.json).
@@ -2071,6 +2206,21 @@ Operations: [non-production--xchange-connector-vista-jc-2.md](non-production--xc
 App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 70 operations. Definition: [xchange-connector/vista-ms-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ms/2/swagger/openapi.json).
 
 Operations: [non-production--xchange-connector-vista-ms-2.md](non-production--xchange-connector-vista-ms-2.md).
+
+## xchange-connector/vista-pc-2 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 8 operations. Definition: [xchange-connector/vista-pc-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pc/2/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `variant` | covered by `vista:GET /direct/actions/{action_key_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/__ryvitId/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/__ryvitId/{ryvitId_value}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/keyid/{KeyID}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/keyid/{KeyID}` |
+| `GET` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/{ryvitId_value}` | `variant` | covered by `vista:GET /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/{ryvitId_value}` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/actions/add` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/actions/add` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/actions/change` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/actions/change` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pc/2/data/potential_projects/cache/search` |
 
 ## xchange-connector/vista-pm-2 (excluded)
 
