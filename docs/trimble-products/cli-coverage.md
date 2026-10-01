@@ -181,6 +181,8 @@ These switches are passed to `SketchUp.exe`, or to the macOS binary `SketchUp.ap
 | `Sketchup.exe > myRubyLog.txt` | Sends Ruby console output (`puts`) to standard output, here redirected to a file (SketchUp 7 release notes) | Excluded: local process and file |
 | `rubocop --format json --out results.json` | `rubocop-sketchup` (installed with `gem install rubocop` and `gem install rubocop-sketchup`, configured in `.rubocop.yml`) analyses a SketchUp extension's source and writes JSON results | Excluded: developer tooling; reads a source tree and writes files |
 | `rubocop -f extension_review -o report.html` | The Extension Review formatter; writes an HTML report | Excluded: same |
+| `LayOut -lang <locale>` | Starts LayOut in the given language. Known only from the SketchUp 2024.0 release notes (https://help.sketchup.com/en/release-notes/sketchup-desktop-20240, verified 2026-10-01: "launching LayOut from the command line using the -lang option"); the value format is not documented | Excluded: launches a desktop application; the syntax is never guessed |
+| `LayOutExporter` | A LayOut C API SDK sample "command line tool that exports .layout documents to .pdf, .png, or .jpg" (https://extensions.sketchup.com/developers/layout_c_api/layout/index.html, verified 2026-10-01); no switches are documented | Excluded: SDK sample that reads and writes local files |
 
 ## 11. Tekla Tedds `TeddsCalcCommand.exe` and `TedToPdf.exe`, excluded
 

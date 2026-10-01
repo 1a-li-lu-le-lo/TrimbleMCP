@@ -28,8 +28,8 @@ Find any of them with `trimble_api_operations` (filter with `family`, or call it
 
 | Family | Products (catalogue API ids) |
 |---|---|
-| connect | Trimble Connect Core Account endpoints documented in prose (`connect-ecom`, `connect-projects-api`) |
-| construction | Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct / e-Builder (`unity-construct`), Unity Maintain / Permit / Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`) |
+| connect | Trimble Connect Core Account endpoints documented in prose (`connect-ecom`, `connect-projects-api`), Trimble Connect Status Sharing (`trimble-connect-status-sharing`) |
+| construction | Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct / e-Builder (`unity-construct`), Unity Maintain / Permit / Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`) |
 | geospatial | Field Configuration (`geospatial-field-configuration`), Field Data / Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`, and WebSocket streams `mobile-manager-ws-v1`, `mobile-manager-ws-v2`) |
 | transportation | TMT Fleet Maintenance (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`: carriers, shippers, visibility, telematics, eCMR, transport operations, rate management, freight audit, freight procurement, yard appointments) |
 | maps | Trimble Maps (`trimble-maps-*`: places, account manager, fleet, dwell time, single search, multi-vehicle routing, routing profile, geofence notifications, road speeds, RouteReporter) and PC*MILER Route Reports (`pcmiler-route-reports`) |

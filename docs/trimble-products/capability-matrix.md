@@ -8,12 +8,12 @@ Last verified: 2026-09-23 (Trimble Connect and Identity); 2026-09-29 (every othe
 
 ## Coverage at a glance
 
-The bridge accounts for every Trimble API operation that has a public machine-readable definition: **13,562 operations in 369 definitions**. Each has exactly one disposition; the per-operation lists are in [endpoints/README.md](endpoints/README.md), and ADR-0007 and ADR-0008 explain the approach.
+The bridge accounts for every Trimble API operation that has a public machine-readable definition: **13,577 operations in 370 definitions**. Each has exactly one disposition; the per-operation lists are in [endpoints/README.md](endpoints/README.md), and ADR-0007 and ADR-0008 explain the approach.
 
 | Scope | How it is covered | Disposition |
 |---|---|---|
 | Trimble Connect: 11 production APIs and every staging, integration, QA, test, draft and internal copy (34 SwaggerHub definitions) | Executable reads against the documented regional hosts; changes as dry-run plans | `read`, `plan`, `variant`, `excluded` |
-| Other Trimble products and services with a public definition, including Transporeon and Trimble Connect's prose-documented Core Account endpoints (55 APIs, 229 definitions) | Searchable and plannable as a dry run; never called, because the bridge has no credentials or host for them | `reference`; `variant` for duplicate publications; `excluded` for 90 safety and credential operations and 4 webhooks |
+| Other Trimble products and services with a public definition, including Transporeon and Trimble Connect's prose-documented Core Account endpoints (56 APIs, 230 definitions) | Searchable and plannable as a dry run; never called, because the bridge has no credentials or host for them | `reference`; `variant` for duplicate publications; `excluded` for 90 safety and credential operations and 4 webhooks |
 | App Xchange connector and App Network definitions (89, from the 18 help.trimble.com connector pages and Trimble's connector directory; two unavailable) | Catalogued; Trimble states they are used internally by the platform | `excluded`, or `variant` of the public Vista Direct API |
 | Trimble Identity | Every endpoint in the OpenID Connect discovery document | `excluded` (used only by the bridge's own sign-in) |
 | Undocumented, deprecated, credential-only and placeholder definitions, and push contracts the customer implements | Catalogued, never used | `excluded` |
@@ -143,7 +143,7 @@ Discovery is mechanical and repeatable (`make catalog`, `scripts/fetch-trimble-o
 
 - every page of every developer.trimble.com product section (24 sections) and every page of developer.trimblemaps.com, scanned for embedded OpenAPI viewers and for OpenAPI, Swagger and AsyncAPI definition links;
 - the App Xchange connector pages on help.trimble.com and Trimble's connector directory at appxchange.trimble.com;
-- directly listed definitions found by the audits, such as Trimble Connect Status Sharing (Tekla Developer Center), TruckMate Imaging and Viewpoint For Projects;
+- definitions on brand-owned API hosts outside the developer portals, listed directly after the audits found them: Trimble Connect Status Sharing (Tekla Developer Center), TruckMate Imaging, Viewpoint For Projects and MEPcontent;
 - the Transporeon developer documentation space;
 - directly published product definitions, Vista's per-operation definitions and the Trimble Identity discovery document;
 - endpoints that are documented only in prose, built into definitions from their pages. The fetch fails if a path disappears from its page.
@@ -171,6 +171,7 @@ Every result must match a reviewed rule in `cmd/trimble-catalog/sources-other.js
 | Transporeon (a Trimble company) | transportation | `transporeon-carriers`, `transporeon-shippers`, `transporeon-shippers-v2`, `transporeon-visibility`, `transporeon-visibility-external-status`, `transporeon-open-visibility`, `transporeon-telematics`, `transporeon-ecmr`, `transporeon-transport-operations`, `transporeon-transport-operations-legacy`, `transporeon-rate-management`, `transporeon-freight-audit`, `transporeon-freight-procurement`, `transporeon-yard-appointments` | HTTP basic, OAuth 2.0, bearer or API key, per API | Transporeon credentials per API; visibility and telematics APIs carry driver locations (personal data) |
 | Trimble Maps | maps | `trimble-maps-places`, `trimble-maps-account-manager`, `trimble-maps-fleet`, `trimble-maps-dwell-time`, `trimble-maps-single-search`, `trimble-maps-multi-vehicle-routing`, `trimble-maps-routing-profile`, `trimble-maps-geofence-notifications`, `trimble-maps-road-speeds`, `trimble-maps-routereporter` | Trimble Maps API key, or tokens from each API's authenticate operation (excluded) | A Trimble Maps API key with the product enabled. Fleet and Routing Profile changes to in-cab CoPilot navigation are **safety-excluded** |
 | PC*MILER Web Services (Route Reports) | maps | `pcmiler-route-reports` | API key | A PC*MILER Web Services key. The rest of PC*MILER Web Services publishes only a WCF help page (below) |
+| MEPcontent (Trimble MEP content platform) | construction | `mepcontent` | API key (`ApiKey` query parameter) | An MEPcontent API key issued to manufacturers and partners |
 | PTx Trimble FarmENGAGE Data API | agriculture | `ptx-farmengage` | Not declared; see the developer guide | PTx Trimble API credentials. Sending prescriptions, work orders or resource files to in-cab devices is **safety-excluded** |
 
 Plans for transportation and agriculture operations, and for the Trimble Maps fleet, routing-profile, RouteReporter, Dwell Time and multi-vehicle routing APIs, carry a warning that a qualified person must review and perform them. Every operation that signs in, issues or shares a token, or carries a credential (a credential-named body field or a required credential parameter, found by the generator in each definition) is excluded, and plans refuse any credential-named field, including inside string and form-encoded bodies.
@@ -214,7 +215,7 @@ These products were checked on 2026-09-29 and 2026-10-01. None publishes an Open
 | Trimble Access (Survey Core plug-in API) | Native SDK | D | Not applicable |
 | Precision, Catalyst, Trimble Precision SDK | Native SDKs | D | Not applicable |
 | Trimble eCognition | Command-line engines (see [cli-coverage.md](cli-coverage.md)) and an SDK automation API documented in the SDK, with no OpenAPI definition | D | Not applicable |
-| SketchUp | Ruby API and C SDK; no REST API. Start-up switches are in [cli-coverage.md](cli-coverage.md) | D | Not applicable |
+| SketchUp and LayOut | Ruby API, C SDK and LayOut C API; no REST API. Start-up switches, LayOut `-lang` and LayOutExporter are in [cli-coverage.md](cli-coverage.md) | D | Not applicable |
 | Tekla Structures, Structural Designer, Tedds | .NET/COM "Open API" SDKs (the name does not mean the OpenAPI format); command lines in [cli-coverage.md](cli-coverage.md) | D | Not applicable |
 | Tekla PowerFab Open API (also used by PowerFab Go) | XML request/response commands over HTTP POST, or through the PowerFab Remote Service on the customer's own server, defined by published XSD schemas (v0108 at api.teklapowerfab.net); `Connect`/`ConnectRemote` carry credentials | C | Not catalogued: an XML/XSD command API on a per-installation host, not an OpenAPI definition |
 | Tekla Environment Service | The `teklaenv` CLI's API (`https://cloud.api.trimble.com/tekla/environments/v1`); no published definition | C | Not catalogued; the CLI is in [cli-coverage.md](cli-coverage.md) |

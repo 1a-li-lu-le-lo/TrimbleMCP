@@ -16,11 +16,11 @@ Trimble Connect has 11 production APIs:
 - Drive (beta)
 - File Service (preview)
 
-Its Core Account endpoints, documented in prose only, are reference APIs (`connect-ecom`, `connect-projects-api`).
+Its Core Account endpoints, documented in prose only, are reference APIs (`connect-ecom`, `connect-projects-api`), and so is the Trimble Connect Status Sharing API (`trimble-connect-status-sharing`, workflow status on regional tcstatus.tekla.com hosts).
 
 The other products (`reference`), by family:
 
-- **construction:** Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct (`unity-construct`), Unity Maintain/Permit, also known as Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`)
+- **construction:** Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct (`unity-construct`), Unity Maintain/Permit, also known as Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`)
 - **geospatial:** Field Configuration (`geospatial-field-configuration`), Field Data/Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`; WebSocket streams as `SUBSCRIBE` operations in `mobile-manager-ws-v1` and `mobile-manager-ws-v2`)
 - **transportation:** TMT (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`)
 - **maps:** Trimble Maps (`trimble-maps-*`) and PC*MILER Route Reports (`pcmiler-route-reports`)

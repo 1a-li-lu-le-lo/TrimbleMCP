@@ -687,22 +687,34 @@ func refuseCredentials(in apiArgs) error {
 			case (strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[")) && json.Unmarshal([]byte(s), &inner) == nil:
 				walk(inner, depth+1, false)
 			case strings.HasPrefix(s, "<"):
-				if k, ok := xmlCredential(s); !ok {
+				k, texts, ok := xmlCredential(s)
+				switch {
+				case !ok:
 					unparsed = "an XML body that does not parse"
-				} else if k != "" {
+				case k != "":
 					found = k
+				default:
+					for _, t := range texts { // text and CDATA may carry JSON or form data
+						walk(t, depth+1, false)
+					}
 				}
 			case formBody.MatchString(s):
 				for _, pair := range strings.FieldsFunc(s, func(r rune) bool { return r == '&' || r == ';' }) {
-					k, val, _ := strings.Cut(pair, "=")
-					if k, _ = url.QueryUnescape(k); catalog.IsCredentialName(k) {
-						found = k
+					raw, val, _ := strings.Cut(pair, "=")
+					k, err := url.QueryUnescape(raw)
+					if catalog.IsCredentialName(raw) || err == nil && catalog.IsCredentialName(k) {
+						found = raw
 						return
 					}
-					if val, err := url.QueryUnescape(val); err == nil {
-						walk(val, depth+1, false)
+					v, err2 := url.QueryUnescape(val)
+					if err != nil || err2 != nil {
+						unparsed = "form data that does not decode"
+						return
 					}
+					walk(v, depth+1, false)
 				}
+			case strings.Contains(strings.ToLower(s), "content-disposition"):
+				unparsed = "an embedded multipart body"
 			case top && s != "":
 				// A top-level string body that is neither JSON, XML nor
 				// form data (multipart, binary, free text) cannot be
@@ -730,25 +742,32 @@ func refuseCredentials(in apiArgs) error {
 var formBody = regexp.MustCompile(`^[^=&;\s]+=[^&;]*([&;][^=&;\s]+=[^&;]*)*$`)
 
 // xmlCredential returns the first XML element or attribute name in s that
-// is a credential; ok is false if s is not well-formed XML.
-func xmlCredential(s string) (name string, ok bool) {
+// is a credential, and the text nodes (including CDATA) for further
+// inspection; ok is false if s is not well-formed XML.
+func xmlCredential(s string) (name string, texts []string, ok bool) {
 	d := xml.NewDecoder(strings.NewReader(s))
 	for {
 		tok, err := d.Token()
 		if err == io.EOF {
-			return "", true
+			return "", texts, true
 		}
 		if err != nil {
-			return "", false
+			return "", nil, false
 		}
-		if se, isStart := tok.(xml.StartElement); isStart {
-			if catalog.IsCredentialName(se.Name.Local) {
-				return se.Name.Local, true
+		switch t := tok.(type) {
+		case xml.StartElement:
+			if catalog.IsCredentialName(t.Name.Local) {
+				return t.Name.Local, nil, true
 			}
-			for _, a := range se.Attr {
+			for _, a := range t.Attr {
 				if catalog.IsCredentialName(a.Name.Local) {
-					return a.Name.Local, true
+					return a.Name.Local, nil, true
 				}
+				texts = append(texts, a.Value)
+			}
+		case xml.CharData:
+			if v := strings.TrimSpace(string(t)); v != "" {
+				texts = append(texts, v)
 			}
 		}
 	}

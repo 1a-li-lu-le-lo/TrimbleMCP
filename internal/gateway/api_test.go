@@ -300,6 +300,9 @@ func TestPlansNeverCarryCredentials(t *testing.T) {
 		"maps credential op":    `{"key":"trimble-maps-fleet:POST /accounts/authenticate","reason":"x"}`,
 		"fleet routing to cabs": `{"key":"trimble-maps-routing-profile:DELETE /routing/v1/routingprofiles/{routingProfileId}","path_params":{"routingProfileId":"r1"},"reason":"x"}`,
 		"resource file to cab":  `{"key":"ptx-farmengage:PATCH /resources/{orgId}/resourcefiles/{id}/send","path_params":{"orgId":"o","id":"i"},"body":[{"deviceId":"d"}],"reason":"x"}`,
+		"bad escape form key":   `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":"password%zz=p&a=1","reason":"x"}`,
+		"xml cdata json":        `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":"<a><![CDATA[{\"password\":\"p\"}]]></a>","reason":"x"}`,
+		"nested multipart":      `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":{"x":"--b\r\nContent-Disposition: form-data; name=\"password\""},"reason":"x"}`,
 		"prescription import":   `{"key":"ptx-farmengage:POST /prescriptions/{orgId}/rx/importjob","path_params":{"orgId":"o"},"body":{"fileName":"a","rateColumn":"r","rateUnit":"u"},"reason":"x"}`,
 	} {
 		env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, args)

@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 13562 operations in 369 definitions; 254 read, 223 plan, 6187 reference, 3084 variant, 3814 excluded.
+**Totals:** 13577 operations in 370 definitions; 254 read, 223 plan, 6202 reference, 3084 variant, 3814 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -67,6 +67,7 @@ These operations are catalogued from the products' own published definitions so 
 | `accubid-project` | Accubid Anywhere: Anywhere Project Service | [accubid-anywhere/project](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v1.yaml) | 8 | Trimble Identity bearer token in the Authorization header | [accubid-project.md](accubid-project.md) |
 | `accubid-project-v2` | Accubid Anywhere: Anywhere Project Service | [accubid-anywhere/project-v2](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v2.yaml) | 1 | Trimble Identity bearer token in the Authorization header | [accubid-project-v2.md](accubid-project-v2.md) |
 | `civil-site-management` | Trimble Civil Site Management | [civil-site-management/v1](https://developer.trimble.com/docs/civil-site-management/openapi/v1.yaml) | 19 | not declared in the definition (401 responses are defined); Trimble Identity per the product docs | [civil-site-management.md](civil-site-management.md) |
+| `mepcontent` | MEPcontent API (Trimble MEP content platform) | [mepcontent](https://api.mepcontent.com/swagger/docs/v1) | 15 | API key in the ApiKey query parameter | [mepcontent.md](mepcontent.md) |
 | `projectsight` | ProjectSight | [projectsight/v1](https://raw.githubusercontent.com/trimble-construction/projectsight-api-samples/main/ProjectSight-v1.json) | 537 | OAuth 2.0 via Trimble Identity (authorization code or client credentials) | [projectsight.md](projectsight.md) |
 | `unity-construct` | Trimble Unity Construct (e-Builder) | 2 | 189 | OAuth 2.0 password grant via /api/v2/Authenticate | [unity-construct.md](unity-construct.md) |
 | `unity-maintain-permit` | Trimble Unity Maintain / Permit (Cityworks) | 150 | 1223 | HTTP bearer | [unity-maintain-permit.md](unity-maintain-permit.md) |
@@ -152,6 +153,7 @@ These operations are catalogued from the products' own published definitions so 
 | [issue-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue-stage/v1) | Issue Management Service API | swaggerhub | variant |  | 29 | variant of issue@v1; staging copy |
 | [issue@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue/v1) | Issue Management Service API | swaggerhub | production | issues | 29 |  |
 | [kuebix](https://api-docs.kuebix.com/) | Kuebix REST API Reference Documentation | direct | excluded |  | 26 | discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com |
+| [mepcontent](https://api.mepcontent.com/swagger/docs/v1) | CPWebApi | direct | reference | mepcontent | 15 |  |
 | [mobile-manager/asyncapi-websocket-v1](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v1.json) | WebSocket V1 Server | portal | reference | mobile-manager-ws-v1 | 1 |  |
 | [mobile-manager/asyncapi-websocket-v2](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v2.json) | WebSocket V2 Server | portal | reference | mobile-manager-ws-v2 | 3 |  |
 | [mobile-manager/v1](https://developer.trimble.com/docs/mobile-manager/openapi/v1.json) | TMM REST API | portal | reference | mobile-manager | 11 |  |
