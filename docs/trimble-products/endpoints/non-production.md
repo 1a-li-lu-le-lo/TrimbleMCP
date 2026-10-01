@@ -672,6 +672,45 @@ credential endpoints (authenticate, refresh, whoami for Appian access tokens); a
 | `POST` | `/Identity/v1/refresh` | `excluded` | the definition's reason (above) |
 | `POST` | `/Identity/v1/whoami` | `excluded` | the definition's reason (above) |
 
+## truckmate-agent-swaggerhub (excluded)
+
+undocumented: an unpublished 2018 SwaggerHub draft in an organisation named TruckMate-REST-API, with a localhost host and no Trimble documentation; the documented TruckMate REST APIs are catalogued. 32 operations. Definition: [truckmate-agent-swaggerhub](https://api.swaggerhub.com/apis/TruckMate-REST-API/agent/18).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/agent-drivers/{driversId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/agent-drivers` | `excluded` | the definition's reason (above) |
+| `GET` | `/agent-drivers/{driversId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/commodities` | `excluded` | the definition's reason (above) |
+| `GET` | `/commodities/{commodityId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/movements` | `excluded` | the definition's reason (above) |
+| `GET` | `/movements/{movementsId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/movements/{movementsId}/stops` | `excluded` | the definition's reason (above) |
+| `GET` | `/movements/{movementsId}/stops/{stopsId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/order/{orderId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/order/{orderId}/details` | `excluded` | the definition's reason (above) |
+| `GET` | `/order/{orderId}/details/{detailsId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/order/{orderId}/trace` | `excluded` | the definition's reason (above) |
+| `GET` | `/order/{orderId}/trace/{traceId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/osd_status_codes` | `excluded` | the definition's reason (above) |
+| `GET` | `/osd_status_codes/{osd_status_codesId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/status` | `excluded` | the definition's reason (above) |
+| `GET` | `/status/{statusId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/statusCodes` | `excluded` | the definition's reason (above) |
+| `GET` | `/statusCodes/{status-codesId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/stops/{stopsId}/orders` | `excluded` | the definition's reason (above) |
+| `GET` | `/trace_types` | `excluded` | the definition's reason (above) |
+| `GET` | `/trace_types/{trace_typesId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/units` | `excluded` | the definition's reason (above) |
+| `GET` | `/units/{unitId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/version` | `excluded` | the definition's reason (above) |
+| `GET` | `/whoami` | `excluded` | the definition's reason (above) |
+| `GET` | `/zones` | `excluded` | the definition's reason (above) |
+| `GET` | `/zones/search` | `excluded` | the definition's reason (above) |
+| `GET` | `/zones/{zoneId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/agent-drivers` | `excluded` | the definition's reason (above) |
+| `PUT` | `/agent-drivers/{driversId}` | `excluded` | the definition's reason (above) |
+
 ## vista-viewpoint-api/authapiv1 (excluded)
 
 legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host. 26 operations. Definition: [vista-viewpoint-api/authapiv1](https://integrations-qa.centralus.cloudapp.azure.com/swagger/authapiv1/swagger.json).

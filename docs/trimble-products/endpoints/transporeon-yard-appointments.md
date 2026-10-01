@@ -7,117 +7,63 @@
 - **Authentication:** not declared in the definition. Declared security schemes: none declared.
 - **Access:** Carriers using Transporeon appointment scheduling (beta).
 - **To call it you would need:** credentials for yard-api.eu.trimble-transportation.com; the definition's server is an internal service name, so the public host must be confirmed.
-- **Documented servers:** `http://ttc-yard-management-carrier-proxy-service`.
-- **Definition:** [transporeon/trimble-transportation-yard-management-swagger-ui-services-carrier-proxy-service](https://yard-api.eu.trimble-transportation.com/yard-management/swagger-ui/services/carrier-proxy-service) (Yard management - Carrier proxy service, version v1). Documentation: https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/395640867/API+for+Appointment+Scheduling+Beta.
+- **Documented servers:** `https://yard-api.eu.trimble-transportation.com`, `http://ttc-yard-management-carrier-proxy-service`.
+- **Definitions:** 2, one section each below.
 
-## Appointment API
+## Discovery endpoints
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/yard-management/operations/v1/appointments/{identifier}` | `reference` | Delete an appointment | identifier* (path); reason (query); body: application/json |
-| `GET` | `/yard-management/operations/v1/appointments/{identifier}/reasons` | `reference` | **Deprecated.** Get reason settings for appointment operation | identifier* (path); operation* (query); locale (query) |
-| `GET` | `/yard-management/operations/v1/appointments/{identifier}/reschedule/suggestions` | `reference` | Get rebookable slot suggestions | identifier* (path); startDateTime* (query); endDateTime* (query) |
-| `GET` | `/yard-management/operations/v1/appointments/{identifier}/swap/suggestions` | `reference` | Get swappable appointments | identifier* (path); startDateTime* (query); endDateTime* (query) |
-| `PATCH` | `/yard-management/operations/v1/appointments/{identifier}/assets` | `reference` | Update Appointment Assets | identifier* (path); body: application/json |
-| `PATCH` | `/yard-management/operations/v1/appointments/{identifier}/extensions` | `reference` | Update Appointment Extensions | identifier* (path); body: application/json |
-| `POST` | `/yard-management/operations/v1/appointments` | `reference` | Add an appointment | body: application/json |
-| `POST` | `/yard-management/operations/v1/appointments/swap` | `reference` | Swap appointments | body: application/json |
-| `POST` | `/yard-management/operations/v1/appointments/{identifier}/purchase-orders` | `reference` | Add Purchase Orders to Appointment | identifier* (path); body: application/json |
-| `POST` | `/yard-management/operations/v1/appointments/{identifier}/reschedule` | `reference` | Reschedule appointment | identifier* (path); body: application/json |
+Definition [transporeon/inline-api-for-appointment-scheduling-beta](https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/395640867/API+for+Appointment+Scheduling+Beta), 2 operations. Documentation: https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/395640867/API+for+Appointment+Scheduling+Beta.
 
-## Appointment Configuration API
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `GET` | `/yard-management/operations/v1/yard-visit-views` | `reference` | Yard Visit View API | Get all the Yard visit views | filter (query); memberFilter (query); page (query); size (query); sortField (query); sortOrder (query); isDeleted (query) |
+| `GET` | `/yard-management/operations/v2/purchase-orders/{retailerId}/codes/{purchaseOrderCode}` | `reference` | Purchase Order Resolver API | Resolve purchase orders by retailer and code | retailerId* (path); purchaseOrderCode* (path); page (query); size (query); sortField (query); sortOrder (query) |
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v1/appointment-configurations/mandatory-fields` | `reference` | Get mandatory fields for appointment operation | operation* (query); yardVisitId (query); yardId (query); capacityGroupId (query); fromDate (query) |
+## Yard management - Carrier proxy service
 
-## Error codes
+Definition [transporeon/trimble-transportation-yard-management-swagger-ui-services-carrier-proxy-service](https://yard-api.eu.trimble-transportation.com/yard-management/swagger-ui/services/carrier-proxy-service), 40 operations. Documentation: https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/395640867/API+for+Appointment+Scheduling+Beta.
 
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/master/v1/error-codes` | `reference` | Get all error codes |  |
-
-## Localization Feedback
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/yard-management/operations/v1/localization-feedback` | `reference` | Submit anonymous localization feedback | body: application/json |
-
-## OLF Booking API
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v2/bookings/{bookingId}` | `reference` | OLF: Get booking status | bookingId* (path) |
-| `POST` | `/yard-management/operations/v2/bookings` | `reference` | OLF: Book time slot | body: application/json |
-
-## OLF Slot Availability API
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/yard-management/operations/v2/slots/available` | `reference` | OLF: Get available time slots | body: application/json |
-
-## Retailer API
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v1/retailers/active-retailers` | `reference` | Get active retailers |  |
-
-## Slots API
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v1/slots` | `reference` | Get slots | serviceAddress.streetAddress (query); serviceAddress.extendedAddress (query); serviceAddress.cityName (query); serviceAddress.postalCode (query); serviceAddress.stateProvinceCode (query); serviceAddress.countryISOCode (query); from* (query); to* (query); yardVisitId (query); yardId (query); page (query); size (query); purchaseOrder.id (query); purchaseOrder.code (query); purchaseOrder.quantity (query); purchaseOrder.supplierId (query); purchaseOrder.capacityGroupSelectorPrimary (query); purchaseOrder.capacityGroupSelectorSecondary (query); purchaseOrder.warehouseName (query) |
-
-## Slots V2 API
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v2/slots` | `reference` | Get slots v2 | yardVisitId* (query); from* (query); to* (query); yardId (query); page (query); size (query) |
-
-## Support Portal BFF
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/support/v1/api-activity` | `reference` | Get Appointment Scheduling API activity failures | legacyCustomerId* (query); from (query); to (query) |
-| `GET` | `/yard-management/support/v1/api-activity/{id}` | `reference` | Get redacted Appointment Scheduling API activity detail | id* (path); legacyCustomerId* (query) |
-| `GET` | `/yard-management/support/v1/onboarding-status` | `reference` | Get support portal onboarding status | legacyCustomerId* (query) |
-
-## Token Link
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `DELETE` | `/yard-management/operations/v1/token-link/appointments/{identifier}` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Delete (cancel) the Token Link's booking | identifier* (path); token* (query); reason (query) |
-| `GET` | `/yard-management/operations/v1/token-link/appointment-editor-config` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get the appointment editor (booking dialog) configuration for the Token Link's yard visit | token* (query); capacityGroupId (query) |
-| `GET` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reasons` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | **Deprecated.** Get reason settings for the Token Link's booking (rebook/cancel) | identifier* (path); token* (query); operation* (query); locale (query) |
-| `GET` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reschedule/suggestions` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get rebookable slot suggestions for the Token Link's booking | identifier* (path); token* (query); from* (query); to* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/slots` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | List bookable slots for the Token Link's yard visit | token* (query); from* (query); to* (query); page (query); size (query) |
-| `GET` | `/yard-management/operations/v1/token-link/verify` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Verify a Token Link and return the yard visit scope (no service bearer is exposed) | token* (query) |
-| `PATCH` | `/yard-management/operations/v1/token-link/appointments/{identifier}/assets` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Update appointment assets for the Token Link's booking (partial update: only sent fields are updated) | identifier* (path); token* (query); body: application/json |
-| `POST` | `/yard-management/operations/v1/token-link/appointments` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Create an appointment for the Token Link's yard visit (yard visit is taken from the token; any identifier in the body is ignored) | token* (query); body: application/json |
-| `POST` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reschedule` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Reschedule the Token Link's booking to a new slot | identifier* (path); token* (query); body: application/json |
-
-## Token Link Reference Data
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/yard-management/operations/v1/token-link/commons/enums` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get common enum reference data for the Token Link's booking dialog | token* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/reason-code-categories/effective` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get effective reason codes for the Token Link's yard visit (rebook/cancel reason dropdown) | token* (query); type* (query); capacityGroupId (query) |
-| `GET` | `/yard-management/operations/v1/token-link/registration/steps` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get the registration steps for a workflow used by the Token Link's booking dialog | token* (query); workflowTemplateId* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/registration/yard-safety-rules-file` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get the yard safety rules file content for the Token Link's booking dialog | token* (query); attachmentId* (query); workflowTemplateId* (query); type* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/translations/{languageId}` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get translations used by the Token Link's booking dialog | languageId* (path); token* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/workflow-configurations` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Get the registration workflow configurations for the Token Link's yard | token* (query) |
-| `GET` | `/yard-management/operations/v1/token-link/yards` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Look up a non-private yard by id for the Token Link's booking dialog | token* (query); yardId* (query) |
-
-## UX Analytics
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `POST` | `/yard-management/operations/v1/analytics/ux-events` | `reference` | Track YVP UX analytics events | body: application/json |
-
-## mcp-protected-resource-metadata-controller
-
-| Method | Path | Disposition | Summary | Parameters |
-|---|---|---|---|---|
-| `GET` | `/.well-known/oauth-protected-resource/**` | `reference` |  |  |
+| Method | Path | Disposition | Tag | Summary | Parameters |
+|---|---|---|---|---|---|
+| `DELETE` | `/yard-management/operations/v1/appointments/{identifier}` | `reference` | Appointment API | Delete an appointment | identifier* (path); reason (query); body: application/json |
+| `DELETE` | `/yard-management/operations/v1/token-link/appointments/{identifier}` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Delete (cancel) the Token Link's booking | identifier* (path); token* (query); reason (query) |
+| `GET` | `/.well-known/oauth-protected-resource/**` | `reference` | mcp-protected-resource-metadata-controller |  |  |
+| `GET` | `/yard-management/master/v1/error-codes` | `reference` | Error codes | Get all error codes |  |
+| `GET` | `/yard-management/operations/v1/appointment-configurations/mandatory-fields` | `reference` | Appointment Configuration API | Get mandatory fields for appointment operation | operation* (query); yardVisitId (query); yardId (query); capacityGroupId (query); fromDate (query) |
+| `GET` | `/yard-management/operations/v1/appointments/{identifier}/reasons` | `reference` | Appointment API | **Deprecated.** Get reason settings for appointment operation | identifier* (path); operation* (query); locale (query) |
+| `GET` | `/yard-management/operations/v1/appointments/{identifier}/reschedule/suggestions` | `reference` | Appointment API | Get rebookable slot suggestions | identifier* (path); startDateTime* (query); endDateTime* (query) |
+| `GET` | `/yard-management/operations/v1/appointments/{identifier}/swap/suggestions` | `reference` | Appointment API | Get swappable appointments | identifier* (path); startDateTime* (query); endDateTime* (query) |
+| `GET` | `/yard-management/operations/v1/retailers/active-retailers` | `reference` | Retailer API | Get active retailers |  |
+| `GET` | `/yard-management/operations/v1/slots` | `reference` | Slots API | Get slots | serviceAddress.streetAddress (query); serviceAddress.extendedAddress (query); serviceAddress.cityName (query); serviceAddress.postalCode (query); serviceAddress.stateProvinceCode (query); serviceAddress.countryISOCode (query); from* (query); to* (query); yardVisitId (query); yardId (query); page (query); size (query); purchaseOrder.id (query); purchaseOrder.code (query); purchaseOrder.quantity (query); purchaseOrder.supplierId (query); purchaseOrder.capacityGroupSelectorPrimary (query); purchaseOrder.capacityGroupSelectorSecondary (query); purchaseOrder.warehouseName (query) |
+| `GET` | `/yard-management/operations/v1/token-link/appointment-editor-config` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Get the appointment editor (booking dialog) configuration for the Token Link's yard visit | token* (query); capacityGroupId (query) |
+| `GET` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reasons` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | **Deprecated.** Get reason settings for the Token Link's booking (rebook/cancel) | identifier* (path); token* (query); operation* (query); locale (query) |
+| `GET` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reschedule/suggestions` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Get rebookable slot suggestions for the Token Link's booking | identifier* (path); token* (query); from* (query); to* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/commons/enums` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get common enum reference data for the Token Link's booking dialog | token* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/reason-code-categories/effective` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get effective reason codes for the Token Link's yard visit (rebook/cancel reason dropdown) | token* (query); type* (query); capacityGroupId (query) |
+| `GET` | `/yard-management/operations/v1/token-link/registration/steps` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get the registration steps for a workflow used by the Token Link's booking dialog | token* (query); workflowTemplateId* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/registration/yard-safety-rules-file` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get the yard safety rules file content for the Token Link's booking dialog | token* (query); attachmentId* (query); workflowTemplateId* (query); type* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/slots` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | List bookable slots for the Token Link's yard visit | token* (query); from* (query); to* (query); page (query); size (query) |
+| `GET` | `/yard-management/operations/v1/token-link/translations/{languageId}` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get translations used by the Token Link's booking dialog | languageId* (path); token* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/verify` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Verify a Token Link and return the yard visit scope (no service bearer is exposed) | token* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/workflow-configurations` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Get the registration workflow configurations for the Token Link's yard | token* (query) |
+| `GET` | `/yard-management/operations/v1/token-link/yards` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link Reference Data | Look up a non-private yard by id for the Token Link's booking dialog | token* (query); yardId* (query) |
+| `GET` | `/yard-management/operations/v2/bookings/{bookingId}` | `reference` | OLF Booking API | OLF: Get booking status | bookingId* (path) |
+| `GET` | `/yard-management/operations/v2/slots` | `reference` | Slots V2 API | Get slots v2 | yardVisitId* (query); from* (query); to* (query); yardId (query); page (query); size (query) |
+| `GET` | `/yard-management/support/v1/api-activity` | `reference` | Support Portal BFF | Get Appointment Scheduling API activity failures | legacyCustomerId* (query); from (query); to (query) |
+| `GET` | `/yard-management/support/v1/api-activity/{id}` | `reference` | Support Portal BFF | Get redacted Appointment Scheduling API activity detail | id* (path); legacyCustomerId* (query) |
+| `GET` | `/yard-management/support/v1/onboarding-status` | `reference` | Support Portal BFF | Get support portal onboarding status | legacyCustomerId* (query) |
+| `PATCH` | `/yard-management/operations/v1/appointments/{identifier}/assets` | `reference` | Appointment API | Update Appointment Assets | identifier* (path); body: application/json |
+| `PATCH` | `/yard-management/operations/v1/appointments/{identifier}/extensions` | `reference` | Appointment API | Update Appointment Extensions | identifier* (path); body: application/json |
+| `PATCH` | `/yard-management/operations/v1/token-link/appointments/{identifier}/assets` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Update appointment assets for the Token Link's booking (partial update: only sent fields are updated) | identifier* (path); token* (query); body: application/json |
+| `POST` | `/yard-management/operations/v1/analytics/ux-events` | `reference` | UX Analytics | Track YVP UX analytics events | body: application/json |
+| `POST` | `/yard-management/operations/v1/appointments` | `reference` | Appointment API | Add an appointment | body: application/json |
+| `POST` | `/yard-management/operations/v1/appointments/swap` | `reference` | Appointment API | Swap appointments | body: application/json |
+| `POST` | `/yard-management/operations/v1/appointments/{identifier}/purchase-orders` | `reference` | Appointment API | Add Purchase Orders to Appointment | identifier* (path); body: application/json |
+| `POST` | `/yard-management/operations/v1/appointments/{identifier}/reschedule` | `reference` | Appointment API | Reschedule appointment | identifier* (path); body: application/json |
+| `POST` | `/yard-management/operations/v1/localization-feedback` | `reference` | Localization Feedback | Submit anonymous localization feedback | body: application/json |
+| `POST` | `/yard-management/operations/v1/token-link/appointments` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Create an appointment for the Token Link's yard visit (yard visit is taken from the token; any identifier in the body is ignored) | token* (query); body: application/json |
+| `POST` | `/yard-management/operations/v1/token-link/appointments/{identifier}/reschedule` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Token Link | Reschedule the Token Link's booking to a new slot | identifier* (path); token* (query); body: application/json |
+| `POST` | `/yard-management/operations/v2/bookings` | `reference` | OLF Booking API | OLF: Book time slot | body: application/json |
+| `POST` | `/yard-management/operations/v2/slots/available` | `reference` | OLF Slot Availability API | OLF: Get available time slots | body: application/json |
 
 `*` marks a required parameter.

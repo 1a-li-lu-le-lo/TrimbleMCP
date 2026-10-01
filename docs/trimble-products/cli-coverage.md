@@ -285,6 +285,9 @@ Tekla PowerFab, licence server and Multiuser Server:
 | `uninstallanchorservice.exe` | Uninstalls FlexNet Licensing Service | Excluded: removes a Windows service |
 | `MUSaaS_Install.cmd` (run as administrator from the Multiuser Server folder) | Creates another Tekla Structures Multiuser Server instance: prompts for an identifier (default 2) and a TCP port (default 1239), creates a folder and a Windows service, and starts it | Excluded: creates and starts a network service |
 | `MUSaaS_Uninstall.cmd` | Deletes an instance created by `MUSaaS_Install.cmd` | Excluded: removes a service |
+| `TS_MUSaas_Install` and `TS_MUSaas_Uninstall` (the names in the current multi-user guide, https://support.tekla.com/doc/tekla-structures/2026/sys_multiuser_multiuser_system, verified 2026-10-01) | The same scripts under their current names | Excluded: same |
+| Multi-user server restart batch (same guide): `net stop "Tekla Structures Multiuser Server"`, `cd C:\ProgramData\TeklaStructuresServer\`, `del /f tcpip_localhost_1238.db`, `net start "Tekla Structures Multiuser Server"` | Stops the service, deletes its lock database and starts it again | Excluded: stops a network service and deletes server data |
+| `register_analysis.bat` (run in `<Tekla Structures>\nt\bin\analysis` from an administrator prompt; Tekla Structures 2018 and 2018i; https://support.tekla.com/article/tekla-structures-dll-registration-for-ad, verified 2026-10-01) | Registers the analysis and design DLLs (the article also offers unregister `.reg` files) | Excluded: registers COM components with administrator rights (a host change) |
 
 Tekla on-premises licence commands (FlexNet utilities; the commands are case-sensitive and may need an administrator command prompt):
 
@@ -292,6 +295,7 @@ Tekla on-premises licence commands (FlexNet utilities; the commands are case-sen
 |---|---|---|
 | `serveractutil -served -commServer http://193.64.145.74:80/flexnet/services/ActivationService?wsdl -activationID <activation ID> -hybrid <count>` (run in the licence server's `Server` folder) | Activates `<count>` licences of an activation ID on the licence server, through Trimble's activation server | Excluded: licence activation; changes entitlements |
 | `serveractutil -view` (written `Serveractutil –view`; run in `C:\TeklaStructures\License\Server` by default) | Lists the licences activated on the server, with their fulfilment IDs | Excluded: licensing administration on a server |
+| `serveractutil -view -long` (https://support.tekla.com/article/how-to-list-the-activated-licenses-using-command-lines, verified 2026-10-01) | Lists the activated licences together with the borrowed ones | Excluded: same |
 | `serveractutil -return <fulfillment_id> -commServer https://activate.tekla.com:443/flexnet/services/ActivationService?wsdl` | Deactivates (returns) a licence to Trimble's activation server; needs internet access | Excluded: licence return; changes entitlements |
 | `appactutil.exe -served -commServer 27007@<server_name> -productID NAME=<product>;VERSION=<version> -expiration <dd-Mmm-yyyy>` (run in `C:\TeklaStructures\License\Borrow`) | Borrows a licence from the company licence server until the expiry date. `<product>` is `ProjectViewer`, `Full`, `SteelDetailing`, `Primary`, `Educational`, `ConstructionModeling`, `Drafter`, `Engineering`, `PrecastConcreteDetailing` or `RebarDetailing` | Excluded: licence borrowing; changes entitlements |
 | `appactutil.exe -view -long` | Shows the borrowed licences in trusted storage | Excluded: licensing administration on a client |
@@ -944,13 +948,13 @@ Source: https://help.trimble.com/doc/b2w-estimate/b2w-estimate/b2w-estimate-admi
 
 ## 29. Stabicad silent installation, excluded
 
-Source: https://help.trimble.com/doc/stabicad/stabicad/ins_install_stabicad_silently (verified 2026-10-01; modified 29 Jun 2026). The same page documents an SCCM/Intune sequence for the prerequisites.
+Sources (verified 2026-10-01): https://help.trimble.com/doc/stabicad/stabicad/ins_install_stabicad_silently (modified 29 Jun 2026), and the knowledge article https://help.trimble.com/knowledge/silent-stabicad-installation-using-sccm ("How to: Perform a silent installation of Stabicad using SCCM or Intune", modified 27 May 2026), which gives the prerequisite, client, local and administrative sequences.
 
-**Why it is excluded:** each command installs software and a SQL Server database configuration (a host change, with administrator rights), and the connection-string and password properties carry database credentials. The documented default connection string includes a password, which is not repeated here.
+**Why it is excluded:** each command installs software and a SQL Server database configuration (a host change, with administrator rights), and the connection-string and password properties carry database credentials. The documented default connection strings and examples include passwords, which are not repeated here.
 
 | Command/Property | What it does | Disposition |
 |---|---|---|
-| `Stabicadsetup.exe -silent <mode> [properties]` | Unattended installation; `<mode>` is `express` (properties ignored), `advanced` (local, with properties), `update` or `network` | Excluded: installs software |
+| `Stabicadsetup.exe -silent <mode> [properties]` | Unattended installation; `<mode>` is `express` (properties ignored), `advanced` (local, with properties), `update`, `network`, or `client` (a network client installation; properties ignored). Without `client` mode, a client install takes `INSTALLDIR`, `INSTALLSTCPLATFORM`, `INSTALLDIR_CADPLATFORM`, `KEEP_DOTNET_POLICIES` and `PRODESIGN3DDETECTED` | Excluded: installs software |
 | `INSTALLDIR=<folder>` | Installation folder (a network folder in `network` mode) | Excluded: same |
 | `INSTALLSTCPLATFORM=True\|False` | Whether to install the Trimble CAD platform | Excluded: same |
 | `INSTALLDIR_CADPLATFORM=<folder>` | CAD platform folder | Excluded: same |
@@ -965,6 +969,11 @@ Source: https://help.trimble.com/doc/stabicad/stabicad/ins_install_stabicad_sile
 | `ALLUSERS=1`, `ARPSYSTEMCOMPONENT=1`, `MSIFASTINSTALL=7`, `INSTALLATIONTYPE=Local\|Network` | Per-machine install; hide from Programs and Features; faster install; installation type | Excluded: same |
 | `SQLSERVER_CONNECTIONSTRING_NOPASSWORD=<connection string>`, `SQLSERVER_PASSWORD=<password>`, `ISPLAINTEXT=True\|False` | Connection string without the password, the password itself, and whether it is stored encrypted in the Stabicad configuration file | Excluded: credentials on the command line |
 | `msiexec /a "StabicadMSI x64.msi" /qn /l*v "<log>" TARGETDIR=<network folder> [properties]` | Administrative (network) installation of the extracted MSI | Excluded: prepares a deployment |
+| `msiexec /i "Stabicad Client\StabicadMSI x64.msi" /qn /l*v "<log>" [properties]` (properties `ALLUSERS`, `ARPSYSTEMCOMPONENT`, `MSIFASTINSTALL`, `INSTALLDIR`, `KEEP_DOTNET_POLICIES`, `PRODESIGN3DDETECTED`) | Installs the network client from the extracted MSI | Excluded: installs software |
+| Knowledge article, phase A: `"VC Redistributables\<version>\vcredist_x64.exe" /quiet` (2012, 2013 update 4 and 5, 2019) and `"Crystal Reports\CRRuntime_64bit_13_0_27.msi" /qn ALLUSERS="1" MSIFASTINSTALL="7" UPGRADE="1"` (then again with `REPAIR="1"`) | Installs the prerequisites for SCCM or Intune | Excluded: installs software |
+| Knowledge article, phase B: `"Client installation\Stabicad Client\Stabicad x64.msi" /qn ALLUSERS="1" INSTALLDIR="\\<server>\<share>\Apps\Stabicad NL\"` | Rolls out client shortcuts to a full network installation (wired LAN only) | Excluded: installs software |
+| Knowledge article, phase C, version 24.07 and earlier: `"Stabicad\StabicadMSI x64.msi" /qn ... INSTALLATIONTYPE="Local" SQLSERVER_SERVER=<server> SQLSERVER_DATABASE=<database> SQLSERVER_WINDOWSAUTHENTICATION="False" SQLSERVER_USERNAME=<user> SQLSERVER_PASSWORD=<password>` | Local installation for laptops and remote workers, with the database server, name and SQL sign-in as separate properties | Excluded: installs software; `SQLSERVER_USERNAME` and `SQLSERVER_PASSWORD` are credentials on the command line |
+| Knowledge article, phase C, version 24.08 and later, and phase D (`msiexec /a ... TARGETDIR=<folder>`, an administrative install that registers nothing and allows several versions side by side) | The same with `SQLSERVER_CONNECTIONSTRING_NOPASSWORD` and `SQLSERVER_PASSWORD` | Excluded: installs software; credentials on the command line |
 
 ## 30. Novapoint unattended installation, excluded
 
@@ -995,7 +1004,18 @@ Source: https://support.tekla.com/help/tekla-structures/dstv_to_dxf_converter (v
 | `-?` | Lists the options and commands | Excluded with the program |
 | `examples` | Lists examples that use correct templates | Excluded with the program |
 
-## 32. Checked, with no official command line
+## 32. TMWSuite Cloud Hub Connector installer (`chc-install.ps1`), excluded
+
+Source: https://developer.trimble.com/docs/tmwsuite/guides/chc-installation/ (verified 2026-10-01). The Cloud Hub Connector (CHC) is an on-premises IIS application, connected to the customer's TMWSuite SQL Server database, through which Trimble Transportation Cloud routes the catalogued `tmwsuite-odata` and `tmwsuite-ordercreate` calls.
+
+**Why it is excluded:** it installs an IIS application with administrator rights (a host change), and the installation handles the database connection string, which contains a password. The bridge runs no local programs and handles no credentials.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `chc-install.ps1` (from the Cloud Hub Connector release, with its deployment package) | Installs CHC as an IIS application (default path `/chc`) | Excluded: installs software (a host change) |
+| `chc-install.ps1 -validate` | Calls `GET /chc/v0/BuildInfo` and `GET /chc/v0/odata/Cities/$count`, which need no key or token, to confirm the application runs and reaches the database | Excluded with the installer; the diagnostics are on the customer's host, which the bridge never calls |
+
+## 33. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
 - **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.

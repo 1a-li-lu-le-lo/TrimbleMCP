@@ -336,10 +336,23 @@ def confluence(cfg, errors):
                     found.setdefault(u, set()).add(page)
             # Definitions embedded inline in the open-api macro (CDATA body).
             macros = re.findall(r'<ac:structured-macro[^>]*ac:name="open-api".*?</ac:structured-macro>', body, re.S)
-            bodies = [m for m in (re.search(r"<!\[CDATA\[(.*?)\]\]>", x, re.S) for x in macros) if m]
-            for n, m in enumerate(bodies):
+            bodies = [m.group(1) for m in (re.search(r"<!\[CDATA\[(.*?)\]\]>", x, re.S) for x in macros) if m]
+            # The same viewer as an Atlassian Forge app: the definition is the
+            # HTML-escaped "__body-content" of its current (guest) parameters.
+            # The legacy "macro-params" copy is used only when there is none.
+            for ext in re.findall(r"<ac:adf-extension>.*?</ac:adf-extension>", body, re.S):
+                if not re.search(r'key="extension-key">[^<]*/static/open-api<', ext):
+                    continue
+                for params in ("guest-params", "macro-params"):
+                    at = ext.find(f'key="{params}"')
+                    m = at >= 0 and re.compile(
+                        r'key="__body-content">(?:<ac:adf-parameter key="value">)?(.*?)</ac:adf-parameter>', re.S).search(ext, at)
+                    if m:
+                        bodies.append(html.unescape(m.group(1)))
+                        break
+            for n, text in enumerate(bodies):
                 sid = cfg["id_prefix"] + "inline-" + slug(r["title"]) + (f"-{n + 1}" if len(bodies) > 1 else "")
-                inline[sid] = (m.group(1), page)
+                inline[sid] = (text, page)
             # Interfaces specified only as attached PDFs are reported for review.
             if re.search(r'ac:name="(viewpdf|view-file)"', body):
                 print(f"note: {page}: specification attached as a file (classify in capability-matrix.md)", file=sys.stderr)
