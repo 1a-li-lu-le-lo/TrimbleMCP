@@ -402,11 +402,11 @@ var regionServices = map[string]struct{ api, note string }{
 	"pset-api":          {"pset", ""},
 	"topic-api":         {"topics", ""},
 	"issues-api":        {"issues", ""},
-	"projects-api":      {"", "listed by /regions; Trimble publishes no API definition for it. Its one documented endpoint (POST /v1/projects/update-users, Core Account) is catalogued as connect-projects-api"},
-	"user-api":          {"", "listed by /regions, but Trimble publishes no API definition for it; user operations are in the Core API"},
-	"batch-api":         {"", "listed by /regions, but Trimble publishes no API definition for it"},
-	"objects-sync-api":  {"", "listed by /regions, but Trimble publishes no API definition for it"},
-	"wopi-api":          {"", "WOPI host (the protocol Microsoft Office for the web uses to open files); a protocol endpoint for Office, not an integrator API, and no definition is published"},
+	"projects-api":      {"", "listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-project-service); its one documented endpoint (POST /v1/projects/update-users, Core Account) is catalogued as connect-projects-api"},
+	"user-api":          {"", "listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-user-app-service); user operations are in the Core API"},
+	"batch-api":         {"", "listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-batch-service)"},
+	"objects-sync-api":  {"", "listed by /regions; no definition is retrievable (/v1/api-docs requires authentication). The Trimble Connect .NET SDK's sync helper is its client"},
+	"wopi-api":          {"", "WOPI host (the protocol Microsoft Office for the web uses to open files); a protocol endpoint for Office, not an integrator API. Its /v1/api-docs definition is catalogued as the excluded source tc-wopi-service"},
 }
 
 // regionFields are the non-service fields of a /regions entry.

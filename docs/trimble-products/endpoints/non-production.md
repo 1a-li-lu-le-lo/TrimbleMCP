@@ -101,6 +101,16 @@ placeholder example served from a personal GitHub Pages site (noel-tw.github.io)
 | `GET` | `/path/to/endpoint` | `excluded` | the definition's reason (above) |
 | `POST` | `/data` | `excluded` | the definition's reason (above) |
 
+## connect-ecom/core-account (excluded)
+
+the Core Account page documents these endpoints in prose; the ECom Service definition (connect-ecom) is used instead. 3 operations. Definition: [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/accounts/{accountId}/project-users` | `variant` | covered by `connect-ecom:GET /accounts/{accountId}/project-users` |
+| `GET` | `/accounts/{accountId}/project-users/{userId}` | `variant` | covered by `connect-ecom:GET /accounts/{accountId}/project-users/{userId}` |
+| `GET` | `/accounts/{accountId}/projects` | `variant` | covered by `connect-ecom:GET /accounts/{accountId}/projects` |
+
 ## custom-attribute-stage@v1 (internal)
 
 staging-only definition served from localhost; no production host. 12 operations. Definition: [custom-attribute-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/custom-attribute-stage/v1).
@@ -359,6 +369,58 @@ staging copy. 6 operations. Definition: [support-stage@v1](https://api.swaggerhu
 | `GET` | `/tickets` | `variant` | covered by `support:GET /tickets` |
 | `GET` | `/tickets/{id}` | `variant` | covered by `support:GET /tickets/{id}` |
 | `POST` | `/tickets` | `variant` | covered by `support:POST /tickets` |
+
+## tc-batch-service (excluded)
+
+undocumented: the service serves this definition publicly, but Trimble's documentation does not link it. 2 operations. Definition: [tc-batch-service](https://batch-api.connect.trimble.com/v1/api-docs).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `POST` | `/batch-requests` | `excluded` | the definition's reason (above) |
+| `POST` | `/bulk-requests/{serviceCode}/{objectType}` | `excluded` | the definition's reason (above) |
+
+## tc-project-service (excluded)
+
+undocumented: the service serves this definition publicly, but Trimble's documentation does not link it; only POST /projects/update-users is documented (Core Account), as connect-projects-api. 11 operations. Definition: [tc-project-service](https://projects-api.connect.trimble.com/v1/api-docs).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/accounts/{accountId}/projects` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/me` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/update-users/{jobId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/{projectId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/{projectId}/groups` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/{projectId}/groups/{groupId}/members` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/{projectId}/users` | `excluded` | the definition's reason (above) |
+| `GET` | `/projects/{projectId}/users/{userId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/users/{userId}/projects` | `excluded` | the definition's reason (above) |
+| `POST` | `/_bulk` | `excluded` | the definition's reason (above) |
+| `POST` | `/projects/update-users` | `variant` | covered by `connect-projects-api:POST /projects/update-users` |
+
+## tc-user-app-service (excluded)
+
+undocumented: the service serves this definition publicly, but Trimble's documentation does not link it (a NuGet client, Trimble.Connect.UserAppService.Client, exists); user operations are in the Core API. 6 operations. Definition: [tc-user-app-service](https://user-api.connect.trimble.com/v1/api-docs).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/users/{uuid}/properties/{key}` | `excluded` | the definition's reason (above) |
+| `GET` | `/users` | `excluded` | the definition's reason (above) |
+| `GET` | `/users/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/users/{uuid}/properties` | `excluded` | the definition's reason (above) |
+| `GET` | `/users/{uuid}/properties/{key}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/users/{uuid}/properties` | `excluded` | the definition's reason (above) |
+
+## tc-wopi-service (excluded)
+
+WOPI host: the protocol endpoint Microsoft Office for the web calls with a file access token; not an integrator API, and not linked from Trimble's documentation. 5 operations. Definition: [tc-wopi-service](https://wopi-api.connect.trimble.com/v1/api-docs).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/discovery` | `excluded` | the definition's reason (above) |
+| `GET` | `/wopi/files/{fileId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/wopi/files/{fileId}/contents` | `excluded` | the definition's reason (above) |
+| `POST` | `/wopi/files/{fileId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/wopi/files/{fileId}/contents` | `excluded` | the definition's reason (above) |
 
 ## tcps-int@2.0 (variant)
 

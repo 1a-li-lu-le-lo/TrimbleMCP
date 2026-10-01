@@ -28,7 +28,7 @@ Find any of them with `trimble_api_operations` (filter with `family`, or call it
 
 | Family | Products (catalogue API ids) |
 |---|---|
-| connect | Trimble Connect Core Account endpoints documented in prose (`connect-ecom`, `connect-projects-api`), Trimble Connect Status Sharing (`trimble-connect-status-sharing`) |
+| connect | Trimble Connect ECom Service (`connect-ecom`: accounts, admins, entitlements, usage) and Core Account projects endpoint (`connect-projects-api`), Trimble Connect Status Sharing (`trimble-connect-status-sharing`) |
 | construction | Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct / e-Builder (`unity-construct`), Unity Maintain / Permit / Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`), MEPcontent (`mepcontent`), Jobpac Connect (`jobpac-connect`; almost every operation is excluded because the Jobpac token travels in the request), Tekla PowerFab Go (`tekla-powerfab-go`) |
 | geospatial | Field Configuration (`geospatial-field-configuration`), Field Data / Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`, and WebSocket streams `mobile-manager-ws-v1`, `mobile-manager-ws-v2`) |
 | transportation | TMT Fleet Maintenance (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`: carriers, shippers, visibility, telematics, eCMR, transport operations, rate management, freight audit and freight audit self-service, freight procurement, yard appointments, market insights) |
@@ -42,7 +42,7 @@ Some of their operations are `excluded` with a `safety:` reason: anything that s
 These have no public machine-readable API definition, or are out of scope (see the capability matrix):
 
 - PC*MILER Web Services other than Route Reports (WCF help pages only), and Trimble Maps REST APIs without a published definition.
-- Spectrum Data Exchange (SOAP and REST services on each customer's server), Trimble Field View (SOAP services on regional hosts), Appian DRTrack web services (SOAP on a per-customer host), the Trimble Business Center Data Service (local OData), TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
+- Spectrum Data Exchange (SOAP and REST services on each customer's server), Trimble Field View (SOAP services on regional hosts), Appian DRTrack web services (SOAP on a per-customer host), Trimble Maps Trip Management and the PC*Miler Rail web services (prose only), Master Builder and the Viewpoint Team connector, the Trimble Business Center Data Service (local OData), TAP Store (prose or Postman only), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
 - Tekla Structures and SketchUp (desktop SDKs, not server APIs); the desktop Tekla PowerFab XML command API; CoPilot and other SDK-only products.
 - The SketchUp Connector, a Trimble-hosted MCP service: the user connects it to their client directly; this bridge does not proxy it.
 - APIs advertised without public documentation (POSPac Cloud, LiDAR QC Cloud, 3D Warehouse, Forestry WSX and DataVuze, TMT Road Call).

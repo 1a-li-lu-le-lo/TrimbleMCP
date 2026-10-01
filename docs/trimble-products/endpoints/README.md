@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 13836 operations in 376 definitions; 254 read, 223 plan, 6303 reference, 3084 variant, 3972 excluded.
+**Totals:** 13928 operations in 381 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4019 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -51,7 +51,7 @@ These operations are catalogued from the products' own published definitions so 
 
 | API | Product | Definitions | Operations | Authentication | Reference |
 |---|---|---|---|---|---|
-| `connect-ecom` | Trimble Connect eCom service (Core Account) | [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | 3 | Trimble Identity bearer token | [connect-ecom.md](connect-ecom.md) |
+| `connect-ecom` | Trimble Connect ECom Service (accounts, entitlements, activations, licensing) | [tc-ecom-service](https://ecom.connect.trimble.com/v1/api-docs) | 68 | Trimble Identity bearer token | [connect-ecom.md](connect-ecom.md) |
 | `connect-projects-api` | Trimble Connect projects service (Core Account) | [connect-projects-api/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | 1 | Trimble Identity bearer token | [connect-projects-api.md](connect-projects-api.md) |
 | `trimble-connect-status-sharing` | Trimble Connect Status Sharing API (workflow tools, documented on the Tekla Developer Center) | 5 | 115 | Bearer status_token, obtained by exchanging a Trimble Identity access token at POST /statusapi/1.0/auth/token (excluded) | [trimble-connect-status-sharing.md](trimble-connect-status-sharing.md) |
 
@@ -147,7 +147,7 @@ These operations are catalogued from the products' own published definitions so 
 | [accubid-anywhere/project-v2](https://developer.trimble.com/docs/accubid-anywhere/openapi/project/v2.yaml) | Anywhere Project Service | portal | reference | accubid-project-v2 | 1 |  |
 | [app-xchange/example-v1](https://noel-tw.github.io/openapi/noel-example.json) | Noel Example | portal | excluded |  | 5 | placeholder example served from a personal GitHub Pages site (noel-tw.github.io); not a Trimble API |
 | [civil-site-management/v1](https://developer.trimble.com/docs/civil-site-management/openapi/v1.yaml) | Site Management API | portal | reference | civil-site-management | 19 |  |
-| [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | Trimble Connect eCom service (Core Account) | doc | reference | connect-ecom | 3 |  |
+| [connect-ecom/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | Trimble Connect eCom service (Core Account) | doc | excluded |  | 3 | variant of connect-ecom; the Core Account page documents these endpoints in prose; the ECom Service definition (connect-ecom) is used instead |
 | [connect-projects-api/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) | Trimble Connect projects service (Core Account) | doc | reference | connect-projects-api | 1 |  |
 | [custom-attribute-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/custom-attribute-stage/v1) | OpenAPI definition | swaggerhub | internal |  | 12 | staging-only definition served from localhost; no production host |
 | [files-int@1.0](https://api.swaggerhub.com/apis/Trimble-Connect/files-int/1.0) | Trimble Connect File Service | swaggerhub | variant |  | 3 | variant of tcps@2.0; integration copy of Core file-upload operations |
@@ -174,6 +174,11 @@ These operations are catalogued from the products' own published definitions so 
 | [ptx-farmengage](https://api-docs.farmengage.com/swagger.json) | FarmENGAGE Data API - Developer Guide | direct | reference | ptx-farmengage | 209 |  |
 | [support-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/support-stage/v1) | Support Service (stage) | swaggerhub | variant |  | 6 | variant of support@v1; staging copy |
 | [support@v1](https://api.swaggerhub.com/apis/Trimble-Connect/support/v1) | Support Service | swaggerhub | production | support | 5 |  |
+| [tc-batch-service](https://batch-api.connect.trimble.com/v1/api-docs) | Trimble Connect Batch Service | direct | excluded |  | 2 | undocumented: the service serves this definition publicly, but Trimble's documentation does not link it |
+| [tc-ecom-service](https://ecom.connect.trimble.com/v1/api-docs) | Trimble Connect ECom Service | direct | reference | connect-ecom | 68 |  |
+| [tc-project-service](https://projects-api.connect.trimble.com/v1/api-docs) | Trimble Connect Project Service | direct | excluded |  | 11 | variant of connect-projects-api; undocumented: the service serves this definition publicly, but Trimble's documentation does not link it; only POST /projects/update-users is documented (Core Account), as connect-projects-api |
+| [tc-user-app-service](https://user-api.connect.trimble.com/v1/api-docs) | Trimble Connect User App Service | direct | excluded |  | 6 | undocumented: the service serves this definition publicly, but Trimble's documentation does not link it (a NuGet client, Trimble.Connect.UserAppService.Client, exists); user operations are in the Core API |
+| [tc-wopi-service](https://wopi-api.connect.trimble.com/v1/api-docs) | Trimble Connect Wopi Service | direct | excluded |  | 5 | WOPI host: the protocol endpoint Microsoft Office for the web calls with a file access token; not an integrator API, and not linked from Trimble's documentation |
 | [tcps-int@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-int/2.0) | Trimble Connect API | swaggerhub | variant |  | 188 | variant of tcps@2.0; integration copy |
 | [tcps-qa@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-qa/2.0) | Trimble Connect API | swaggerhub | variant |  | 188 | variant of tcps@2.0; QA copy |
 | [tcps-stage@2.0](https://api.swaggerhub.com/apis/Trimble-Connect/tcps-stage/2.0) | Trimble Connect API | swaggerhub | variant |  | 188 | variant of tcps@2.0; staging copy |
@@ -520,11 +525,11 @@ The Trimble Connect `GET /tc/api/2.0/regions` response names these services, but
 
 | Service | Note |
 |---|---|
-| `batch-api` | listed by /regions, but Trimble publishes no API definition for it |
-| `objects-sync-api` | listed by /regions, but Trimble publishes no API definition for it |
-| `projects-api` | listed by /regions; Trimble publishes no API definition for it. Its one documented endpoint (POST /v1/projects/update-users, Core Account) is catalogued as connect-projects-api |
-| `user-api` | listed by /regions, but Trimble publishes no API definition for it; user operations are in the Core API |
-| `wopi-api` | WOPI host (the protocol Microsoft Office for the web uses to open files); a protocol endpoint for Office, not an integrator API, and no definition is published |
+| `batch-api` | listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-batch-service) |
+| `objects-sync-api` | listed by /regions; no definition is retrievable (/v1/api-docs requires authentication). The Trimble Connect .NET SDK's sync helper is its client |
+| `projects-api` | listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-project-service); its one documented endpoint (POST /v1/projects/update-users, Core Account) is catalogued as connect-projects-api |
+| `user-api` | listed by /regions. It serves a definition at /v1/api-docs that Trimble's documentation does not link (catalogued as the excluded source tc-user-app-service); user operations are in the Core API |
+| `wopi-api` | WOPI host (the protocol Microsoft Office for the web uses to open files); a protocol endpoint for Office, not an integrator API. Its /v1/api-docs definition is catalogued as the excluded source tc-wopi-service |
 
 ## Hosts
 

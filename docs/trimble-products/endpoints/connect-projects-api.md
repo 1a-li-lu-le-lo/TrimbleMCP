@@ -7,13 +7,13 @@
 - **Authentication:** Trimble Identity bearer token. Declared security schemes: none declared.
 - **Access:** Account administrators only.
 - **To call it you would need:** an account administrator's Trimble Identity token; documented in prose only (no definition).
-- **Documented servers:** `https://projects-api.connect.trimble.com`.
+- **Documented servers:** `https://projects-api.connect.trimble.com/v1`.
 - **Definition:** [connect-projects-api/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) (Trimble Connect projects service (Core Account), version documented). Documentation: https://developer.trimble.com/docs/connect/tools/api/core-account/.
 
 ## Untagged
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/v1/projects/update-users` | `reference` | Create a job that adds or removes users across projects (account administrators only) | body: application/json |
+| `POST` | `/projects/update-users` | `reference` | Create a job that adds or removes users across projects (account administrators only) | body: application/json |
 
 `*` marks a required parameter.

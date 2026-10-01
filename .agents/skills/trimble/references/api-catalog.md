@@ -16,7 +16,7 @@ Trimble Connect has 11 production APIs:
 - Drive (beta)
 - File Service (preview)
 
-Its Core Account endpoints, documented in prose only, are reference APIs (`connect-ecom`, `connect-projects-api`), and so is the Trimble Connect Status Sharing API (`trimble-connect-status-sharing`, workflow status on regional tcstatus.tekla.com hosts).
+Its ECom Service (accounts, entitlements, activations; `connect-ecom`, with licensing changes and invitation keys safety-excluded) and the Core Account projects endpoint (`connect-projects-api`) are reference APIs, and so is the Trimble Connect Status Sharing API (`trimble-connect-status-sharing`, workflow status on regional tcstatus.tekla.com hosts).
 
 The other products (`reference`), by family:
 

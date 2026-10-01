@@ -148,6 +148,14 @@ Source: https://support.tekla.com/doc/tekla-structures/2025/cus_create_startup_s
 | `/server:<server_name>` | Multi-user server for `/create` | Excluded: creates data |
 | `-m <macro_file_path>` | Runs a macro after start-up | Excluded: runs code |
 
+Tekla Structures Rebar mesh view creator (source: https://support.tekla.com/doc/tekla-structures/2026/dra_creating_a_view_for_a_reinforcement_mesh, section "Run Rebar mesh view creator from command line", verified 2026-10-01). `RebarMeshViewCreator.exe` is in `..\<version>\bin\applications\Tekla\drawings\RebarMeshViewCreator` and works on the open model, for example `RebarMeshViewCreator -create 0 -standard "<path>\myStandardFile.xml" -attributes LengthUnit=0;LineAttributes=RebarMeshMark`:
+
+| Switch | What it does | Disposition |
+|---|---|---|
+| `-create <mode>` | `0` creates mesh views for all meshes, `1` for the selected meshes, `2` creates annotations for the selected meshes | Excluded: changes the model's drawings |
+| `-standard <absolute file path>` | Settings file to use | Excluded: local file path |
+| `-attributes <name>=<value>;...` | Overrides individual settings | Excluded with the program |
+
 Tekla Template Editor (source: https://support.tekla.com/doc/tekla-structures/2025/tpled_start_tpled_with_command_line, verified 2026-10-01). The options are case-insensitive. The editor is a local desktop program for report and drawing templates, so it is excluded for the same reason:
 
 | Switch | What it does | Disposition |
@@ -273,6 +281,7 @@ Tekla Structural Designer, Tedds, Tedds for Word, Portal Frame Designer and Conn
 | `msiexec /i <package>.msi /qn`, for example `msiexec /i TeklaTedds.msi /qn TEKLA_LICENSE_METHOD=#18 TEKLA_LICENSE_SERVER=licserve01` | Silent installation. The page adds that standard MSI properties such as `INSTALLDIR` also work, without listing them | Excluded: installs software |
 | `TEKLA_LICENSE_METHOD=#17`, `#33`, `#18`, `#68` or `#65535` | Licensing method: Local, USB, Server, Tekla Online or Automatic | Excluded: changes licensing configuration |
 | `TEKLA_LICENSE_SERVER=<server>` | Name, or static IP address, of the licence server | Excluded: same |
+| `msiexec /i <package>.msi /l*xv <log>`, for example `msiexec /i "c:\temp\TeklaTedds.msi" /l*xv "c:\temp\TeklaTeddsLog.txt"` (https://support.tekla.com/article/how-do-you-enable-msi-logging, verified 2026-10-01; the page's alternative is the machine-wide Windows Installer `Logging` policy) | Installs with a verbose log | Excluded: installs software |
 
 Tekla PowerFab, licence server and Multiuser Server:
 
@@ -287,6 +296,7 @@ Tekla PowerFab, licence server and Multiuser Server:
 | `MUSaaS_Uninstall.cmd` | Deletes an instance created by `MUSaaS_Install.cmd` | Excluded: removes a service |
 | `TS_MUSaas_Install` and `TS_MUSaas_Uninstall` (the names in the current multi-user guide, https://support.tekla.com/doc/tekla-structures/2026/sys_multiuser_multiuser_system, verified 2026-10-01) | The same scripts under their current names | Excluded: same |
 | Multi-user server restart batch (same guide): `net stop "Tekla Structures Multiuser Server"`, `cd C:\ProgramData\TeklaStructuresServer\`, `del /f tcpip_localhost_1238.db`, `net start "Tekla Structures Multiuser Server"` | Stops the service, deletes its lock database and starts it again | Excluded: stops a network service and deletes server data |
+| `tsd.exe /reg` (run in the Tekla Structural Designer installation folder; https://support.tekla.com/help/tekla-structures/not-version-specific/tsd_rebarimport, verified 2026-10-01) | Registers Structural Designer's COM interface so that the Tekla Structures rebar importer can use it | Excluded: registers COM components (a host change) |
 | `register_analysis.bat` (run in `<Tekla Structures>\nt\bin\analysis` from an administrator prompt; Tekla Structures 2018 and 2018i; https://support.tekla.com/article/tekla-structures-dll-registration-for-ad, verified 2026-10-01) | Registers the analysis and design DLLs (the article also offers unregister `.reg` files) | Excluded: registers COM components with administrator rights (a host change) |
 
 Tekla on-premises licence commands (FlexNet utilities; the commands are case-sensitive and may need an administrator command prompt):
@@ -326,10 +336,12 @@ The full switch list of the TSEP builder is not public. The 2017 release notes p
 
 | Command/Switch | What it does | Disposition |
 |---|---|---|
-| TSEP batch builder (Tekla's pages call it "Batch builder" and the "command line TSEP builder"; the public pages do not name its executable) | Builds a `.tsep` package from a manifest XML file | Excluded: build tooling; writes files |
+| `TeklaExtensionPackage.BatchBuilder.exe`, the TSEP batch builder (Tekla's pages also call it "Batch builder" and the "command line TSEP builder"; the executable is named in https://support.tekla.com/doc/tekla-structures/2026/rel_2026_sp2_new_features_and_improvements, verified 2026-10-01) | Builds a `.tsep` package from a manifest XML file | Excluded: build tooling; writes files |
+| `-a` | Renames the `.tsep` file; re-enabled in Tekla Structures 2026 SP2 (TTSD-76195, same page). Its exact argument is not documented publicly | Excluded with the builder |
 | `-o <output path>` | Output path. Optional since TSEP 2025, when the `.tsep` is created next to the manifest; no longer needs a full path | Excluded with the builder |
 | `--verbose` | New in TSEP 2025: shows every log message on the console | Excluded with the builder |
 | Version options (Tekla Structures 2017) | "Options to modify extension product version, and to append product version to the .tsep file name". Their names are only in the sign-in documentation, so they are not listed | Excluded with the builder |
+| `TeklaExtensionPackage.Builder.exe` (in `<version>\nt\bin`; https://support.tekla.com/article/an-alternative-way-to-installing-tseps, verified 2026-10-01) | The graphical "TSEP builder and test runner": signs, verifies, installs and uninstalls `.tsep` packages. No switches are documented | Excluded: installs extensions, which are code |
 | `dotnet tool install --global AzureTrustedSignTool` | Installs the signing tool | Excluded: installs software |
 | `AzureTrustedSignTool sign --filePath --accountname AccountName --profilename ProfileName` | Signs a `.tsep` with Azure Trusted Signing; it wraps `dotnet/sign` | Excluded: uses code-signing credentials; writes files |
 
@@ -988,7 +1000,7 @@ Source: https://help.trimble.com/doc/novapoint/novapoint/get-started/install-the
 
 ## 31. Tekla DSTV to DXF Converter command line, excluded
 
-Source: https://support.tekla.com/help/tekla-structures/dstv_to_dxf_converter (verified 2026-10-01). The extension's CLI mode is documented for Tekla Structures 2018 to 2022; from 2023 the conversion is an integrated component without this command line.
+Sources (verified 2026-10-01): the current Tekla Structures 2026 guide, https://support.tekla.com/doc/tekla-structures/2026/int_create_nc_files ("Convert DSTV to DXF through command prompt"), which installs the command in `..\Tekla Structures\<version>\bin\applications\Tekla\Tools\DSTVtoDXFConverter`; the extension page for Tekla Structures 2018 to 2022, https://support.tekla.com/help/tekla-structures/dstv_to_dxf_converter, which documents the same syntax with examples; and https://support.tekla.com/doc/tekla-structures/2026/int_convert_dstv_to_dxf_old for the older `tekla_dstv2dxf.exe`.
 
 **Why it is excluded:** it is a local program that reads NC files from the model folder and writes DXF files, overwriting them by default. The bridge runs no local programs and has no filesystem tool.
 
@@ -1003,6 +1015,7 @@ Source: https://support.tekla.com/help/tekla-structures/dstv_to_dxf_converter (v
 | `-!` | Prints the version number | Excluded with the program |
 | `-?` | Lists the options and commands | Excluded with the program |
 | `examples` | Lists examples that use correct templates | Excluded with the program |
+| `tekla_dstv2dxf.exe`, run through the supplied `dstv2dxf_conversion.bat` files (in `..\bin\applications\Tekla\Tools\dstv2dxf`) | The older converter: converts every DSTV file in a folder to DXF in the same folder, with settings from `tekla_dstv2dxf_<env>.def`. No switches are documented | Excluded: local batch program that writes files |
 
 ## 32. TMWSuite Cloud Hub Connector installer (`chc-install.ps1`), excluded
 
@@ -1015,10 +1028,22 @@ Source: https://developer.trimble.com/docs/tmwsuite/guides/chc-installation/ (ve
 | `chc-install.ps1` (from the Cloud Hub Connector release, with its deployment package) | Installs CHC as an IIS application (default path `/chc`) | Excluded: installs software (a host change) |
 | `chc-install.ps1 -validate` | Calls `GET /chc/v0/BuildInfo` and `GET /chc/v0/odata/Cities/$count`, which need no key or token, to confirm the application runs and reaches the database | Excluded with the installer; the diagnostics are on the customer's host, which the bridge never calls |
 
-## 33. Checked, with no official command line
+## 33. App Xchange Agent installation scripts, excluded
+
+Source: https://help.trimble.com/doc/app-xchange/app-xchange/connectivity/app-xchange-agent (verified 2026-10-01). The App Xchange Agent is an on-premises Windows service that connects a customer's database (for example Vista) to App Xchange over outbound HTTPS. The Add Connector Agent wizard generates an installation script for each agent; it is run in PowerShell 5.0 or later as administrator, and an agent is removed with a similar uninstall script. The legacy v1 agent, a process Trimble will deprecate in 2027, is installed by a separate procedure on the same page and runs as the Windows services `Int.Serv.Core.ConnectorService` and `Int.Serv.Core.ConnectorService.Monitor`.
+
+**Why it is excluded:** the scripts install or remove a Windows service with administrator rights (a host change), and each is generated for one agent. Their text is generated per agent and not published, so there are no switches to list. The bridge runs no local programs.
+
+| Command | What it does | Disposition |
+|---|---|---|
+| Generated installation script (PowerShell, as administrator) | Installs the App Xchange Agent service for the agent created in the wizard | Excluded: installs a service |
+| Generated uninstall script (copied after Delete Connector Agent) | Removes the agent from the server | Excluded: removes a service |
+| App Xchange Agent v1 installation (legacy) | Installs the v1 services named above | Excluded: installs a service |
+
+## 34. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
-- **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.
+- **Only installer and registration command lines:** Tekla Structural Designer (installer and `tsd.exe /reg`), Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.
 - **Also automated through SDKs or APIs:** besides the command lines above, SketchUp, Tekla Structures, Tedds, CoPilot and PC\*MILER have SDKs or APIs. Trimble Access has no documented command line and is automated through its SDK. See [capability-matrix.md](capability-matrix.md).
 - **POSPac:** POSPac MMS's command-line program `POSPacBatch.exe` is publicly named in Applanix release notes, and POSPac Complete advertises a batch command line (both in section 24), but no public page documents their switches. POSPac Cloud is an API, classified in [capability-matrix.md](capability-matrix.md). POSPac Command-line TBC Subscription is installed by TBC (section 14); no public page documents its own command line.
 - **Spectrum Command Prompt** (https://help.trimble.com/doc/spectrum/spectrum/system-administration/administrator-utilities/command-prompt, verified 2026-10-01): opened inside Spectrum with Ctrl + Break, it takes a Spectrum function name to go to that screen, or `PA` to return to the Site Map. Like TBC's CAD command line (section 14), it is an in-application navigation prompt, not an operating-system command line. It belongs to the desktop user interface, which the bridge does not drive, so it is outside this page.
