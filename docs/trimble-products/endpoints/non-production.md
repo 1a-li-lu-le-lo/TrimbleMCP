@@ -166,6 +166,39 @@ staging copy. 29 operations. Definition: [issue-stage@v1](https://api.swaggerhub
 | `PUT` | `/context/{contextId}/issues/{issueId}/links/bulk` | `variant` | covered by `issues:PUT /context/{contextId}/issues/{issueId}/links/bulk` |
 | `PUT` | `/context/{contextId}/issues/{issueId}/links/{linkId}` | `variant` | covered by `issues:PUT /context/{contextId}/issues/{issueId}/links/{linkId}` |
 
+## kuebix (excluded)
+
+discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com. 26 operations. Definition: [kuebix](https://api-docs.kuebix.com/).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/orders` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/shipments/{shipmentId}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/shipments/{shipmentId}/rates/delete` | `excluded` | the definition's reason (above) |
+| `GET` | `/orders` | `excluded` | the definition's reason (above) |
+| `GET` | `/shipment/track` | `excluded` | the definition's reason (above) |
+| `GET` | `/shipments/{shipmentId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/shipments/{shipmentId}/rates` | `excluded` | the definition's reason (above) |
+| `GET` | `/shipments/{shipmentId}/rates/view` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/bookExistingShipment/{shipmentId}` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/createAndBook` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/createAndBookCustomerRouted` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/createAndSchedule` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/quickRate` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/saveShipmentAndSaveRates` | `excluded` | the definition's reason (above) |
+| `POST` | `/action/shipments/{shipmentId}/rates/spot` | `excluded` | the definition's reason (above) |
+| `POST` | `/orders` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/docs/bol` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/docs/labels` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/docs/parcel` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/{shipmentId}/ratequote/save` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/{shipmentId}/rates/save` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/{shipmentId}/rates/{rateQuoteId}/book` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/{shipmentId}/schedule` | `excluded` | the definition's reason (above) |
+| `POST` | `/shipments/{shipmentId}/unbook` | `excluded` | the definition's reason (above) |
+| `PUT` | `/shipments/{shipmentId}` | `excluded` | the definition's reason (above) |
+
 ## model-stage@v1 (variant)
 
 staging copy. 14 operations. Definition: [model-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/model-stage/v1).
@@ -484,6 +517,45 @@ staging copy. 82 operations. Definition: [topic-stage@v2](https://api.swaggerhub
 
 Operations: [non-production--topic-stage-v2.md](non-production--topic-stage-v2.md).
 
+## transporeon/inline-api-for-carrier-slot-booking-deprecated (excluded)
+
+deprecated by Transporeon (page title 'API for Carrier Slot Booking (deprecated)'); the next-generation Appointment API is specified only as a PDF. 6 operations. Definition: [transporeon/inline-api-for-carrier-slot-booking-deprecated](https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/27230328/API+for+Carrier+Slot+Booking+deprecated).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/v1/booking/{bookingId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/v1/config/customfields` | `excluded` | the definition's reason (above) |
+| `GET` | `/v1/openbookings` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/schedule/book` | `excluded` | the definition's reason (above) |
+| `POST` | `/v1/schedule/slots` | `excluded` | the definition's reason (above) |
+| `PUT` | `/v1/schedule/updatevehicleinformation` | `excluded` | the definition's reason (above) |
+
+## transporeon/inline-api-for-visibility (excluded)
+
+the former Tracking & Visibility Interface (Swagger 2.0); its own description says most endpoints are deprecated and supported only for existing implementers, and points to the Visibility API (catalogued as transporeon-visibility). 19 operations. Definition: [transporeon/inline-api-for-visibility](https://transporeon-hcskb.atlassian.net/wiki/spaces/ADPD/pages/27230553/API+for+Visibility).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/{version}/allocation/{shipperId}/{transportNumber}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/{version}/allocation/{transportId}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/{version}/eta/{shipperId}/{transportNumber}/{deliveryNumber}/{loadingType}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/{version}/eta/{transportId}/{deliveryId}/{loadingType}` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/transport/{shipperId}/{transportNumber}` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/transport/{transportId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/vehicleStates` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/workflow/transport/{shipperId}/{transportNumber}` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/workflow/transport/{transportId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/workflows` | `excluded` | the definition's reason (above) |
+| `GET` | `/{version}/workflows/pageSize/{pageSize}/offset/{offset}` | `excluded` | the definition's reason (above) |
+| `POST` | `/{version}/vehicleStatus` | `excluded` | the definition's reason (above) |
+| `POST` | `/{version}/workflowStatus` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/deviceAllocation` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/etas` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/geoPositions` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/licensePlate` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/sixfoldLicensePlate` | `excluded` | the definition's reason (above) |
+| `PUT` | `/{version}/subcarrier/licensePlate` | `excluded` | the definition's reason (above) |
+
 ## transporeon/transporeon-carrier-interface-openapi-v1-swagger-push-json (excluded)
 
 push-notification contract that the carrier implements and Transporeon calls; not an API anyone calls at Transporeon. 12 operations. Definition: [transporeon/transporeon-carrier-interface-openapi-v1-swagger-push-json](https://xch.transporeon.com/carrier_interface/openapi/v1/swagger-push.json).
@@ -599,6 +671,65 @@ credential endpoints (authenticate, refresh, whoami for Appian access tokens); a
 | `POST` | `/Identity/v1/authenticate` | `excluded` | the definition's reason (above) |
 | `POST` | `/Identity/v1/refresh` | `excluded` | the definition's reason (above) |
 | `POST` | `/Identity/v1/whoami` | `excluded` | the definition's reason (above) |
+
+## vista-viewpoint-api/authapiv1 (excluded)
+
+legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host. 26 operations. Definition: [vista-viewpoint-api/authapiv1](https://integrations-qa.centralus.cloudapp.azure.com/swagger/authapiv1/swagger.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `DELETE` | `/api/v1/auth/clientaccount/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/api/v1/auth/segment/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/api/v1/auth/systemadmin/{id}` | `excluded` | the definition's reason (above) |
+| `DELETE` | `/api/v1/auth/tenant/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/auth/clientaccount/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/auth/endpoint/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/auth/segment/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/auth/systemadmin/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/auth/tenant/{id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/api/v1/clientauthorization/{clientId}` | `excluded` | the definition's reason (above) |
+| `GET` | `/health/alive` | `excluded` | the definition's reason (above) |
+| `GET` | `/health/ready` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/clientaccount` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/clientaccount/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/endpoint/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/segment` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/segment/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/sourceproduct/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/systemadmin` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/systemadmin/query` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/tenant` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v1/auth/tenant/query` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/v1/auth/clientaccount/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/v1/auth/segment/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/v1/auth/systemadmin/{id}` | `excluded` | the definition's reason (above) |
+| `PUT` | `/api/v1/auth/tenant/{id}` | `excluded` | the definition's reason (above) |
+
+## vista-viewpoint-api/authapiv2 (excluded)
+
+legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host. 2 operations. Definition: [vista-viewpoint-api/authapiv2](https://integrations-qa.centralus.cloudapp.azure.com/swagger/authapiv2/swagger.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/health/alive` | `excluded` | the definition's reason (above) |
+| `GET` | `/health/ready` | `excluded` | the definition's reason (above) |
+
+## vista-viewpoint-api/commonapiv1 (excluded)
+
+legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host. 88 operations. Definition: [vista-viewpoint-api/commonapiv1](https://integrations-qa.centralus.cloudapp.azure.com/swagger/commonapiv1/swagger.json).
+
+Operations: [non-production--vista-viewpoint-api-commonapiv1.md](non-production--vista-viewpoint-api-commonapiv1.md).
+
+## vista-viewpoint-api/commonapiv2 (excluded)
+
+legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host. 4 operations. Definition: [vista-viewpoint-api/commonapiv2](https://integrations-qa.centralus.cloudapp.azure.com/swagger/commonapiv2/swagger.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/health/alive` | `excluded` | the definition's reason (above) |
+| `GET` | `/health/ready` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/{enterpriseId}/ap/unapprovedinvoice` | `excluded` | the definition's reason (above) |
+| `POST` | `/api/v2/{enterpriseId}/blobstorage/uploadlink` | `excluded` | the definition's reason (above) |
 
 ## xchange-connector/autodesk-cc-account-admin-1 (excluded)
 
@@ -875,6 +1006,34 @@ App Xchange connector definition; Trimble states these OADs 'are provided to off
 | `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/pending_pos/cache/search` | `excluded` | the definition's reason (above) |
 | `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_headers/cache/search` | `excluded` | the definition's reason (above) |
 | `POST` | `/direct/subscribers/{subscriber_code}/foundation/po/1/data/po_items/cache/search` | `excluded` | the definition's reason (above) |
+
+## xchange-connector/ftp-file-management-1 (excluded)
+
+App Xchange connector definition; Trimble states these OADs 'are provided to offer a basic overview of coverage and capabilities' and 'are used internally by the platform and not directly by end users'. 21 operations. Definition: [xchange-connector/ftp-file-management-1](https://api.xchange.trimble.com/connect/v1/direct/ftp/file-management/1/swagger/openapi.json).
+
+| Method | Path | Disposition | Detail |
+|---|---|---|---|
+| `GET` | `/direct/actions/{action_key_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/cache/id/{Id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/cache` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/cache/__ryvitId/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/cache/id/{Id}` | `excluded` | the definition's reason (above) |
+| `GET` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/cache/{ryvitId_value}` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/actions/create` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/actions/delete` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/actions/list` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/actions/move` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/directories/cache/search` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/delete` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/get` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/list` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/move` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/pgp-decrypt` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/actions/write` | `excluded` | the definition's reason (above) |
+| `POST` | `/direct/subscribers/{subscriber_code}/ftp/file-management/1/data/files/cache/search` | `excluded` | the definition's reason (above) |
 
 ## xchange-connector/google-drive-files-1 (excluded)
 

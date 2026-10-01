@@ -172,6 +172,9 @@ func (s *spec) params(pathItem, op map[string]any) []Param {
 			}
 			if sch != nil {
 				pr.Type, pr.Format = typeOf(sch), str(sch, "format")
+				if strings.HasPrefix(pr.Type, "array") || sch["items"] != nil {
+					pr.Type = "array" // e.g. a non-standard "array of TunnelCategory"
+				}
 				enum := sch["enum"]
 				if it := s.resolve(sch["items"]); pr.Type == "array" && it != nil {
 					pr.Type = "array:" + typeOf(it)
@@ -199,6 +202,58 @@ func (s *spec) params(pathItem, op map[string]any) []Param {
 		order := map[string]int{"path": 0, "query": 1, "header": 2, "cookie": 3}
 		return order[out[i].In] < order[out[j].In]
 	})
+	return out
+}
+
+// credentialFields returns the request-body property names, at any depth,
+// that carry credentials (catalog.IsCredentialName).
+func (s *spec) credentialFields(pathItem, op map[string]any) []string {
+	found := map[string]bool{}
+	var walk func(v any, depth int)
+	walk = func(v any, depth int) {
+		sch := s.resolve(v)
+		if sch == nil || depth > 6 {
+			return
+		}
+		for name, p := range obj(sch["properties"]) {
+			if catalog.IsCredentialName(name) {
+				found[name] = true
+			}
+			walk(p, depth+1)
+		}
+		walk(sch["items"], depth+1)
+		for _, k := range []string{"allOf", "oneOf", "anyOf"} {
+			for _, x := range asSlice(sch[k]) {
+				walk(x, depth+1)
+			}
+		}
+	}
+	if rb := s.resolve(op["requestBody"]); rb != nil {
+		for _, c := range obj(rb["content"]) {
+			walk(obj(c)["schema"], 0)
+		}
+	}
+	for _, list := range []any{pathItem["parameters"], op["parameters"]} {
+		for _, p := range asSlice(list) {
+			pm := s.resolve(p)
+			switch str(pm, "in") {
+			case "body":
+				walk(pm["schema"], 0)
+			case "formData":
+				if catalog.IsCredentialName(str(pm, "name")) {
+					found[str(pm, "name")] = true
+				}
+			}
+		}
+	}
+	out := make([]string, 0, len(found))
+	for n := range found {
+		out = append(out, n)
+	}
+	sort.Strings(out)
+	if len(out) == 0 {
+		return nil
+	}
 	return out
 }
 
@@ -376,6 +431,7 @@ func (s *spec) pathOperations(paths map[string]any) []Operation {
 				o.Tags = append(o.Tags, fmt.Sprint(t))
 			}
 			o.BodyTypes, o.BodyReq = s.body(item, op)
+			o.CredentialFields = s.credentialFields(item, op)
 			out = append(out, o)
 		}
 	}

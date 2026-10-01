@@ -7,43 +7,23 @@
 - **Authentication:** none declared; the API is served locally on the field device. Declared security schemes: none declared.
 - **Access:** Local device API.
 - **To call it you would need:** running on the device that hosts Trimble Mobile Manager (https://tmm-api-local.fieldsystems.trimble.com:9638 or http://localhost:9637).
-- **Documented servers:** `ws://tmm-api-local.fieldsystems.trimble.com:9635`, `ws://localhost:9635` (local address), `ws://127.0.0.1:9635` (local address), `ws://tmm-api-local.fieldsystems.trimble.com:9639`, `ws://localhost:9639` (local address), `ws://127.0.0.1:9639` (local address), `https://tmm-api-local.fieldsystems.trimble.com:9638`, `http://tmm-api-local.fieldsystems.trimble.com:9637`, `http://localhost:9637` (local address), `http://127.0.0.1:9637` (local address).
-- **Definitions:** 3, one section each below.
+- **Documented servers:** `https://tmm-api-local.fieldsystems.trimble.com:9638`, `http://tmm-api-local.fieldsystems.trimble.com:9637`, `http://localhost:9637` (local address), `http://127.0.0.1:9637` (local address).
+- **Definition:** [mobile-manager/v1](https://developer.trimble.com/docs/mobile-manager/openapi/v1.json) (TMM REST API, version 1.0.0). Documentation: https://developer.trimble.com/docs/mobile-manager/reference/openapi/v1/.
 
-## WebSocket V1 Server
+## Untagged
 
-Definition [mobile-manager/asyncapi-websocket-v1](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v1.json), 1 operations. Documentation: https://developer.trimble.com/docs/mobile-manager/reference/websocket-v1/.
-
-| Method | Path | Disposition | Tag | Summary | Parameters |
-|---|---|---|---|---|---|
-| `SUBSCRIBE` | `/` | `reference` |  |  |  |
-
-## WebSocket V2 Server
-
-Definition [mobile-manager/asyncapi-websocket-v2](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v2.json), 3 operations. Documentation: https://developer.trimble.com/docs/mobile-manager/reference/websocket-v2/.
-
-| Method | Path | Disposition | Tag | Summary | Parameters |
-|---|---|---|---|---|---|
-| `SUBSCRIBE` | `/` | `variant`: same call as `mobile-manager:SUBSCRIBE /` |  |  |  |
-| `SUBSCRIBE` | `/events` | `reference` |  |  |  |
-| `SUBSCRIBE` | `/locationV2` | `reference` |  |  |  |
-
-## TMM REST API
-
-Definition [mobile-manager/v1](https://developer.trimble.com/docs/mobile-manager/openapi/v1.json), 11 operations. Documentation: https://developer.trimble.com/docs/mobile-manager/reference/openapi/v1/.
-
-| Method | Path | Disposition | Tag | Summary | Parameters |
-|---|---|---|---|---|---|
-| `GET` | `/api/v1/antenna/` | `reference` |  | Get antenna parameters |  |
-| `GET` | `/api/v1/correctionSource/` | `reference` |  | Get correction source parameters |  |
-| `GET` | `/api/v1/positionStream/` | `reference` |  | Get the position stream details | format* (query) |
-| `GET` | `/api/v1/publicKey/` | `reference` |  | Get the TMM API Public Key (RSA) |  |
-| `GET` | `/api/v1/receiver/` | `reference` |  | Get current receiver information |  |
-| `GET` | `/api/v1/tmmInfo/` | `reference` |  | Get TMM information |  |
-| `GET` | `/api/v1/userInfo/` | `reference` |  | Get user information |  |
-| `PUT` | `/api/v1/antenna/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device |  | Set antenna parameters |  |
-| `PUT` | `/api/v1/correctionSource/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device |  | Set correction source parameters |  |
-| `PUT` | `/api/v1/positionStream/locationV2/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device |  | Set configuration for LocationV2 broadcast |  |
-| `PUT` | `/api/v1/receiver/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device |  | Set receiver parameters |  |
+| Method | Path | Disposition | Summary | Parameters |
+|---|---|---|---|---|
+| `GET` | `/api/v1/antenna/` | `reference` | Get antenna parameters |  |
+| `GET` | `/api/v1/correctionSource/` | `reference` | Get correction source parameters |  |
+| `GET` | `/api/v1/positionStream/` | `reference` | Get the position stream details | format* (query) |
+| `GET` | `/api/v1/publicKey/` | `reference` | Get the TMM API Public Key (RSA) |  |
+| `GET` | `/api/v1/receiver/` | `reference` | Get current receiver information |  |
+| `GET` | `/api/v1/tmmInfo/` | `reference` | Get TMM information |  |
+| `GET` | `/api/v1/userInfo/` | `reference` | Get user information |  |
+| `PUT` | `/api/v1/antenna/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device | Set antenna parameters |  |
+| `PUT` | `/api/v1/correctionSource/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device | Set correction source parameters |  |
+| `PUT` | `/api/v1/positionStream/locationV2/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device | Set configuration for LocationV2 broadcast |  |
+| `PUT` | `/api/v1/receiver/` | `excluded`: safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device | Set receiver parameters |  |
 
 `*` marks a required parameter.

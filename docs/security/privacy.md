@@ -8,7 +8,7 @@
 | Trimble Identity tokens | Secret | Upstream auth | Never | Encrypted token store |
 | Caller bearer tokens | Secret | Remote auth | Never | SHA-256 only |
 | Audit records | Internal | Accountability | No | Append-only JSONL; retention set by the operator |
-| Location, fleet, farm, worker data | Restricted | Not configured; the transportation, agriculture and geospatial APIs are `reference` only, and the bridge never calls them | No | n/a |
+| Location, fleet, farm, worker data | Restricted | Not configured; the transportation, agriculture, geospatial and maps APIs (and Civil Site Management device coordinates) are `reference` only, and the bridge never calls them | No | n/a |
 | Catalogue (operation documentation from official definitions) | Public | Find and plan operations | Yes (labelled `catalogue`) | Embedded in the binary |
 | Reference plans (another product's request, with the IDs and body the caller supplied) | As supplied by the caller | Human review | Yes (labelled `reference_only`, `not_executed`) | Not stored; the audit log keeps the input hash |
 

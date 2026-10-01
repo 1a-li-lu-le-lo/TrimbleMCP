@@ -175,7 +175,7 @@ func queryValues(p catalog.Param, raw any) ([]string, error) {
 	}
 	var vals []string
 	if arr, ok := raw.([]any); ok {
-		if !strings.HasPrefix(p.Type, "array") {
+		if p.Type != "array" && !strings.HasPrefix(p.Type, "array:") {
 			return nil, errs.Newf(errs.Validation, "query parameter %s does not take a list", p.Name)
 		}
 		if len(arr) > 100 {
@@ -633,61 +633,87 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	}, nil
 }
 
-// credentialNames are parameter and body field names that carry secrets.
-// Plans are shown to people and models and recorded, so they must never
-// contain credentials; pagination cursors such as skipToken are not
-// credentials and are allowed.
-var credentialNames = map[string]bool{
-	"password": true, "passwd": true, "pwd": true, "secret": true, "clientsecret": true, "client_secret": true,
-	"apikey": true, "api_key": true, "x-api-key": true, "accesstoken": true, "access_token": true,
-	"refreshtoken": true, "refresh_token": true, "idtoken": true, "id_token": true, "gistoken": true,
-	"mfatoken": true, "token": true, "authtoken": true, "auth_token": true, "authorization": true,
-	"privatekey": true, "private_key": true, "sessiontoken": true, "session_token": true,
-}
-
-// refuseCredentials rejects plan inputs whose parameter or body field names
-// (at any depth) are credentials.
+// refuseCredentials rejects plan inputs that carry a credential: a path,
+// query or header parameter, or a body field at any depth, whose name is a
+// credential (catalog.IsCredentialName). Plans are shown to people and
+// models and recorded, so they must never contain credentials. A string
+// body is inspected too: as JSON, and as form-encoded data whose values may
+// themselves be JSON (Unity Maintain/Permit sends data={...}).
 func refuseCredentials(in apiArgs) error {
-	isCred := func(k string) bool { return credentialNames[strings.ToLower(k)] }
+	deny := func(what, name string) error {
+		return errs.Newf(errs.PolicyDenied, "%s %q carries a credential; plans never contain credentials", what, cleanUntrusted(name))
+	}
 	for _, m := range []map[string]string{in.Path, in.Headers} {
 		for k := range m {
-			if isCred(k) {
-				return errs.Newf(errs.PolicyDenied, "%q carries a credential; plans never contain credentials", cleanUntrusted(k))
+			if catalog.IsCredentialName(k) {
+				return deny("parameter", k)
 			}
 		}
 	}
 	for k := range in.Query {
-		if isCred(k) {
-			return errs.Newf(errs.PolicyDenied, "%q carries a credential; plans never contain credentials", cleanUntrusted(k))
+		if catalog.IsCredentialName(k) {
+			return deny("parameter", k)
 		}
 	}
 	var found string
-	var walk func(v any)
-	walk = func(v any) {
+	var walk func(v any, depth int)
+	walk = func(v any, depth int) {
+		if found != "" || depth > 16 {
+			return
+		}
 		switch t := v.(type) {
 		case map[string]any:
 			for k, x := range t {
-				if isCred(k) && found == "" {
+				if catalog.IsCredentialName(k) {
 					found = k
+					return
 				}
-				walk(x)
+				walk(x, depth+1)
 			}
 		case []any:
 			for _, x := range t {
-				walk(x)
+				walk(x, depth+1)
+			}
+		case string:
+			s := strings.TrimSpace(t)
+			var inner any
+			if (strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[")) && json.Unmarshal([]byte(s), &inner) == nil {
+				walk(inner, depth+1)
+				return
+			}
+			if strings.Contains(s, "=") {
+				if form, err := url.ParseQuery(s); err == nil {
+					for k, vals := range form {
+						if catalog.IsCredentialName(k) {
+							found = k
+							return
+						}
+						for _, x := range vals {
+							walk(x, depth+1)
+						}
+					}
+				}
 			}
 		}
 	}
 	if len(in.Body) > 0 {
 		var body any
 		if json.Unmarshal(in.Body, &body) == nil {
-			walk(body)
+			walk(body, 0)
 		}
 	}
 	if found != "" {
-		return errs.Newf(errs.PolicyDenied, "body field %q carries a credential; plans never contain credentials", cleanUntrusted(found))
+		return deny("body field", found)
 	}
 	return nil
+}
+
+// vehicleAPIs are APIs outside the transportation and agriculture families
+// that manage vehicles, drivers or in-cab navigation; their plans carry the
+// qualified-person warning too.
+var vehicleAPIs = map[string]bool{
+	"trimble-maps-fleet": true, "trimble-maps-routing-profile": true, "trimble-maps-routereporter": true,
+	"trimble-maps-dwell-time": true, "trimble-maps-multi-vehicle-routing": true,
 }
 
 // referencePlan renders a dry-run request for another product's operation.
@@ -725,7 +751,7 @@ func referencePlan(op *catalog.Operation, path map[string]string, query url.Valu
 	if op.Deprecated {
 		warnings = append(warnings, "Trimble marks this operation as deprecated.")
 	}
-	if a.Family == "transportation" || a.Family == "agriculture" {
+	if a.Family == "transportation" || a.Family == "agriculture" || vehicleAPIs[a.ID] {
 		warnings = append(warnings, "This product manages vehicles, drivers or field operations. A qualified person must review and perform the request; the bridge never operates vehicles or machinery.")
 	}
 	plan := map[string]any{

@@ -21,8 +21,8 @@
 | `GET` | `/v1/documents/{id}` | `reference` | Get details of a document with provided Id | id* (path) |
 | `GET` | `/v1/documents/{id}/attachments/{attachmentId}` | `reference` | Get an attachment of a document by document id and attachment id | id* (path); attachmentId* (path) |
 | `GET` | `/v1/documents/{id}/pdf` | `reference` | Get PDF of a document with provided Id | id* (path) |
-| `GET` | `/v1/documents/{id}/sharing` | `reference` | Get sharing data of a document with provided Id | id* (path) |
-| `GET` | `/v1/documents/{id}/sharing/{tokenType}` | `reference` | Get sharing data of a document with provided Id | id* (path); tokenType* (path) |
+| `GET` | `/v1/documents/{id}/sharing` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Get sharing data of a document with provided Id | id* (path) |
+| `GET` | `/v1/documents/{id}/sharing/{tokenType}` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Get sharing data of a document with provided Id | id* (path); tokenType* (path) |
 | `GET` | `/v1/documents/{id}/signature/{role}` | `reference` | Get signature of a document with provided Id and role | id* (path); role* (path) |
 
 ## eCMR

@@ -4,10 +4,10 @@ A Go MCP server and cross-agent skill that give AI agents narrow, audited, **rea
 
 The first adapter is the **Trimble Connect** REST API: projects, folder items, and file metadata. A simulated `mock` adapter lets everything run without credentials.
 
-**Coverage:** every Trimble API operation with a public definition is accounted for: **12,963 operations in 347 definitions**.
+**Coverage:** every Trimble API operation with a public definition is accounted for: **13,275 operations in 357 definitions**.
 
 - **Trimble Connect** (11 APIs): reads are executable, and changes are dry-run plans. Its prose-documented Core Account endpoints are catalogued too.
-- **Other products** (50 reference APIs: Vista, ProjectSight, Viewpoint For Projects, Unity Construct, Unity Maintain/Permit, Accubid Anywhere, Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, Transporeon, Trimble Maps, PC*MILER, PTx FarmENGAGE): documented and plannable, never called.
+- **Other products** (54 reference APIs: Vista, ProjectSight, Viewpoint For Projects, Unity Construct, Unity Maintain/Permit, Accubid Anywhere, Civil Site Management, Geospatial field services, Mobile Manager, TMT, TMWSuite, TruckMate, Transporeon, Trimble Maps, PC*MILER, PTx FarmENGAGE): documented and plannable, never called.
 - **Copies:** staging, QA and draft copies, and duplicate publications, are `variant`s that point at the operation they copy.
 - **Excluded, with a reason:** internal App Xchange connector definitions, push and webhook contracts, undocumented or deprecated definitions, credential operations, and safety exclusions.
 - **Trimble Identity:** every endpoint is catalogued and excluded for agents.
@@ -55,7 +55,7 @@ make build test smoke
 - `trimble_get_project` (listed only where the upstream endpoint is verified)
 - `trimble_list_folder_items`
 - `trimble_get_file_metadata`
-- `trimble_api_operations`, `trimble_api_read`, `trimble_api_plan`: every catalogued operation (12,963 in 347 definitions).
+- `trimble_api_operations`, `trimble_api_read`, `trimble_api_plan`: every catalogued operation (13,275 in 357 definitions).
   - **Trimble Connect:** production reads are executable, and changes are dry-run planned.
   - **Other products:** operations are `reference`, which means searchable and dry-run planned, never called.
   - **Copies:** `variant`, pointing at the operation they duplicate.

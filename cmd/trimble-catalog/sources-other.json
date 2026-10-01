@@ -106,6 +106,8 @@
         "https://api.xchange.trimble.com/connect/v1/direct/vista/sl/2/swagger/openapi.json",
         "https://api.xchange.trimble.com/connect/v1/direct/vista/sm/2/swagger/openapi.json",
         "https://api.xchange.trimble.com/connect/v1/direct/vista/ud/2/swagger/openapi.json"]}
+      ,{"page": "https://appxchange.trimble.com/connectors/s-ftp-connector", "definitions": [
+        "https://api.xchange.trimble.com/connect/v1/direct/ftp/file-management/1/swagger/openapi.json"]}
     ]},
   "confluence": [
     {"base": "https://transporeon-hcskb.atlassian.net/wiki", "space": "ADPD", "id_prefix": "transporeon/",
@@ -145,6 +147,12 @@
     {"id": "trimble-maps-places", "url": "https://api.trimblemaps.com/swagger/v1/swagger.json", "doc_url": "https://api.trimblemaps.com/places/v1/swagger/index.html"},
     {"id": "ptx-farmengage", "url": "https://api-docs.farmengage.com/swagger.json", "doc_url": "https://api-docs.farmengage.com/"},
     {"id": "viewpoint-for-projects", "url": "https://api-uk.vfp.viewpoint.com/swagger/docs/latest", "doc_url": "https://help.trimble.com/en/viewpoint-for-projects/viewpoint-for-projects/administrators-guide/it-dept-info/api-and-developer-documentation"},
+    {"id": "truckmate-imaging", "url": "https://truckmatecloudhub.trimble-transportation.com/imaging/openapi.json", "doc_url": "https://truckmatecloudhub.trimble-transportation.com/imaging/documentation"},
+    {"id": "vista-viewpoint-api/commonapiv1", "url": "https://integrations-qa.centralus.cloudapp.azure.com/swagger/commonapiv1/swagger.json", "doc_url": "https://sites.google.com/trimble.com/vista-cloud-faq/home/integration-technology/vista-apis"},
+    {"id": "vista-viewpoint-api/authapiv1", "url": "https://integrations-qa.centralus.cloudapp.azure.com/swagger/authapiv1/swagger.json", "doc_url": "https://sites.google.com/trimble.com/vista-cloud-faq/home/integration-technology/vista-apis"},
+    {"id": "vista-viewpoint-api/commonapiv2", "url": "https://integrations-qa.centralus.cloudapp.azure.com/swagger/commonapiv2/swagger.json", "doc_url": "https://sites.google.com/trimble.com/vista-cloud-faq/home/integration-technology/vista-apis"},
+    {"id": "vista-viewpoint-api/authapiv2", "url": "https://integrations-qa.centralus.cloudapp.azure.com/swagger/authapiv2/swagger.json", "doc_url": "https://sites.google.com/trimble.com/vista-cloud-faq/home/integration-technology/vista-apis"},
+    {"id": "kuebix", "url": "https://api-docs.kuebix.com/", "doc_url": "https://api-docs.kuebix.com/"},
     {"id": "trimble-maps-routereporter-service", "url": "https://routereporterservice.trimblemaps.com/swagger/v1/swagger.json", "doc_url": ""},
     {"id": "trimble-maps-contentapi", "url": "https://contentapi.trimblemaps.com/swagger/v1/swagger.json", "doc_url": ""},
     {"id": "tekla-support-dev", "url": "https://api.swaggerhub.com/apis/Tekla/ts-support_service_api_v_3/v3", "doc_url": ""},
@@ -156,9 +164,9 @@
     {"match_key": "^ptx-farmengage:PUT /(operations|prescriptions)/[^ ]*/vehicletarget/", "reason": "safety: sends a work order or prescription (application map) to the in-cab device of a vehicle, which can drive field machinery; the bridge never plans or performs anything that reaches machinery"},
     {"match_key": "^ptx-farmengage:PATCH /resources/[^ ]*/resourcefiles/[^ ]*/send$", "reason": "safety: sends a resource file (guidance lines, boundaries, vehicle and implement profiles) to in-cab PTx displays that guide field machinery; the bridge never plans or performs anything that reaches machinery"},
     {"match_key": "^ptx-farmengage:(POST /prescriptions/[^ ]*/rx/importjob|PATCH /prescriptions/[^ ]*/rx/importjob/[^ ]*)$", "reason": "safety: imports a prescription (application map) that is sent to the in-cab devices named in deviceIds; a plan cannot tell whether the job targets devices, so neither step is planned"},
-    {"match_key": "^trimble-maps-fleet:(POST|PUT|DELETE) /(vehiclegroups/[^ ]*/(routingProfiles|avoidFavorSets|customPlaceSets|mapsets)|configurationprofiles/[^ ]*/vehiclegroups/|configurationProfiles|mapsets|avoidFavorSets|customPlaceSets)", "reason": "safety: changes the routing, configuration or map data that in-cab CoPilot navigation uses for a group of vehicles; a qualified fleet administrator must make such changes"},
+    {"match_key": "^trimble-maps-fleet:((POST|PUT|DELETE) /(vehiclegroups/[^ ]*/(routingProfiles|avoidFavorSets|customPlaceSets|mapsets|vehicles)|configurationprofiles/[^ ]*/vehiclegroups/|configurationProfiles|mapsets|avoidFavorSets|customPlaceSets)|POST /vehiclegroups$|DELETE /vehiclegroups/[^/ ]+$)", "reason": "safety: changes the routing, configuration or map data that in-cab CoPilot navigation uses for a group of vehicles (including creating a group with default profiles, moving vehicles between groups, or deleting a group); a qualified fleet administrator must make such changes"},
     {"match_key": "^trimble-maps-routing-profile:(POST|PUT|DELETE) ", "reason": "safety: changes a vehicle routing profile (dimensions, weights, hazardous materials) that in-cab navigation uses to route trucks; a qualified fleet administrator must make such changes"},
-    {"match_key": "^(tmt:POST /Integration/OAuth/(Token|Refresh|Revoke)|truckmate(-master-data)?:(GET|POST) /login|truckmate:POST /documents/[^ ]*/token|unity-construct:POST /api/v2/Authenticate|trimble-maps-places:POST /places/v1/authenticate|ptx-farmengage:POST /adaptplugin/token|unity-maintain-permit:POST /General/(Authentication/(Authenticate[A-Za-z]*|CityworksOnlineAuthenticate|GetToken|Validate)|Token/RevokeUser)|unity-maintain-permit:POST /Ams/GISService/(Add|Update)GISServiceEndPointSecurity|unity-maintain-permit:POST /Ams/Designer/CreateUser|trimble-maps-account-manager:POST /authenticate|trimble-maps-fleet:POST /accounts/authenticate|trimble-maps-single-search:POST /api/authenticate|trimble-maps-routereporter:POST /identity/v2/token)$", "reason": "safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity)"},
+    {"match_key": "^(tmt:POST /Integration/OAuth/(Token|Refresh|Revoke)|truckmate(-master-data)?:(GET|POST) /login|truckmate:POST /documents/[^ ]*/token|unity-construct:POST /api/v2/Authenticate|trimble-maps-places:POST /places/v1/authenticate|ptx-farmengage:POST /adaptplugin/token|unity-maintain-permit:POST /General/(Authentication/(Authenticate[A-Za-z]*|CityworksOnlineAuthenticate|GetToken|Validate)|Token/RevokeUser)|unity-maintain-permit:POST /Ams/GISService/(Add|Update)GISServiceEndPointSecurity|unity-maintain-permit:POST /Ams/Designer/CreateUser|trimble-maps-account-manager:POST /authenticate|trimble-maps-fleet:POST /accounts/authenticate|trimble-maps-single-search:POST /api/authenticate|trimble-maps-routereporter:POST /identity/v2/token|tmt:POST /Integration/(System/(Customer|Employee)|LTC/LTCCustomer)|truckmate:(POST /webUsers|PUT /webUsers/\\{username\\})|unity-maintain-permit:POST /(Ams/Employee/(Add|Update)|General/Authentication/CityworksOnlineSites)|transporeon-ecmr:GET /v1/documents/\\{id\\}/sharing(/\\{tokenType\\})?|transporeon-yard-appointments:[A-Z]+ /yard-management/operations/v1/token-link/.*|truckmate:GET /documents/\\{documentType\\}/searchValues/\\{documentIdentifier\\}/\\{documentFormat\\})$", "reason": "safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity)"},
     {"match_key": "^mobile-manager:(POST|PUT|PATCH|DELETE) ", "reason": "safety: changes GNSS receiver, antenna, correction or position-stream settings on a field device; positioning that guides survey or machine work must be configured by a qualified person on the device"}
   ],
   "rules": [
@@ -187,6 +195,12 @@
     {"match_doc": "/docs/geospatial/reference/openapi/field-data/", "class": "reference", "api": "geospatial-field-data", "family": "geospatial", "product": "Trimble Geospatial Field Data (Jobs)",
      "auth": "OAuth 2.0 (Trimble Identity, id.trimble.com)", "access": "Customer",
      "requires": "a Trimble Identity token with the jobs service scope"},
+    {"match_source": "mobile-manager/asyncapi-websocket-v1", "class": "reference", "api": "mobile-manager-ws-v1", "family": "geospatial", "product": "Trimble Mobile Manager WebSocket V1 (location stream)",
+     "auth": "none declared; served locally on the field device", "access": "Local device API",
+     "requires": "running on the device that hosts Trimble Mobile Manager (ws://tmm-api-local.fieldsystems.trimble.com:9635 or ws://localhost:9635)"},
+    {"match_source": "mobile-manager/asyncapi-websocket-v2", "class": "reference", "api": "mobile-manager-ws-v2", "family": "geospatial", "product": "Trimble Mobile Manager WebSocket V2 (location and event streams)",
+     "auth": "none declared; served locally on the field device", "access": "Local device API",
+     "requires": "running on the device that hosts Trimble Mobile Manager (ws://tmm-api-local.fieldsystems.trimble.com:9639 or ws://localhost:9639)"},
     {"match_doc": "/docs/mobile-manager/", "class": "reference", "api": "mobile-manager", "family": "geospatial", "product": "Trimble Mobile Manager",
      "auth": "none declared; the API is served locally on the field device", "access": "Local device API",
      "requires": "running on the device that hosts Trimble Mobile Manager (https://tmm-api-local.fieldsystems.trimble.com:9638 or http://localhost:9637)"},
@@ -276,6 +290,20 @@
      "reason": "push-notification contract that the shipper implements and Transporeon calls; not an API anyone calls at Transporeon"},
     {"match_source": "transporeon/transporeon-operations-v3-api-docs-transport-operations-outgoing", "class": "excluded", "family": "transportation", "product": "Transporeon: Transport Operations outgoing",
      "reason": "outgoing (webhook) contract that the customer implements at its own endpoint (the definition's server is a placeholder); Transporeon calls it"},
+
+    {"match_source": "truckmate-imaging", "class": "reference", "api": "truckmate-imaging", "family": "transportation", "product": "TruckMate Imaging REST API",
+     "auth": "HTTP bearer (as the other TruckMate REST APIs)", "access": "Licensed separately (Imaging Tier-1 #63000, Tier-2 #63010); imaging vendors",
+     "requires": "the TruckMate Imaging licence, a bearer credential, and the customer's TruckMate host (the definition declares no servers)"},
+    {"match_prefix": "vista-viewpoint-api/", "class": "excluded", "family": "construction", "product": "Viewpoint API (legacy Vista REST API)",
+     "reason": "legacy: Trimble's Vista Cloud FAQ says the Viewpoint API is no longer actively developed and that App Xchange is preferred, and its only documented host is a QA-named Azure host"},
+    {"match_source": "kuebix", "class": "excluded", "family": "transportation", "product": "Kuebix TMS (Trimble Transportation)",
+     "reason": "discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com"},
+    {"match_source": "transporeon/inline-api-for-freight-procurement", "class": "reference", "api": "transporeon-freight-procurement", "family": "transportation", "product": "Transporeon: Freight Procurement API",
+     "auth": "per the definition (Transporeon credentials)", "access": "Transporeon Freight Procurement (tendering) customers", "requires": "Transporeon credentials for api.transporeon.com/TenderingApi"},
+    {"match_source": "transporeon/inline-api-for-carrier-slot-booking-deprecated", "class": "excluded", "family": "transportation", "product": "Transporeon: Carrier Slot Booking API",
+     "reason": "deprecated by Transporeon (page title 'API for Carrier Slot Booking (deprecated)'); the next-generation Appointment API is specified only as a PDF"},
+    {"match_source": "transporeon/inline-api-for-visibility", "class": "excluded", "family": "transportation", "product": "Transporeon: former Tracking & Visibility Interface",
+     "reason": "the former Tracking & Visibility Interface (Swagger 2.0); its own description says most endpoints are deprecated and supported only for existing implementers, and points to the Visibility API (catalogued as transporeon-visibility)"},
 
     {"match_source": "vista", "class": "reference", "api": "vista", "family": "construction", "product": "Trimble Construction One: Vista (App Xchange Direct API)",
      "auth": "X-Application-Key header (API key)", "access": "Cloud-hosted Vista customers who purchase the Vista API; 2,000 requests per minute per key",

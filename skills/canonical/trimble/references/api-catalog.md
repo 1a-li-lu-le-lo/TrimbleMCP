@@ -8,8 +8,6 @@ Trimble Connect has 11 production APIs:
 - Model
 - Model Feature
 - Org (Organizer)
-
-Its Core Account endpoints, documented in prose only, are reference APIs (`connect-ecom`, `connect-projects-api`).
 - Property Set
 - Topics (BCF 2.1/3.0)
 - Topics Exchange
@@ -18,11 +16,13 @@ Its Core Account endpoints, documented in prose only, are reference APIs (`conne
 - Drive (beta)
 - File Service (preview)
 
+Its Core Account endpoints, documented in prose only, are reference APIs (`connect-ecom`, `connect-projects-api`).
+
 The other products (`reference`), by family:
 
 - **construction:** Vista (`vista`), ProjectSight (`projectsight`), Viewpoint For Projects (`viewpoint-for-projects`), Unity Construct (`unity-construct`), Unity Maintain/Permit, also known as Cityworks (`unity-maintain-permit`), Accubid Anywhere (`accubid-*`), Civil Site Management (`civil-site-management`)
-- **geospatial:** Field Configuration (`geospatial-field-configuration`), Field Data/Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`, including WebSocket streams as `SUBSCRIBE` operations)
-- **transportation:** TMT (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`), Transporeon (`transporeon-*`)
+- **geospatial:** Field Configuration (`geospatial-field-configuration`), Field Data/Jobs (`geospatial-field-data`), Mobile Manager (`mobile-manager`; WebSocket streams as `SUBSCRIBE` operations in `mobile-manager-ws-v1` and `mobile-manager-ws-v2`)
+- **transportation:** TMT (`tmt`), TMWSuite (`tmwsuite-*`), TruckMate (`truckmate*`, including `truckmate-imaging`), Transporeon (`transporeon-*`)
 - **maps:** Trimble Maps (`trimble-maps-*`) and PC*MILER Route Reports (`pcmiler-route-reports`)
 - **agriculture:** PTx FarmENGAGE (`ptx-farmengage`)
 
@@ -66,7 +66,7 @@ Report it as a request for a person or a separately authorised integration to pe
   - every Trimble-internal or non-production-only operation;
   - every Trimble Identity endpoint;
   - definitions Trimble does not document;
-  - **safety exclusions** (reasons start with `safety:`): FarmENGAGE operations that send prescriptions, work orders or resource files (guidance lines, boundaries, vehicle and implement profiles) to in-cab devices, including both steps of a prescription import; Trimble Maps Fleet and Routing Profile changes to the routing, configuration or map data that in-cab CoPilot navigation uses; Mobile Manager changes to GNSS receiver, antenna, correction or position-stream settings; and every other product's sign-in, token and secret-storing operations (agents never handle credentials). Stop and explain; never describe how to perform them another way.
+  - **safety exclusions** (reasons start with `safety:`): FarmENGAGE operations that send prescriptions, work orders or resource files (guidance lines, boundaries, vehicle and implement profiles) to in-cab devices, including both steps of a prescription import; Trimble Maps Fleet and Routing Profile changes to the routing, configuration or map data that in-cab CoPilot navigation uses; Mobile Manager changes to GNSS receiver, antenna, correction or position-stream settings; and every operation that signs in, issues or shares a token (such as Transporeon eCMR sharing links), or whose request carries a credential (agents never handle credentials). Stop and explain; never describe how to perform them another way.
 - **Transportation and agriculture plans** carry a warning: a qualified person must review and perform them.
 - **Staging:** with `TRIMBLE_CONNECT_ENV=stage`, published staging hosts exist only for `core` (us, eu, ap), `topics` and `topic-exchange` (us, ap) and `file-service` (us). Any other API or region returns `unsupported_capability` in staging.
 - **Status:** an API marked `preview` or `beta` (File Service, Drive) is flagged in warnings.

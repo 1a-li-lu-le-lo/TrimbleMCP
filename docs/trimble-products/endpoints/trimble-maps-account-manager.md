@@ -25,7 +25,7 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/authenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authenticate Account Manager | body: application/json |
+| `POST` | `/authenticate` | `excluded`: safety: the request body carries credential fields (apiKey); agents never handle credentials | Authenticate Account Manager | body: application/json |
 
 ## Company
 

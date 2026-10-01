@@ -234,7 +234,7 @@ Definition [unity-maintain-permit/ams-designer](https://us-aws-ro.fileservice.tr
 | `POST` | `/Ams/Designer/CodeDescScores` | `reference` | Designer | Code desc score |  |
 | `POST` | `/Ams/Designer/CodeDescriptions` | `reference` | Designer | Code descriptions | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Designer/CodeTypes` | `reference` | Designer | Code types | body: application/x-www-form-urlencoded |
-| `POST` | `/Ams/Designer/CreateUser` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Designer | Create user | body: application/x-www-form-urlencoded |
+| `POST` | `/Ams/Designer/CreateUser` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Designer | Create user | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Designer/DeleteAttachmentMappings` | `reference` | Designer | Delete attachment mappings | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Designer/DeleteCodeDescriptions` | `reference` | Designer | Delete code description | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Designer/DeleteCodeType` | `reference` | Designer | Delete code type, will also delete associated codes | body: application/x-www-form-urlencoded |
@@ -274,7 +274,7 @@ Definition [unity-maintain-permit/ams-employee](https://us-aws-ro.fileservice.tr
 
 | Method | Path | Disposition | Tag | Summary | Parameters |
 |---|---|---|---|---|---|
-| `POST` | `/Ams/Employee/Add` | `reference` | Employee | Add employee | body: application/x-www-form-urlencoded |
+| `POST` | `/Ams/Employee/Add` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Employee | Add employee | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Employee/AddLicensedItems` | `reference` | Employee | AddLicensedItems | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Employee/All` | `reference` | Employee | Get a list of all employees | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Employee/ByAdminUnits` | `reference` | Employee | Get employees by admin units. | body: application/x-www-form-urlencoded |
@@ -289,7 +289,7 @@ Definition [unity-maintain-permit/ams-employee](https://us-aws-ro.fileservice.tr
 | `POST` | `/Ams/Employee/Groups` | `reference` | Employee | Get groups that given employees are member of by employee sid. | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Employee/NamesAreUnique` | `reference` | Employee | Are the names unique | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/Employee/Search` | `reference` | Employee | Search employees | body: application/x-www-form-urlencoded |
-| `POST` | `/Ams/Employee/Update` | `reference` | Employee | Update employee | body: application/x-www-form-urlencoded |
+| `POST` | `/Ams/Employee/Update` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Employee | Update employee | body: application/x-www-form-urlencoded |
 
 ## Trimble Unity 3.4 API — Ams/Entity
 
@@ -443,12 +443,12 @@ Definition [unity-maintain-permit/ams-gisservice](https://us-aws-ro.fileservice.
 | Method | Path | Disposition | Tag | Summary | Parameters |
 |---|---|---|---|---|---|
 | `POST` | `/Ams/GISService/AddGISServiceDefinition` | `reference` | GISService | Add a new GISServiceDefinition | body: application/x-www-form-urlencoded |
-| `POST` | `/Ams/GISService/AddGISServiceEndPointSecurity` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | GISService | Add a new GISServiceEndPoint with optional Security settings | body: application/x-www-form-urlencoded |
+| `POST` | `/Ams/GISService/AddGISServiceEndPointSecurity` | `excluded`: safety: the request body carries credential fields (ClientSecret, Password); agents never handle credentials | GISService | Add a new GISServiceEndPoint with optional Security settings | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/GISService/CloneGISServiceDefinition` | `reference` | GISService | Clone a GISServiceDefinition | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/GISService/DeleteGISServiceDefinitions` | `reference` | GISService | Delete GISServiceDefinitions | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/GISService/DeleteGISServiceEndPointSecurities` | `reference` | GISService | Delete ServiceEndPoints | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/GISService/GISServiceDefinitions` | `reference` | GISService | Get list of GISServiceDefinitions, by Id, Name, or combination of DomainId, EmployeeSid, and GroupId, defaults to current user values if nothing is provided. | body: application/x-www-form-urlencoded |
-| `POST` | `/Ams/GISService/UpdateGISServiceEndPointSecurity` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | GISService | Update a GISServiceEndPointSecurity | body: application/x-www-form-urlencoded |
+| `POST` | `/Ams/GISService/UpdateGISServiceEndPointSecurity` | `excluded`: safety: the request body carries credential fields (ClientSecret, Password); agents never handle credentials | GISService | Update a GISServiceEndPointSecurity | body: application/x-www-form-urlencoded |
 | `POST` | `/Ams/GISService/ValidateServiceSecurity` | `reference` | GISService | Validate service url and security for GISServiceSecurities | body: application/x-www-form-urlencoded |
 
 ## Trimble Unity 3.4 API — Ams/Inbox
@@ -1197,17 +1197,17 @@ Definition [unity-maintain-permit/general-authentication](https://us-aws-ro.file
 | Method | Path | Disposition | Tag | Summary | Parameters |
 |---|---|---|---|---|---|
 | `POST` | `/General/Authentication/ApiVersion` | `reference` | Authentication | Get the current api version |  |
-| `POST` | `/General/Authentication/Authenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Authenticate a username and password | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/AuthenticateGisToken` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Authenticate a username with a GIS Token | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/AuthenticateMfaToken` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Authenticate with a Mfa Token | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/AuthenticateTidToken` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Authenticate a username with a Tid access token | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/CityworksOnlineAuthenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Authenticate a username and password | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/CityworksOnlineSites` | `reference` | Authentication | Get a list of sites for this user | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/Authenticate` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Authentication | Authenticate a username and password | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/AuthenticateGisToken` | `excluded`: safety: the request body carries credential fields (GisToken); agents never handle credentials | Authentication | Authenticate a username with a GIS Token | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/AuthenticateMfaToken` | `excluded`: safety: the request body carries credential fields (MfaToken); agents never handle credentials | Authentication | Authenticate with a Mfa Token | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/AuthenticateTidToken` | `excluded`: safety: the request body carries credential fields (AccessToken, IdToken); agents never handle credentials | Authentication | Authenticate a username with a Tid access token | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/CityworksOnlineAuthenticate` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Authentication | Authenticate a username and password | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/CityworksOnlineSites` | `excluded`: safety: the request body carries credential fields (Password); agents never handle credentials | Authentication | Get a list of sites for this user | body: application/x-www-form-urlencoded |
 | `POST` | `/General/Authentication/Domains` | `reference` | Authentication | Get a list of domains |  |
 | `POST` | `/General/Authentication/GetToken` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Get token for DomainId, StoreDomainId and/or OrgId | body: application/x-www-form-urlencoded |
 | `POST` | `/General/Authentication/Groups` | `reference` | Authentication | Get the CWGroups for the given domain. | body: application/x-www-form-urlencoded |
 | `POST` | `/General/Authentication/User` | `reference` | Authentication | Get user information by login name | body: application/x-www-form-urlencoded |
-| `POST` | `/General/Authentication/Validate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authentication | Validate an authentication token | body: application/x-www-form-urlencoded |
+| `POST` | `/General/Authentication/Validate` | `excluded`: safety: the request body carries credential fields (Token); agents never handle credentials | Authentication | Validate an authentication token | body: application/x-www-form-urlencoded |
 | `POST` | `/General/Authentication/Version` | `reference` | Authentication | Get the current software version |  |
 
 ## Trimble Unity 3.4 API — General/Authorization

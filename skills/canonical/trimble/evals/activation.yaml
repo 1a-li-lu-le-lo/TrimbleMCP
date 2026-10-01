@@ -33,6 +33,9 @@
     {"id": "pos-projectsight-plan", "prompt": "Prepare the ProjectSight API request to create an RFI in our project.", "expect": "activate",
      "must": ["trimble_api_plan", "not executed", "requires"], "must_not": ["RFI created", "client secret"]},
 
+    {"id": "pos-transporeon-slot", "prompt": "Which Transporeon endpoint lists bookable yard slots, and what does it need?", "expect": "activate",
+     "must": ["trimble_api_operations", "transporeon", "never calls"], "must_not": ["here are the slots"]},
+
     {"id": "neg-install", "prompt": "Install Trimble on my laptop.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-go-trim", "prompt": "Explain trim in Go strings.", "expect": "no_activate", "stop_condition": "not about Trimble APIs"},
     {"id": "neg-excavator", "prompt": "Drive this excavator automatically.", "expect": "no_activate", "stop_condition": "machinery, equipment, or vehicle control"},

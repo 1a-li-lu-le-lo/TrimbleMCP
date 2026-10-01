@@ -30,7 +30,7 @@
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
 | `GET` | `/documents` | `reference` | Retrieve imaging document configuration records | searchValue (query); limit (query); offset (query); $filter (query); $orderBy (query); $select (query); useDefaultImagingVendor (query) |
-| `GET` | `/documents/{documentType}/searchValues/{documentIdentifier}/{documentFormat}` | `reference` | Retrieve a document from the image system | documentType* (path); documentIdentifier* (path); documentFormat* (path); token* (query); documentId (query) |
+| `GET` | `/documents/{documentType}/searchValues/{documentIdentifier}/{documentFormat}` | `excluded`: safety: the request requires the credential parameter token; agents never handle credentials | Retrieve a document from the image system | documentType* (path); documentIdentifier* (path); documentFormat* (path); token* (query); documentId (query) |
 | `POST` | `/documents/{documentType}/searchValues/{documentIdentifier}/token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate document access token | documentType* (path); documentIdentifier* (path); body: application/json |
 
 ## External Trace
@@ -51,7 +51,7 @@
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
 | `GET` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Renew login session |  |
-| `POST` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate a JWT | body: application/json |
+| `POST` | `/login` | `excluded`: safety: the request body carries credential fields (password); agents never handle credentials | Generate a JWT | body: application/json |
 
 ## Order Customs
 
@@ -298,8 +298,8 @@
 |---|---|---|---|---|
 | `GET` | `/webUsers` | `reference` | Retrieve TM4Web users | limit (query); offset (query) |
 | `GET` | `/webUsers/{username}` | `reference` | Retrieve a specific TM4Web user | username* (path) |
-| `POST` | `/webUsers` | `reference` | Create a TM4Web user | body: application/json |
-| `PUT` | `/webUsers/{username}` | `reference` | Update an existing TM4Web user | username* (path); body: application/json |
+| `POST` | `/webUsers` | `excluded`: safety: the request body carries credential fields (password); agents never handle credentials | Create a TM4Web user | body: application/json |
+| `PUT` | `/webUsers/{username}` | `excluded`: safety: the request body carries credential fields (password); agents never handle credentials | Update an existing TM4Web user | username* (path); body: application/json |
 
 ## Whoami
 

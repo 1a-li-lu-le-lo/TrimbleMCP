@@ -218,7 +218,7 @@
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
 | `GET` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Renew login session |  |
-| `POST` | `/login` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate a JWT | body: application/json |
+| `POST` | `/login` | `excluded`: safety: the request body carries credential fields (password); agents never handle credentials | Generate a JWT | body: application/json |
 
 ## Operation Codes
 

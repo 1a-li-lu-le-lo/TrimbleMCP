@@ -182,7 +182,7 @@ These switches are passed to `SketchUp.exe`, or to the macOS binary `SketchUp.ap
 | `rubocop --format json --out results.json` | `rubocop-sketchup` (installed with `gem install rubocop` and `gem install rubocop-sketchup`, configured in `.rubocop.yml`) analyses a SketchUp extension's source and writes JSON results | Excluded: developer tooling; reads a source tree and writes files |
 | `rubocop -f extension_review -o report.html` | The Extension Review formatter; writes an HTML report | Excluded: same |
 
-## 11. Tekla Tedds `TeddsCalcCommand.exe`, excluded
+## 11. Tekla Tedds `TeddsCalcCommand.exe` and `TedToPdf.exe`, excluded
 
 Source: https://support.tekla.com/doc/tekla-tedds/2026/oth_teddscalccommand (verified 2026-09-29; the same page exists for 2024). Tekla describes it as "a utility application which allows the Tedds Calculator to be used in automation scenarios without having to use the Tekla Tedds API". It is in the Tedds program folder, typically `C:\Program Files\Tekla\Structural\Tedds`.
 
@@ -200,6 +200,21 @@ Syntax, as documented: `TeddsCalcCommand.exe -lib <calculation_library_filename>
 | `-ui hidden` | Hides the user interface and simulates progress through it; shows it if validation fails | Excluded: same |
 | `-ui disabled` | No user interface and no input validation; the design completes whatever the input | Excluded: skips input validation, so the results may be invalid (safety) |
 
+`TedToPdf.exe`, a second Tedds utility that batch-converts Tedds documents (`.ted`) to PDF.
+
+Source: https://support.tekla.com/article/how-can-i-batch-convert-tedds-document-ted-files-to-pdf-files (Tekla Tedds 2026 - 2022; verified 2026-10-01). It is in the Tedds installation folder, typically `C:\Program Files (x86)\Tekla\Structural\Tedds`, needs .NET Core 3.1 or later, and was introduced in Tedds 2020 Service Pack 1. Each PDF is written next to its `.ted` file with the same name. The article says that the C# source is on GitHub (TrimbleSolutionsCorporation/TeddsTedToPdfConverter); that repository was not opened for this page.
+
+Syntax, as documented: `TEDTOPDF [drive:][path][filename] [/R] [/O]`. Started without arguments, it opens a window that asks for a file or folder path.
+
+**Why it is excluded:** it reads local Tedds documents and writes PDF files to local folders, overwriting existing PDFs with `/O`. The bridge runs no local programs and has no filesystem tool.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `TedToPdf.exe` with no arguments | Opens the application, which prompts for the path of a file or folder to convert | Excluded: launches a desktop application |
+| `[drive:][path][filename]` | The drive, folder or files to convert | Excluded: local file path; writes PDF files |
+| `/R` | If the path is a folder, also converts every file in its child folders | Excluded: same |
+| `/O` | Overwrites existing PDF files instead of prompting | Excluded: overwrites local files |
+
 ## 12. Tekla installers, licensing and servers, excluded
 
 Sources (verified 2026-09-29):
@@ -210,7 +225,16 @@ Sources (verified 2026-09-29):
 - Tekla licence server: https://support.tekla.com/doc/tekla-structures/not-version-specific/lic_installing_tekla_structures_license_server_manually.
 - Tekla Structures Multiuser Server: https://support.tekla.com/article/setting-up-multiple-instances-of-tekla-structures-multiuser-server.
 
-**Why it is excluded:** each command installs or removes software, a Windows service or a server, needs administrator rights, and changes the host. Host changes are out of scope for an agent (safety Level 5), as for the Trimble Connect installer in section 2. Some also set licensing, or start a service that listens on a network port.
+Sources added on 2026-10-01 (verified 2026-10-01):
+
+- Earlier Tekla Structures distribution pages, still published: https://support.tekla.com/article/centralized-distribution-of-tekla-structures-2022, https://support.tekla.com/article/centralized-distribution-of-tekla-structures-2020 and https://support.tekla.com/article/centralized-distribution-of-tekla-structures-2018.
+- Tekla licence activation: https://support.tekla.com/article/how-to-activate-licenses-using-command-lines-manual-activation.
+- Tekla licence deactivation: https://support.tekla.com/doc/tekla-structures/not-version-specific/lic_license_deactivation (the redirect target of the article "How to deactivate licenses using command lines – Manual deactivation").
+- Tekla licence borrowing: https://support.tekla.com/article/how-to-borrow-a-license-using-command-lines.
+- Tekla licence server post-set-up checks: https://support.tekla.com/doc/tekla-structures/not-version-specific/lic_tekla_on-demand_licensing_post_set-up_checks.
+- Tekla PowerFab database repair: https://support.tekla.com/doc/tekla-powerfab/2024i/adm_repair_program_errors_command_line, and the MySQL update procedure: https://support.tekla.com/doc/tekla-powerfab/2025i/adm_update_sql.
+
+**Why it is excluded:** each command installs or removes software, a Windows service or a server, needs administrator rights, and changes the host. Host changes are out of scope for an agent (safety Level 5), as for the Trimble Connect installer in section 2. Some also set licensing, or start a service that listens on a network port. The licence commands activate, return or borrow licences, which changes entitlements at Trimble's activation server or the company licence server. The PowerFab repair command administers the production database with the database administrator's password. The bridge handles no credentials and never changes licensing or a host.
 
 Tekla Structures (the properties go inside `/v"..."` for the `.exe`, or on the `msiexec` command line):
 
@@ -228,6 +252,8 @@ Tekla Structures (the properties go inside `/v"..."` for the `.exe`, or on the `
 | `msiexec /i "Tekla Structures 2026.msi" /qn [INSTALLDIR=... TSMODELDIR=...] /lvoicewarmupx <log>` | MSI installation of the software | Excluded: installs software |
 | `msiexec /i "Tekla Structures 2026 Default Env.msi" /qn /lvoicewarmupx <log>` | MSI installation of the Default environment | Excluded: same |
 | `Env_Switzerland_2021.exe /v"ADDLOCAL=Switzerland_GER,Switzerland_FRA,Switzerland_ITA"` (any subset; `/s /v"/qn ADDLOCAL=..."` for silent) | Installs only the chosen language content of the Switzerland environment | Excluded: same |
+| `RUNATTSOPENING=true`, for example `Env_Default_2022.exe /s /v"/qn /lvoicewarmupx TS2022Default_logfile.log RUNATTSOPENING= true "` (environment installers from Tekla Structures 2019 SP1; shown on the 2020 and 2022 pages) | Turns off extraction of the environment's `.tsep` packages at installation time, which is otherwise the default | Excluded: installs software |
+| `INSTALL_WAREHOUSE_OFFLINE_CONTENT="Yes"` or `"No"`, for example `TeklaStructures2018.exe /s /v"/qn INSTALLDIR=\"C:\TeklaStructures\" TSMODELDIR=\"C:\TeklaStructuresModels2018\" INSTALL_WAREHOUSE_OFFLINE_CONTENT=\"Yes\" /lvoicewarmupx TS2018_logfile.log"` (Tekla Structures 2018 page) | `Yes` includes the Tekla Warehouse Offline content `.tsep` files, which install the next time Tekla Structures starts; `No`, or no value, leaves them out | Excluded: same |
 
 Tekla Structural Designer, Tedds, Tedds for Word, Portal Frame Designer and Connection Designer:
 
@@ -249,6 +275,27 @@ Tekla PowerFab, licence server and Multiuser Server:
 | `uninstallanchorservice.exe` | Uninstalls FlexNet Licensing Service | Excluded: removes a Windows service |
 | `MUSaaS_Install.cmd` (run as administrator from the Multiuser Server folder) | Creates another Tekla Structures Multiuser Server instance: prompts for an identifier (default 2) and a TCP port (default 1239), creates a folder and a Windows service, and starts it | Excluded: creates and starts a network service |
 | `MUSaaS_Uninstall.cmd` | Deletes an instance created by `MUSaaS_Install.cmd` | Excluded: removes a service |
+
+Tekla on-premises licence commands (FlexNet utilities; the commands are case-sensitive and may need an administrator command prompt):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `serveractutil -served -commServer http://193.64.145.74:80/flexnet/services/ActivationService?wsdl -activationID <activation ID> -hybrid <count>` (run in the licence server's `Server` folder) | Activates `<count>` licences of an activation ID on the licence server, through Trimble's activation server | Excluded: licence activation; changes entitlements |
+| `serveractutil -view` (written `Serveractutil –view`; run in `C:\TeklaStructures\License\Server` by default) | Lists the licences activated on the server, with their fulfilment IDs | Excluded: licensing administration on a server |
+| `serveractutil -return <fulfillment_id> -commServer https://activate.tekla.com:443/flexnet/services/ActivationService?wsdl` | Deactivates (returns) a licence to Trimble's activation server; needs internet access | Excluded: licence return; changes entitlements |
+| `appactutil.exe -served -commServer 27007@<server_name> -productID NAME=<product>;VERSION=<version> -expiration <dd-Mmm-yyyy>` (run in `C:\TeklaStructures\License\Borrow`) | Borrows a licence from the company licence server until the expiry date. `<product>` is `ProjectViewer`, `Full`, `SteelDetailing`, `Primary`, `Educational`, `ConstructionModeling`, `Drafter`, `Engineering`, `PrecastConcreteDetailing` or `RebarDetailing` | Excluded: licence borrowing; changes entitlements |
+| `appactutil.exe -view -long` | Shows the borrowed licences in trusted storage | Excluded: licensing administration on a client |
+| `appactutil.exe -return <fulfillment ID> -commServer 27007@<server_name>` | Returns a borrowed licence | Excluded: changes entitlements |
+| `tekla_composite.exe` (run from a command prompt on the licence server) | Prints the composite host ID to put in the `SERVER` line of `tekla.lic`. The same page uses the Windows command `hostname` for the server name | Excluded: exposes a licence-binding host identifier; local program |
+
+Tekla PowerFab database maintenance (on the PowerFab server; Tekla says the commands do not work on other workstations):
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `cd <MySQL bin folder>` (default `C:\mysql\bin`) | Changes to the MySQL `bin` folder, found in MySQL Service Manager | Excluded with the procedure |
+| `mysqlcheck -u admin -p --auto-repair --check --all-databases [--port=<port>]` | Checks every database on the PowerFab MySQL server and repairs corrupt tables; `-p` prompts for the PowerFab database admin password. `--port` may be left out for the default port 3306 | Excluded: database administration with credentials; repairs server databases |
+| `uninstall.exe` (in the MySQL installation folder, typically `C:\mysql\`) | Optionally uninstalls the old MySQL version during a MySQL update. The page says to run it and documents no switches | Excluded: removes software from a server |
+| `mysql_setup_<version>.exe` (in `C:\Users\Public\Documents\Tekla\Backup` by default, or from Tekla Warehouse) | Installs the new MySQL version; Trimble's `mysql_setup_8.exe` creates a `MySQL_TeklaPowerFab` service on port 3306. The page documents no switches | Excluded: installs software and a database service |
 
 ## 13. Tekla extension packaging, excluded
 
@@ -416,6 +463,7 @@ Sources (verified 2026-09-29):
 
 - https://docs.ecognition.com/eCognition_documentation/Other%20Resources/eCognition%20SDK/Automation%20API/1.5%20Introduction%20to%20Remote%20Automation.htm ("Introduction to Remote Automation", eCognition 10.5). It says: "Provided are the DIACmdClient.exe, the DIACmdEngine.exe and DIAMkWksp tools. While these are not a programming interface, but command line tools, they do utilize the SOAP protocol interface".
 - Docker image `ecognition/linux_cle`, "Trimble eCognition Command-line engine for Linux": https://hub.docker.com/r/ecognition/linux_cle (updated 2026-09-01).
+- The other seven images of the official `ecognition` Docker Hub namespace (https://hub.docker.com/v2/repositories/ecognition/ lists eight; verified 2026-10-01): https://hub.docker.com/r/ecognition/win_cle, https://hub.docker.com/r/ecognition/linux_js, https://hub.docker.com/r/ecognition/win_js, https://hub.docker.com/r/ecognition/linux_es, https://hub.docker.com/r/ecognition/win_es, https://hub.docker.com/r/ecognition/linux_es_cuda and https://hub.docker.com/r/ecognition/linux_ls.
 
 **Why it is excluded:** these tools run image-analysis rule sets, which are code, on local or server engines. They read and write local image, project and workspace files, and submit jobs to an eCognition Server. `DIACmdClient -db user[:pwd]@storage` puts a password on the command line, where other local processes can see it. The bridge runs no local programs, has no filesystem tool and handles no credentials. The SOAP interface these tools use is a separate API and is not covered here.
 
@@ -480,7 +528,28 @@ Docker image `ecognition/linux_cle` (it also contains `DIAMkWksp` and `DIACmdCli
 | `docker run ... ecognition/linux_cle:<tag> ./DIACmdEngine <arguments>` | Runs one analysis with the `DIACmdEngine` syntax above; returns 0 on success and -1 otherwise | Excluded: runs a rule set on local files |
 | `-e ECOG_CONFIG_logging="log path=/mnt/logs;trace level=Detailed"` | Logging configuration | Excluded with the container |
 
-## 17. PC\*MILER BatchPro, Rail-BatchPro and installer, excluded
+The other eCognition Docker images. Every image reads the licence server from `LM_LICENSE_FILE=@<licence server address>`, and accepts any `config/eCognition.cfg` setting as `ECOG_CONFIG_{config-group}="key1=value1;key2=value2;.."`. The GRID images (Job Scheduler and Engine Server) are needed only for rule sets that submit, copy, subset, tile or delete scenes, or read subscene statistics.
+
+**Why these are excluded:** they start long-running network services (the Job Scheduler listens on TCP 8184 with a web interface), run rule sets, which are code, or, for the licence server, run a privileged container that activates licences at Trimble's activation server from an activation ID and returns them on stop. A `docker container kill` loses the activated licences permanently. The bridge runs no containers or local programs and never changes licensing.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `docker run -it -e "LM_LICENSE_FILE=@<licence server address>" -v C:\path\to\mydata:c:\mnt ecognition/win_cle:10.4.0` | Windows command-line engine (Windows Server 2019 base) run interactively; `DIACmdEngine.exe` is available inside | Excluded: runs containers; licensing |
+| `docker run -e "LM_LICENSE_FILE=@..." -v ... ecognition/win_cle:10.4.0 DIACmdEngine.exe image-dir=... import-connector=... [import-connector-file=...] ruleset=... output-dir=...` | Runs one analysis with the `DIACmdEngine` syntax above (the readme writes the save option as `--save-dpr`) | Excluded: runs a rule set on local files |
+| `docker run --rm -d --name ecog_linux_js -p 8184:8184/tcp --ip=172.28.5.1 -e LM_LICENSE_FILE=@<licence IP> --network=grid_network -m 8g --cpus=2 ecognition/linux_js:10.5.0` | Starts the GRID Job Scheduler, which manages the job queue and serves a web interface on port 8184. One per GRID | Excluded: starts a network service |
+| `-e ECOG_CONFIG_DiaJobScheduler_general="database folder=<folder>;database file prefix=<prefix>"` | Places the Job Scheduler's file-based job database on a shared volume | Excluded: writes files; service configuration |
+| `docker network create -d bridge --subnet=172.28.0.0/16 --gateway=172.28.5.254 grid_network` (the Engine Server readme writes `-d nat`) | Creates the Docker network that the readmes assume | Excluded: changes host networking |
+| `ecognition/win_js` | The Job Scheduler on a Windows Server 2019 base; its readme refers to the Linux readme | Excluded: starts a network service |
+| `docker run --rm -d --name ecog_linux_es -e JOB_SCHEDULER=<Job Scheduler IP>:8184 -e LM_LICENSE_FILE=@<licence IP> --network=grid_network -m 8g --cpus=2 ecognition/linux_es:10.5.0` | Starts a GRID Engine Server, which connects to the Job Scheduler and processes its jobs (no point clouds on Linux) | Excluded: starts a processing service that runs rule sets |
+| `-v /myShare:/mnt -e ECOG_CONFIG_logging="log path=/mnt/logs;trace level=Detailed"` | Optional shared folder and logging for the Job Scheduler and Engine Server | Excluded with the container |
+| `ecognition/win_es` | The Engine Server on a Windows Server 2019 base; it can also process point clouds. Its readme refers to the Linux readme | Excluded: same |
+| `ecognition/linux_es_cuda` | The Linux Engine Server with the CUDA build of TensorFlow; its readme refers to the Linux readme | Excluded: same |
+| `docker run --privileged -d -e container=docker -e VENDOR_PORT=<vendor port> -e ECOGNITION_ACTIVATION_ID=<activation ID> -e NR_LIC=<number of hybrid licences> -p <vendor port>:<vendor port> -p 27000-27009:27000-27009 -v /sys/fs/cgroup:/sys/fs/cgroup ecognition/linux_ls:10.5.0` | Starts the eCognition License Server. On start it activates `NR_LIC` licences of the activation ID over the internet; `--privileged` is required for activation and return | Excluded: licence activation; privileged container; network service |
+| `-p 8090:8090` | Exposes the licence server's web console | Excluded: network service |
+| `docker container stop <container>` | Stops the licence server and returns (deactivates) its licences | Excluded: licence return |
+| `docker logs <container>` (optionally after `--name <name>` on `docker run`) | Shows whether activation or return succeeded | Excluded with the container |
+
+## 17. PC\*MILER BatchPro, Rail-BatchPro, installer, Connect TCP/IP and AS/400 server, excluded
 
 Sources (official Trimble Maps PC\*MILER support articles):
 
@@ -489,7 +558,7 @@ Sources (official Trimble Maps PC\*MILER support articles):
 - https://support.pcmiler.com/en/support/solutions/articles/19000053641-is-there-a-command-line-option-available-for-pc-miler-rail-batchpro-.
 - https://support.pcmiler.com/en/support/solutions/articles/19000053111-installing-pc-miler-silent-installation-.
 
-**Not read directly.** On 2026-09-29, support.pcmiler.com and www.pcmiler.com returned HTTP 403 to automated clients, and learn.transportation.trimble.com redirected to its home page. The entries below were confirmed from search-engine extracts of these official pages. They need re-reading from a network that can open them, and the switch list may be incomplete until then.
+**Not read directly.** On 2026-09-29, support.pcmiler.com and www.pcmiler.com returned HTTP 403 to automated clients, and learn.transportation.trimble.com redirected to its home page. The BatchPro, Rail-BatchPro and installer entries in the first table below were confirmed from search-engine extracts of these official pages. They need re-reading from a network that can open them, and the switch list may be incomplete until then.
 
 **Why it is excluded:** BatchPro and Rail-BatchPro are local batch programs that read input and configuration files and write output reports. `setup.exe` installs software (a host change). The bridge runs no local programs and has no filesystem tool. PC\*MILER Web Services is classified separately in [capability-matrix.md](capability-matrix.md).
 
@@ -502,6 +571,29 @@ Sources (official Trimble Maps PC\*MILER support articles):
 | `"-output:<name>"` | Optional base name of the output file, without `.OUT` | Excluded: writes local files |
 | `setup.exe -r` | Runs the installer and records the choices in `setup.iss`, in the Windows folder (copy it next to `setup.exe`) | Excluded: installs software |
 | `setup.exe /s` | Installs silently with the recorded choices | Excluded: same |
+
+PC\*MILER Connect TCP/IP interface and the PC\*MILER-AS/400 Distance Server.
+
+Sources (verified 2026-10-01; both pages could be read directly):
+
+- https://developer.trimblemaps.com/pcmiler/connect/workflows/the-tcp-ip-interface/ ("The TCP/IP Interface").
+- https://developer.trimblemaps.com/pcmiler/connect/as400/tolls/as-400-tolls-integration-technical-implications/ ("AS/400 Tolls: Technical Implications").
+
+`pcmsock.exe`, the TCP/IP interface program, and `tcpsvc.exe`, its Windows-service form, are installed in `C:\ALK Technologies\PCMILERXX\tcpip`. They need PC\*MILER Connect. Syntax, as documented: `pcmsock [product code] [port number] [dataset code]`, with an optional thread count. The same parameters are the service's start parameters. The interface is plain text: a client that connects receives a prompt ending in `READY`, and can then call every applicable PC\*MILER Connect function.
+
+**Why these are excluded:** `pcmsock.exe` and `tcpsvc.exe` open a TCP port on the host that exposes the PC\*MILER Connect routing engine to the network, and `SRV32.exe` is a local server program that services AS/400 data queues. Starting listeners or services changes the host. The bridge runs no local programs. PC\*MILER Connect is a local DLL product, not a web API.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `pcmsock PC_MILER <port>`, for example `pcmsock PC_MILER 2001` | Starts the TCP/IP server for PC\*MILER Connect (product code `PC_MILER`), listening on a unique port. The port is required | Excluded: starts a network listener; local program |
+| `[dataset code]`, for example `pcmsock PC_MILER 2001 NA` | Optional region: `NA` North America, `AF` Africa, `AS` Asia, `EU` Europe, `ME` Middle East, `OC` Oceania, `SA` South America. It overrides the default region in `pcmserve.ini` | Excluded with the server |
+| `[threads]`, for example `pcmsock PC_MILER 2001 4` or `pcmsock PC_MILER 2001 NA 4` | Number of threads (default 64) | Excluded with the server |
+| `tcpsvc.exe` with the same start parameters | Runs the TCP/IP interface as a Windows service | Excluded: installs and runs a network service |
+| `Pcmsock25.exe PC_MILER 8250 LOG_BASIC .\V25log.txt` (also `Pcmsock20.exe PC_MILER 8200`) | A logging form with versioned executable names. **Not read directly:** it comes only from search-engine extracts of the "MVS for Windows" support article 19000077351 on support.developer.trimblemaps.com, which returned HTTP 403 on 2026-10-01 | Excluded: same; writes a log file |
+| `tcptest.exe` (with the sample trip `trip.txt`) | Test client that sends commands to a running server | Excluded: local program; network client |
+| `simple.pl` | Sample Perl 5 client for Unix, VMS or other hosts | Excluded: same |
+| `telnet 127.0.0.1 <port>` | Connects to the text interface to test the installation | Excluded: network client |
+| `SRV32_hwy.exe 2`, for example `C:\ALK Technologies\pcmiler31\as400\SRV32_hwy.exe 2`, set as the command-line parameter of a shortcut to `Srv32.exe` | Runs a Standard Highway and a Tolls Distance Server side by side, after `pcmserve.ini` and `pcmsrv32.dll` are copied to `pmwssrv.ini` and `pmwssrv.dll` and the copy's `Library=` is switched between `ALKWIN` and `ALKTLL` | Excluded: local server program that services AS/400 data queues |
 
 ## 18. Viewpoint Vista client installer, excluded
 
@@ -659,14 +751,102 @@ Source: the npm organisation `trimble-oss` (https://www.npmjs.com/org/trimble-os
 
 The `@trimble-oss/modus-mcp-server` readme installs and runs the unscoped name `modus-mcp-server` (`npm install -g modus-mcp-server`, `npx -y modus-mcp-server@latest`). npm shows that unscoped name as unpublished since 2025-07-14, so those commands do not fetch Trimble's scoped package.
 
-## 22. Checked, with no official command line
+## 22. Trimble Connect Object Manager (Quadri) `quadri.exe`, excluded
+
+Sources (verified 2026-10-01):
+
+- https://help.trimble.com/en/trimble-connect/trimble-connect/object-manager/functions/configuration-tools/scheduled-batch-operations ("Scheduled Batch Operations", modified 1 Oct 2026; it redirects to the same path under https://help.trimble.com/doc/). Its sub-page "Run a Batch File Automatically" covers only scheduling the batch file in Windows Task Scheduler.
+- https://help.trimble.com/doc/quadri/quadri/quadri-connectors/quadri-fully-integrated-novapoint: Novapoint includes the Quadri desktop client, so the same `quadri.exe` command line applies to Novapoint installations. No separate Novapoint command line was checked.
+
+Trimble Connect Object Manager, formerly Quadri, works on a shared object model on a server. Its desktop client `quadri.exe` takes switches, and Trimble's example batch file (`.cmd`, placed in the folder that holds `quadri.exe`) runs it with `START /wait` to receive, share and run tasks without a user. Example lines, as documented:
+
+- `START /wait quadri.exe -bkgr -exit:save -p:"%Workset%" -serverop:receive -wait:true`
+- `START /wait quadri.exe -bkgr -exit:save -p:"%Workset%" -serverop:share -sharedesc:"<description>" -wait:true`
+- `START /wait quadri.exe -bkgr -exit:save -p:"%Workset%" -batchtask:<task GUID> -wait:true`
+
+**Why it is excluded:** it is a local desktop program. `-serverop:share` and `-batchtask` change the shared cloud model that the whole project team works on, and `-license` changes the licensing regime. The bridge runs no local programs, and the Object Manager model is not reached through any catalogued API.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `-f` | Batch file name | Excluded: local file path |
+| `-p` | Project: the local model (workset) file | Excluded: local file path |
+| `-c` | Configuration file | Excluded: local file path |
+| `-l` | Layout file | Excluded: local file path |
+| `-e` | Extensions file | Excluded: local file path |
+| `-log` | Log configuration file | Excluded: local file path |
+| `-a` | Performs an action: `new`, `load` or `load_prev` | Excluded: local program |
+| `-nsp` | No splash screen | Excluded with the program |
+| `-bkgr` | Runs in silent mode | Excluded: unattended run of the actions below |
+| `-splash` | Sets the splash screen file | Excluded with the program |
+| `-noserver` | Runs without a server | Excluded with the program |
+| `-noautocad` | Runs without AutoCAD | Excluded with the program |
+| `-license` | Sets the licensing regime | Excluded: changes licensing |
+| `-language` | Sets the language | Excluded with the program |
+| `-config` | Sets the configuration to use | Excluded with the program |
+| `-userconfig` | Sets the user configuration to use | Excluded with the program |
+| `-resetuserconfig` | Listed without a description | Excluded; its effect is undocumented |
+| `-stopshareonvalidationerror` | Listed without a description | Excluded; its effect is undocumented |
+| `-batchtask:<GUID>` | Runs a task in silent mode, for example producing TrimBIM files | Excluded: runs tasks; writes files |
+| `-serverop:receive` or `-serverop:share` | Receives changes from, or shares changes to, the server; used with silent mode | Excluded: `share` changes the shared cloud model |
+| `-sharetask` | Shares a given task | Excluded: changes the shared cloud model |
+| `-sharedesc:"<text>"` | Description shown on the timeline when sharing | Excluded with `-serverop:share` |
+| `-exit:save` or `-exit:discard` | Saves or discards the local model on exit | Excluded: writes local files |
+| `-unit` | Sets the units, for example imperial | Excluded with the program |
+| `-wait:true` | In every example line, but not in the parameter table | Excluded; its effect is undocumented |
+
+## 23. Trimble Inpho command-line tools, excluded
+
+Source: "Release Notes for Inpho 15" (Trimble Inpho 15.0.0 to 15.1.1, July 2025; contact imaging_support@trimble.com). The copy found is hosted by a reseller, not by Trimble: https://www.terraspatium.gr/uploads/2/4/2/3/24237397/releasenotes_trimblephotogrammetry__english__15.pdf (verified 2026-10-01). As with Convert to RINEX in section 15, a third-party copy of a Trimble document is used, so current versions may differ. The release notes name these command-line tools and options but give no syntax, and no public Trimble page documents the full command lines of the Inpho modules.
+
+**Why it is excluded:** these are local photogrammetry programs that read and write image, terrain and point files on the workstation. The bridge runs no local programs and has no filesystem tool. Inpho's UASMaster installers are in section 14.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `make_pyr.exe` | Described as "the command line tool make_pyr.exe". Versions up to 14.1.0, with Image Commander (`imgcom`), can convert pseudo 16-bit JPEG TIFF images, which version 15 no longer reads | Excluded: local image processing; writes files |
+| MATCH-T DSM `-TpixDtmAlignX`, `-TpixDtmAlignY` | Command-line options (15.1.0) that align the DTM TPIX tile grid to a coordinate definition, as in MATCH-3DX | Excluded: local processing |
+| MATCH-T DSM `-TpixPtsAlignX`, `-TpixPtsAlignY` | The same for the point TPIX tiles | Excluded: same |
+| MATCH-T DSM `-TpixXYNameSequence` | Swaps the XY index or coordinate order in TPIX file names (YX to XY), to match MATCH-3DX names | Excluded: same |
+| DTMToolkit batch mode with an options file | Batch processing driven by an options file, which can define a name pattern (fixed in 15.0.0). The options-file format is not public | Excluded: reads and writes local files |
+
+## 24. Applanix POSPac MMS `POSPacBatch.exe`, excluded
+
+Source: "POSPac MMS 8.1 Release Notes" (Applanix, a Trimble company, June 2017), hosted by a reseller, not by Trimble or Applanix: https://assets.toyo.co.jp/files/user/POSPac_MMS_8.1_-_Release_Notes.pdf (verified 2026-10-01). Under POSPac MMS 7.2 it says "Added POSPacBatch.exe as part of the installer to run a command line version of POSPac". Under 8.1 it lists batch features marked "command line only": IMU data-gap scanning, multiple export and EO outputs, tags to turn DMI or GAMS on or off, and Single Base fallback when SmartBase fails. Batch projects are XML batch files (`.posbat`). No public page documents the switch list of `POSPacBatch.exe`. The auditor's `-qc` option does not appear in this document and was not found elsewhere, so it is not listed.
+
+**Why it is excluded:** it is local GNSS-inertial post-processing that reads raw survey data and writes position and orientation solutions. The results feed survey and mapping work that a qualified person must check. The bridge runs no local programs and has no filesystem tool. TBC's installer for POSPac Command-Line TBC Subscription is in section 14.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `POSPacBatch.exe` | The command-line version of POSPac, installed with POSPac MMS since 7.2; runs batch projects | Excluded: local GNSS-inertial processing |
+| `-m UAV` | Named once, in an 8.1 bug fix: "using POSPac UAV in command line fails when using the command line option –m UAV". Its full meaning is not documented | Excluded with the program |
+| `.posbat` batch file | XML batch project file, with fields such as multipath settings, lever arms, mounting angles and GAMS lever arms | Excluded: reads a local file |
+
+## 25. TruckMate program auto-login parameters, excluded
+
+Sources: the TruckMate Online Help on Trimble's Transportation Learning Center: "Logging into TruckMate", https://learn.transportation.trimble.com/wp-content/uploads/tte/ebcbe19c93c746dd320c/olhlp/a9739f17da68/docs/Current/TMStdFunct/SF-02-LoggingIn.html, and "Communications Manager procedures", https://learn.transportation.trimble.com/wp-content/uploads/tte/ebcbe19c93c746dd320c/olhlp/66a8653bcc5d/docs/Current/MobileCommMgr/MCM-02-Procs.html. The help-path hash varies between search results (another is `.../olhlp/66280698c978/...`).
+
+**Not read directly.** On 2026-10-01, learn.transportation.trimble.com redirected these pages to its home page, as in section 17. The entries below were confirmed from search-engine extracts of these official pages.
+
+Every TruckMate program accepts these start-up parameters for automatic sign-in, for example `C:\Program Files (x86)\[TruckMate install folder]\MILESERV.EXE \U:USERNAME \P:Password \C:Schema \I:CompanyID`, or `COMMGR.EXE '\U:USER' '\P:password'` for Communications Manager. Either slash (`\` or `/`) is accepted.
+
+**Why it is excluded:** `\P:` puts the user's TruckMate password on the command line, in shortcuts and scripts, where other local processes and users can read it. The parameters also launch desktop programs. The bridge handles no credentials and runs no local programs. The TruckMate REST API is catalogued separately.
+
+| Command/Switch | What it does | Disposition |
+|---|---|---|
+| `\U:<user>` (or `/U:`) | TruckMate user name | Excluded: credential on the command line |
+| `\P:<password>` (or `/P:`) | The user's password, in clear text | Excluded: password on the command line |
+| `\C:<schema>` (or `/C:`) | Database schema; must be used with `\I:` | Excluded: launches a desktop program |
+| `\I:<company ID>` (or `/I:`) | Company ID (an integer) for multi-company sign-in; must be used with `\C:` | Excluded: same |
+
+## 26. Checked, with no official command line
 
 - **Trimble Connect Sync:** GUI only (section 3).
-- **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer, Connection Designer and PowerFab (section 12). Otherwise they are automated through SDKs or APIs.
+- **Only installer command lines:** Tekla Structural Designer, Tedds for Word, Portal Frame Designer and Connection Designer (section 12). Otherwise they are automated through SDKs or APIs. Tekla PowerFab has installer command lines and a documented command-prompt database repair (`mysqlcheck`), both in section 12.
 - **Also automated through SDKs or APIs:** besides the command lines above, SketchUp, Tekla Structures, Tedds, CoPilot and PC\*MILER have SDKs or APIs. Trimble Access has no documented command line and is automated through its SDK. See [capability-matrix.md](capability-matrix.md).
-- **POSPac Command-line TBC Subscription:** installed by TBC (section 14). No public page documents its own command line.
+- **POSPac:** POSPac MMS's command-line program `POSPacBatch.exe` is publicly named in Applanix release notes (section 24), but no public page documents its switches. POSPac Command-line TBC Subscription is installed by TBC (section 14); no public page documents its own command line.
+- **Spectrum Command Prompt** (https://help.trimble.com/doc/spectrum/spectrum/system-administration/administrator-utilities/command-prompt, verified 2026-10-01): opened inside Spectrum with Ctrl + Break, it takes a Spectrum function name to go to that screen, or `PA` to return to the Site Map. Like TBC's CAD command line (section 14), it is an in-application navigation prompt, not an operating-system command line. It belongs to the desktop user interface, which the bridge does not drive, so it is outside this page.
+- **Inpho modules:** apart from the tools and options in section 23, no public page documents a command line for the Inpho modules.
 - **TSEP Manifest Generator** (https://github.com/TrimbleSolutionsCorporation/TSEPManifestGenerator): a GUI tool; its readme documents no command line.
 - **Not product command lines:** the Trimble-published npm executables (section 21), the open-source tools in the `trimble-oss` GitHub organisation (for example DBA Dash), and `CxxSonarQubeRunner` (section 13). These are not Trimble product interfaces.
-- **Needs re-reading:** the PC\*MILER entries (section 17), from a network that can open support.pcmiler.com.
+- **Needs re-reading:** the PC\*MILER BatchPro, Rail-BatchPro and installer entries and the `LOG_BASIC` form of `pcmsock` (section 17), from a network that can open support.pcmiler.com and support.developer.trimblemaps.com; and the TruckMate auto-login parameters (section 25), from a network that can open learn.transportation.trimble.com.
 
 Command-line access to Trimble APIs in general goes through `trimblectl` (section 5). `trimblectl api operations` searches every catalogued operation of every product. `trimblectl api read` calls Trimble Connect reads, and `trimblectl api plan` prepares dry-run requests for Trimble Connect changes and other products' reference operations.

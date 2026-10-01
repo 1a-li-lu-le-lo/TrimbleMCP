@@ -293,3 +293,32 @@ func TestKeyShape(t *testing.T) {
 		}
 	}
 }
+
+func TestIsCredentialName(t *testing.T) {
+	for _, n := range []string{"password", "LoginPassword", "TinaPassword", "ntripPassword", "client_secret", "X-Api-Key",
+		"apiKey", "access_token", "token", "GisToken", "mfaToken", "pwd", "Authorization", "privateKey"} {
+		if !IsCredentialName(n) {
+			t.Errorf("%s should be a credential name", n)
+		}
+	}
+	for _, n := range []string{"skipToken", "continuationToken", "nextPageToken", "tokenType", "databaseToken", "page", "projectId", "keyword"} {
+		if IsCredentialName(n) {
+			t.Errorf("%s should not be a credential name", n)
+		}
+	}
+}
+
+// No plannable operation can need a credential: one that requires a
+// credential parameter is excluded instead.
+func TestNoPlannableOperationRequiresCredentials(t *testing.T) {
+	for _, o := range Must().Operations {
+		if o.Disposition != Plan && o.Disposition != Reference {
+			continue
+		}
+		for _, p := range o.Params {
+			if p.Required && IsCredentialName(p.Name) {
+				t.Errorf("%s: required parameter %q is a credential, so the operation cannot be planned", o.Key, p.Name)
+			}
+		}
+	}
+}

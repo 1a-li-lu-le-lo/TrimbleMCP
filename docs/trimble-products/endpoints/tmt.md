@@ -55,7 +55,7 @@
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
 | `GET` | `/Integration/LTC/LTCCustomer` | `reference` | Returns the Customer | customerID (query); customerName (query) |
-| `POST` | `/Integration/LTC/LTCCustomer` | `reference` | Creates/Updates a customer | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/LTC/LTCCustomer` | `excluded`: safety: the request body carries credential fields (LoginPassword); agents never handle credentials | Creates/Updates a customer | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 | `POST` | `/Integration/LTC/LTCVendor` | `reference` |  | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 
 ## Integration/Mobile
@@ -80,9 +80,9 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/Integration/OAuth/Refresh` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Refresh access token using refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
-| `POST` | `/Integration/OAuth/Revoke` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Revoke refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
-| `POST` | `/Integration/OAuth/Token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Generate access token using username/password | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Refresh` | `excluded`: safety: the request body carries credential fields (refresh_token); agents never handle credentials | Refresh access token using refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Revoke` | `excluded`: safety: the request body carries credential fields (refresh_token); agents never handle credentials | Revoke refresh token | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/OAuth/Token` | `excluded`: safety: the request body carries credential fields (password); agents never handle credentials | Generate access token using username/password | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 
 ## Integration/Parts/FCA
 
@@ -108,8 +108,8 @@
 | `GET` | `/Integration/System/UnitSpecifications` | `reference` | Gets the specification details of a unit. | UnitId (query); UnitNumber (query); CustomerName (query); IntegrationName (query) |
 | `GET` | `/Integration/System/UnitWorkPending` | `reference` | Gets the pending work for units by either Unit Id or by Unit Number or Customer Name | unitId (query); unitNumber (query); customerName (query); minCreatedAt (query); minModifiedAt (query); maxModifiedAt (query); pageIndex (query); pageSize (query); IntegrationName (query); IntegrationGroupId (query) |
 | `GET` | `/Integration/System/Vendor` | `reference` | Gets the details of Vendors | VendorsID (query); VendorID (query); VendorName (query); VendorType (query); IntegrationName (query); IntegrationGroupId (query) |
-| `POST` | `/Integration/System/Customer` | `reference` | Creates/Updates a customer | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
-| `POST` | `/Integration/System/Employee` | `reference` | Creates/Updates a new Employee | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/System/Customer` | `excluded`: safety: the request body carries credential fields (LoginPassword); agents never handle credentials | Creates/Updates a customer | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
+| `POST` | `/Integration/System/Employee` | `excluded`: safety: the request body carries credential fields (TinaPassword); agents never handle credentials | Creates/Updates a new Employee | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 | `POST` | `/Integration/System/File` | `reference` | Attach one or more files to objects. | Type* (query); Id* (query); body: multipart/form-data |
 | `POST` | `/Integration/System/ShopItem` | `reference` | Creates/Updates a Shop item | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |
 | `POST` | `/Integration/System/Unit` | `reference` | Creates/Updates a unit. | body: application/json, application/x-www-form-urlencoded, application/xml, text/json, text/xml |

@@ -29,7 +29,7 @@
 | `GET` | `/api/batch/jobs` | `reference` | Get All Jobs |  |
 | `GET` | `/api/batch/stats/{jobId}` | `reference` | Get Batch Stats | jobId* (path) |
 | `GET` | `/api/batch/{jobId}` | `reference` | Get Batch Results | jobId* (path); offset (query); limit (query) |
-| `POST` | `/api/authenticate` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Service Authentication | body: application/json |
+| `POST` | `/api/authenticate` | `excluded`: safety: the request body carries credential fields (apiKey, refreshToken); agents never handle credentials | Service Authentication | body: application/json |
 | `POST` | `/api/batch` | `reference` | Create Search Batch | body: application/json |
 
 `*` marks a required parameter.

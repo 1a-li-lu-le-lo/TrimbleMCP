@@ -9,8 +9,8 @@
 - Exposing worker, vehicle, or customer location beyond the stated purpose.
 - Fabricating IDs, coordinates, or measurements.
 - Deleting or altering audit evidence.
-- Planning or describing how to perform an operation excluded with a `safety:` reason: FarmENGAGE operations that send prescriptions, work orders or resource files (guidance lines, boundaries, vehicle and implement profiles) to in-cab devices, including both steps of a prescription import; Trimble Maps Fleet and Routing Profile changes to the routing, configuration or map data that in-cab CoPilot navigation uses; Mobile Manager changes to GNSS receiver, antenna, correction or position-stream settings; and every other product's sign-in, token and secret-storing operations (agents never handle credentials).
-- Calling another product's API, or asking for its credentials. Plans refuse any parameter or body field that carries a credential (password, secret, API key, token). `reference` operations are plans for a qualified person, never actions.
+- Planning or describing how to perform an operation excluded with a `safety:` reason: FarmENGAGE operations that send prescriptions, work orders or resource files (guidance lines, boundaries, vehicle and implement profiles) to in-cab devices, including both steps of a prescription import; Trimble Maps Fleet and Routing Profile changes to the routing, configuration or map data that in-cab CoPilot navigation uses; Mobile Manager changes to GNSS receiver, antenna, correction or position-stream settings; and every operation that signs in, issues or shares a token (such as Transporeon eCMR sharing links), or whose request carries a credential (agents never handle credentials).
+- Calling another product's API, or asking for its credentials. Plans refuse any parameter or body field whose name carries a credential (for example LoginPassword, client_secret, X-Api-Key or a token), including inside string and form-encoded bodies. `reference` operations are plans for a qualified person, never actions.
 
 ## Output labels
 

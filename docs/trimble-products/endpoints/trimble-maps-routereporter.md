@@ -14,7 +14,7 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `POST` | `/identity/v2/token` | `excluded`: safety: signs in, issues, renews, validates or revokes credentials, or stores a password or client secret; agents never handle credentials (as for Trimble Identity) | Authenticate using an API key and retrieve an authentication token. | body: application/json |
+| `POST` | `/identity/v2/token` | `excluded`: safety: the request body carries credential fields (apiKey); agents never handle credentials | Authenticate using an API key and retrieve an authentication token. | body: application/json |
 
 ## GPS Pings
 

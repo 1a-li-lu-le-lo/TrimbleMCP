@@ -244,6 +244,9 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 					if o.Method == "ANY" {
 						o.Disposition, o.Reason = catalog.Excluded, "API Gateway catch-all (any method); not a documented operation"
 					}
+					if cred := credentialUse(o); cred != "" {
+						o.Disposition, o.Reason = catalog.Excluded, "safety: "+cred+"; agents never handle credentials"
+					}
 				}
 				cat.Operations = append(cat.Operations, o)
 			}
@@ -319,6 +322,21 @@ func addWebhooks(cat *Catalog, src *Source, sp *spec) int {
 		cat.Operations = append(cat.Operations, o)
 	}
 	return len(hooks)
+}
+
+// credentialUse explains why an operation needs a credential in its
+// request (a credential-named body field, or a required credential
+// parameter), or returns "".
+func credentialUse(o Operation) string {
+	if o.Method != "GET" && o.Method != "HEAD" && len(o.CredentialFields) > 0 {
+		return "the request body carries credential fields (" + strings.Join(o.CredentialFields, ", ") + ")"
+	}
+	for _, p := range o.Params {
+		if p.Required && catalog.IsCredentialName(p.Name) {
+			return "the request requires the credential parameter " + p.Name
+		}
+	}
+	return ""
 }
 
 func hasAPI(cat *Catalog, id string) bool {

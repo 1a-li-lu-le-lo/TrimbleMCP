@@ -99,9 +99,12 @@ type Operation struct {
 	Params      []Param  `json:"params,omitempty"`
 	BodyTypes   []string `json:"body_content_types,omitempty"`
 	BodyReq     []string `json:"body_required,omitempty"`
-	Deprecated  bool     `json:"deprecated,omitempty"`
-	Disposition string   `json:"disposition"`
-	Reason      string   `json:"reason"`
-	CoveredBy   string   `json:"covered_by,omitempty"`
-	Tool        string   `json:"tool,omitempty"`
+	// CredentialFields are request-body properties (at any depth) whose
+	// names carry credentials; plans never accept them.
+	CredentialFields []string `json:"credential_fields,omitempty"`
+	Deprecated       bool     `json:"deprecated,omitempty"`
+	Disposition      string   `json:"disposition"`
+	Reason           string   `json:"reason"`
+	CoveredBy        string   `json:"covered_by,omitempty"`
+	Tool             string   `json:"tool,omitempty"`
 }

@@ -304,7 +304,7 @@ def confluence(cfg, errors):
     space (Transporeon), read through Confluence's REST API."""
     nxt = "/rest/api/content/search?" + urllib.parse.urlencode(
         {"cql": f"space={cfg['space']} and type=page", "limit": "50", "expand": "body.storage"})
-    found, pages = {}, 0
+    found, inline, pages = {}, {}, 0
     while nxt:
         try:
             d = json.loads(get(cfg["base"] + nxt))
@@ -314,13 +314,23 @@ def confluence(cfg, errors):
         for r in d.get("results", []):
             pages += 1
             page = cfg["base"] + r["_links"]["webui"]
-            for u in re.findall(r"""https?://[^"'<>\s\]]+""", r["body"]["storage"]["value"]):
+            body = r["body"]["storage"]["value"]
+            for u in re.findall(r"""https?://[^"'<>\s\]]+""", body):
                 u = html.unescape(u)
                 if DEFINITION.search(u) and not any(x in u for x in cfg["ignore"]):
                     found.setdefault(u, set()).add(page)
+            # Definitions embedded inline in the open-api macro (CDATA body).
+            macros = re.findall(r'<ac:structured-macro[^>]*ac:name="open-api".*?</ac:structured-macro>', body, re.S)
+            bodies = [m for m in (re.search(r"<!\[CDATA\[(.*?)\]\]>", x, re.S) for x in macros) if m]
+            for n, m in enumerate(bodies):
+                sid = cfg["id_prefix"] + "inline-" + slug(r["title"]) + (f"-{n + 1}" if len(bodies) > 1 else "")
+                inline[sid] = (m.group(1), page)
+            # Interfaces specified only as attached PDFs are reported for review.
+            if re.search(r'ac:name="(viewpdf|view-file)"', body):
+                print(f"note: {page}: specification attached as a file (classify in capability-matrix.md)", file=sys.stderr)
         nxt = d.get("_links", {}).get("next")
-    print(f"{cfg['space']}: {pages} pages, {len(found)} definitions", file=sys.stderr)
-    return found
+    print(f"{cfg['space']}: {pages} pages, {len(found)} linked and {len(inline)} inline definitions", file=sys.stderr)
+    return found, inline
 
 
 def documented(entry, errors):
@@ -384,8 +394,16 @@ def main():
                lambda u, d: "xchange-connector/" + slug(u.split("/direct/", 1)[1].replace("/swagger/openapi.json", "")), "app-xchange")
 
     for c in man["confluence"]:
-        fetch_defs(confluence(c, errors), lambda u, d, c=c: c["id_prefix"] + slug(urllib.parse.unquote(
+        linked, inline = confluence(c, errors)
+        fetch_defs(linked, lambda u, d, c=c: c["id_prefix"] + slug(urllib.parse.unquote(
             urllib.parse.urlparse(u).netloc.split(".")[-2] + urllib.parse.urlparse(u).path)), "confluence")
+        for sid, (text, page) in sorted(inline.items()):
+            rec = {"id": sid, "spec_url": page, "doc_urls": [page], "kind": "confluence"}
+            try:
+                save(out, sid, to_json(text.encode()))
+            except Exception as e:
+                rec["error"] = f"inline definition does not parse: {e}"
+            discovered.append(rec)
 
     for d in man["direct"]:
         rec = {"id": d["id"], "spec_url": d["url"], "doc_urls": [d["doc_url"]] if d["doc_url"] else [], "kind": "direct"}
