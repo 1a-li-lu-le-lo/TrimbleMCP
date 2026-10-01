@@ -341,7 +341,7 @@
     {"match_source": "truckmate-agent-swaggerhub", "class": "excluded", "family": "transportation", "product": "TruckMate Agent REST API (SwaggerHub draft)",
      "reason": "undocumented: an unpublished 2018 SwaggerHub draft in an organisation named TruckMate-REST-API, with a localhost host and no Trimble documentation; the documented TruckMate REST APIs are catalogued"},
     {"match_source": "kuebix", "class": "excluded", "family": "transportation", "product": "Kuebix TMS (Trimble Transportation)",
-     "reason": "discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com"},
+     "reason": "no longer a Trimble product: Trimble announced it would wind down Kuebix, and kuebix.com now says Kuebix is part of FreightWise; the definition is still published at api-docs.kuebix.com"},
     {"match_source": "transporeon/inline-api-for-appointment-scheduling-beta", "class": "reference", "api": "transporeon-yard-appointments", "family": "transportation", "product": "Transporeon: Appointment Scheduling API (beta; Trimble Transportation yard management)",
      "auth": "not declared in the definition", "access": "Carriers using Transporeon appointment scheduling (beta)", "requires": "credentials for yard-api.eu.trimble-transportation.com; the definition's server is an internal service name, so the public host must be confirmed"},
     {"match_source": "transporeon/inline-api-for-freight-audit-selfservice", "class": "reference", "api": "transporeon-freight-audit-selfservice", "family": "transportation", "product": "Transporeon: Freight Audit SelfService API (FASS)",

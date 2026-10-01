@@ -6,7 +6,7 @@
 - **Disposition:** `reference`. The bridge never calls this API; operations can be searched with `trimble_api_operations` and validated into a dry-run plan with `trimble_api_plan` (omit `product`).
 - **Authentication:** Trimble Identity bearer token. Declared security schemes: none declared.
 - **Access:** Account administrators only.
-- **To call it you would need:** an account administrator's Trimble Identity token; documented in prose only (no definition).
+- **To call it you would need:** an account administrator's Trimble Identity token; this endpoint is documented in prose on the Core Account page (the service's own definition is undocumented and catalogued as excluded).
 - **Documented servers:** `https://projects-api.connect.trimble.com/v1`.
 - **Definition:** [connect-projects-api/core-account](https://developer.trimble.com/docs/connect/tools/api/core-account/) (Trimble Connect projects service (Core Account), version documented). Documentation: https://developer.trimble.com/docs/connect/tools/api/core-account/.
 

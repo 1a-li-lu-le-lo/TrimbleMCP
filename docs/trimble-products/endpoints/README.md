@@ -157,7 +157,7 @@ These operations are catalogued from the products' own published definitions so 
 | [issue-stage@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue-stage/v1) | Issue Management Service API | swaggerhub | variant |  | 29 | variant of issue@v1; staging copy |
 | [issue@v1](https://api.swaggerhub.com/apis/Trimble-Connect/issue/v1) | Issue Management Service API | swaggerhub | production | issues | 29 |  |
 | [jobpac-connect](https://api-doc.jobpac.com.au/) | Jobpac Connect API | direct | reference | jobpac-connect | 129 |  |
-| [kuebix](https://api-docs.kuebix.com/) | Kuebix REST API Reference Documentation | direct | excluded |  | 26 | discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com |
+| [kuebix](https://api-docs.kuebix.com/) | Kuebix REST API Reference Documentation | direct | excluded |  | 26 | no longer a Trimble product: Trimble announced it would wind down Kuebix, and kuebix.com now says Kuebix is part of FreightWise; the definition is still published at api-docs.kuebix.com |
 | [mepcontent](https://api.mepcontent.com/swagger/docs/v1) | CPWebApi | direct | reference | mepcontent | 15 |  |
 | [mobile-manager/asyncapi-websocket-v1](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v1.json) | WebSocket V1 Server | portal | reference | mobile-manager-ws-v1 | 1 |  |
 | [mobile-manager/asyncapi-websocket-v2](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v2.json) | WebSocket V2 Server | portal | reference | mobile-manager-ws-v2 | 3 |  |

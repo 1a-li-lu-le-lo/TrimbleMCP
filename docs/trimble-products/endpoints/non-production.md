@@ -178,7 +178,7 @@ staging copy. 29 operations. Definition: [issue-stage@v1](https://api.swaggerhub
 
 ## kuebix (excluded)
 
-discontinued: Trimble announced that the Kuebix TMS shuts down; the definition is still published at api-docs.kuebix.com. 26 operations. Definition: [kuebix](https://api-docs.kuebix.com/).
+no longer a Trimble product: Trimble announced it would wind down Kuebix, and kuebix.com now says Kuebix is part of FreightWise; the definition is still published at api-docs.kuebix.com. 26 operations. Definition: [kuebix](https://api-docs.kuebix.com/).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
