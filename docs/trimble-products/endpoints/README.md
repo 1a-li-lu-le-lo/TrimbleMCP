@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 14099 operations in 387 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4190 excluded.
+**Totals:** 14145 operations in 389 definitions; 254 read, 223 plan, 6364 reference, 3088 variant, 4216 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -130,6 +130,8 @@ These operations are catalogued from the products' own published definitions so 
 | `truckmate-finance` | TruckMate: Finance REST API | [truckmate/finance](https://truckmatecloudhub.trimble-transportation.com/finance/openapi.json) | 100 | HTTP bearer (Trimble Identity JWT, TruckMate web user, or API key) | [truckmate-finance.md](truckmate-finance.md) |
 | `truckmate-imaging` | TruckMate Imaging REST API | [truckmate-imaging](https://truckmatecloudhub.trimble-transportation.com/imaging/openapi.json) | 82 | HTTP bearer (as the other TruckMate REST APIs) | [truckmate-imaging.md](truckmate-imaging.md) |
 | `truckmate-master-data` | TruckMate: MasterData | [truckmate/master-data](https://truckmatecloudhub.trimble-transportation.com/masterdata/openapi.json) | 282 | HTTP bearer (Trimble Identity JWT, TruckMate web user, or API key) | [truckmate-master-data.md](truckmate-master-data.md) |
+| `truckmate-mobcomm` | TruckMate Mobile Communications API (ART; mobile-communications provider interface) | [truckmate-mobcomm](https://truckmatecloudhub.trimble-transportation.com/mobcomm/openapi.json) | 39 | TruckMate API key (bearer) or Trimble ID JWT | [truckmate-mobcomm.md](truckmate-mobcomm.md) |
+| `truckmate-visibility` | TruckMate Visibility Service API (ART; shipments and stop status for Visibility Hub) | [truckmate-visibility](https://truckmatecloudhub.trimble-transportation.com/visibility/openapi.json) | 7 | TruckMate API key (bearer) | [truckmate-visibility.md](truckmate-visibility.md) |
 
 ## All definitions
 
@@ -255,6 +257,8 @@ These operations are catalogued from the products' own published definitions so 
 | [trimble-maps/vehicle-routing-profile](https://developer.trimblemaps.com/restful-apis/api/vehicle-routing-profile.json) |  Routing Profile API | maps | reference | trimble-maps-routing-profile | 7 |  |
 | [truckmate-agent-swaggerhub](https://api.swaggerhub.com/apis/TruckMate-REST-API/agent/18) | Agent | direct | excluded |  | 32 | undocumented: an unpublished 2018 SwaggerHub draft in an organisation named TruckMate-REST-API, with a localhost host and no Trimble documentation; the documented TruckMate REST APIs are catalogued |
 | [truckmate-imaging](https://truckmatecloudhub.trimble-transportation.com/imaging/openapi.json) | TruckMate Imaging REST API | direct | reference | truckmate-imaging | 82 |  |
+| [truckmate-mobcomm](https://truckmatecloudhub.trimble-transportation.com/mobcomm/openapi.json) | Mobile Communications API | direct | reference | truckmate-mobcomm | 39 |  |
+| [truckmate-visibility](https://truckmatecloudhub.trimble-transportation.com/visibility/openapi.json) | Visibility | direct | reference | truckmate-visibility | 7 |  |
 | [truckmate/finance](https://truckmatecloudhub.trimble-transportation.com/finance/openapi.json) | Finance REST API | portal | reference | truckmate-finance | 100 |  |
 | [truckmate/master-data](https://truckmatecloudhub.trimble-transportation.com/masterdata/openapi.json) | MasterData | portal | reference | truckmate-master-data | 282 |  |
 | [truckmate/truckmate](https://truckmatecloudhub.trimble-transportation.com/tm/openapi.json) | TruckMate REST API | portal | reference | truckmate | 214 |  |

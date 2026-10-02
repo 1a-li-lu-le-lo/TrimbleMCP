@@ -269,6 +269,20 @@ def vista(index_url, errors):
             for section, entries in frag.get("components", {}).items():
                 spec["components"].setdefault(section, {}).update(entries)
     print(f"vista: {len(ops)} operation pages, {len(merged)} modules", file=sys.stderr)
+    # The changelog can announce actions before their reference pages exist;
+    # report each one so it is reviewed (see capability-matrix.md).
+    pages = {u.lower() for _, u in ops}
+    changelog = re.findall(r"^- \[[^\]]*\]\((https://direct-api\.xchange\.trimble\.com/changelog/[^)]+\.md)\)", idx.split("## Changelog", 1)[-1], re.M)
+    for url in changelog:
+        try:
+            md = get(url).decode("utf-8", "replace")
+        except Exception as e:
+            errors.append({"id": "vista-changelog:" + url, "spec_url": url, "doc_urls": [url], "kind": "vista", "error": str(e)})
+            continue
+        for row in re.findall(r"^\|[^|\n]*\|\s*Added\s*\|.*$", md, re.M):
+            for obj, action in re.findall(r"`([a-z0-9_]+)/([a-z0-9_]+)`", row):
+                if not any(u.endswith(f"{obj}actions{action}.md") for u in pages):
+                    print(f"note: {url}: action {obj}/{action} is announced but has no reference page (classify in capability-matrix.md)", file=sys.stderr)
     return merged
 
 

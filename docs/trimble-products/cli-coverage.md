@@ -776,6 +776,12 @@ Windows URI scheme (`trimblemobilemanager://request/<request>?callback=<uri>`; T
 | `tmmRegister` (`applicationId`) | Registers the app; returns the result and the REST API and WebSocket ports | Excluded: device-local registration |
 | `tmmSocketServerPort` | Returns the REST API and WebSocket ports | Excluded: device-local |
 
+Android Location Extras (https://developer.trimble.com/docs/mobile-manager/reference/android-location-extras/, verified 2026-10-02; linked from the three pages above). When TMM is chosen as the Android mock-location app in Developer Settings, any app on the device receives TMM's positions through the standard Android Location API, with extra metadata in each location's extras bundle: `vrms`, `hrms`, `hdop`, `vdop`, `pdop`, `diffAge`, `diffStatus`, `diffID`, `mslHeight`, `undulation`, `receiverModel`, `mockProvider`, `appVersion`, `geoidModel`, `battery`, `utcTime`, `utcTimeStamp`, `gpsTimeStamp`, `subscriptionType`, `igsAntenna`, `antennaHeight`, `isTip`, `imuAlignmentStatus`, `pitch`, `roll` and `yaw`.
+
+| Interface | What it does | Disposition |
+|---|---|---|
+| TMM as the Android mock-location provider, with the extras above | Streams live precise positions to apps on the device | Excluded: on-device only, with no machine-readable definition; a live precise-position stream (personal data, and positioning that guides field work) |
+
 ## 21. Trimble-published npm executables, excluded
 
 Source: the npm organisation `trimble-oss` (https://www.npmjs.com/org/trimble-oss; package list https://registry.npmjs.org/-/org/trimble-oss/package), and each package's registry record and readme (verified 2026-09-29). Of the organisation's 18 packages, these four declare executables; the other 14 declare none.

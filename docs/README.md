@@ -27,7 +27,7 @@ Start here. Every document in the repository is listed below. `internal/skilltes
 |---|---|
 | [mcp/tools.md](mcp/tools.md) | Every MCP tool, resource and prompt; output envelope; protocol revisions |
 | [trimble-products/capability-matrix.md](trimble-products/capability-matrix.md) | Every Trimble product: its API access class, how it is covered, and the products with no machine-readable definition |
-| [trimble-products/endpoints/README.md](trimble-products/endpoints/README.md) | Every Trimble API operation with a public definition (14,099 operations in 387 definitions: Trimble Connect, the other Trimble products including Transporeon, App Xchange connector definitions, Trimble Identity) with its disposition; the generated per-API references are linked from there |
+| [trimble-products/endpoints/README.md](trimble-products/endpoints/README.md) | Every Trimble API operation with a public definition (14,145 operations in 389 definitions: Trimble Connect, the other Trimble products including Transporeon, App Xchange connector definitions, Trimble Identity) with its disposition; the generated per-API references are linked from there |
 | [trimble-products/cli-coverage.md](trimble-products/cli-coverage.md) | Every documented Trimble command line, installer switch, URL launcher and published CLI (Trimble Connect for Windows, App Xchange, Tekla, SketchUp, Tedds, eCognition, PC*MILER, Trimble Business Center, Vista client, CoPilot, Mobile Manager and more) and every `trimblectl` command |
 | [trimble-products/trimble-connect.md](trimble-products/trimble-connect.md) | Field-level trace of the typed Trimble Connect tools to the OpenAPI definition |
 

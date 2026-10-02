@@ -6,7 +6,7 @@
 - **Disposition:** `reference`. The bridge never calls this API; operations can be searched with `trimble_api_operations` and validated into a dry-run plan with `trimble_api_plan` (omit `product`).
 - **Authentication:** none declared; served locally on the field device. Declared security schemes: none declared.
 - **Access:** Local device API.
-- **To call it you would need:** running on the device that hosts Trimble Mobile Manager (ws://tmm-api-local.fieldsystems.trimble.com:9639 or ws://localhost:9639).
+- **To call it you would need:** running on the device that hosts Trimble Mobile Manager (ws://tmm-api-local.fieldsystems.trimble.com:9639 or ws://localhost:9639; since TMM 2026.20 also wss://tmm-api-local.fieldsystems.trimble.com:9640).
 - **Documented servers:** `ws://tmm-api-local.fieldsystems.trimble.com:9639`, `ws://localhost:9639` (local address), `ws://127.0.0.1:9639` (local address).
 - **Definition:** [mobile-manager/asyncapi-websocket-v2](https://developer.trimble.com/docs/mobile-manager/asyncapi/websocket-v2.json) (WebSocket V2 Server, version 1.0.0). Documentation: https://developer.trimble.com/docs/mobile-manager/reference/websocket-v2/.
 
