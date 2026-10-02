@@ -2400,7 +2400,7 @@ App Xchange connector definition; Trimble states these OADs 'are used internally
 
 ## xchange-connector/vista-pm-2 (excluded)
 
-App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 159 operations. Definition: [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json).
+App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 160 operations. Definition: [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json).
 
 Operations: [non-production--xchange-connector-vista-pm-2.md](non-production--xchange-connector-vista-pm-2.md).
 

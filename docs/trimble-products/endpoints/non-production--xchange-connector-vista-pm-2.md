@@ -2,7 +2,7 @@
 
 # xchange-connector/vista-pm-2 (excluded)
 
-Part of [non-production.md](non-production.md). App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 159 operations. Definition: [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json).
+Part of [non-production.md](non-production.md). App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal. 160 operations. Definition: [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json).
 
 | Method | Path | Disposition | Detail |
 |---|---|---|---|
@@ -131,6 +131,7 @@ Part of [non-production.md](non-production.md). App Xchange connector definition
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/firm_contacts/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pm/2/data/firm_contacts/cache/search` |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/firms/actions/add` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pm/2/data/firms/actions/add` |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/firms/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pm/2/data/firms/cache/search` |
+| `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/imp_est_header/actions/import` | `excluded` | the definition's reason (above) |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/imp_est_header/cache/search` | `excluded` | the definition's reason (above) |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/imp_est_materials/cache/search` | `variant` | covered by `vista:POST /direct/subscribers/{subscriber_code}/vista/pm/2/data/imp_est_materials/cache/search` |
 | `POST` | `/direct/subscribers/{subscriber_code}/vista/pm/2/data/imp_est_materials_v2/actions/add` | `excluded` | the definition's reason (above) |

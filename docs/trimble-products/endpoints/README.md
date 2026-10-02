@@ -2,7 +2,7 @@
 
 # Trimble API endpoint coverage
 
-Every operation in every Trimble API definition the bridge could find is listed here with exactly one disposition. The definitions were retrieved on 2026-10-01 from these sources:
+Every operation in every Trimble API definition the bridge could find is listed here with exactly one disposition. The definitions were retrieved on 2026-10-02 from these sources:
 
 - the official Trimble-Connect SwaggerHub organisation (https://api.swaggerhub.com/apis/Trimble-Connect);
 - every OpenAPI definition embedded in a Trimble Developer Portal (https://developer.trimble.com) reference page, found by crawling each product section's sitemap;
@@ -19,7 +19,7 @@ Every operation in every Trimble API definition the bridge could find is listed 
 | `variant` | The same call as the operation named in `covered_by`: a staging, integration, QA, test or draft copy, or a second module publishing the same endpoint | Use the `covered_by` operation |
 | `excluded` | Not callable by the bridge; the reason is recorded per operation | none |
 
-**Totals:** 14098 operations in 387 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4189 excluded.
+**Totals:** 14099 operations in 387 definitions; 254 read, 223 plan, 6344 reference, 3088 variant, 4190 excluded.
 
 ## Trimble Connect APIs (executable reads)
 
@@ -516,7 +516,7 @@ These operations are catalogued from the products' own published definitions so 
 | [xchange-connector/vista-jc-2](https://api.xchange.trimble.com/connect/v1/direct/vista/jc/2/swagger/openapi.json) | Vista Job Cost v2 Direct API | app-xchange | excluded |  | 311 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
 | [xchange-connector/vista-ms-2](https://api.xchange.trimble.com/connect/v1/direct/vista/ms/2/swagger/openapi.json) | Vista Material Sales v2 Direct API | app-xchange | excluded |  | 70 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
 | [xchange-connector/vista-pc-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pc/2/swagger/openapi.json) | Vista Pre-Construction v2 Direct API | app-xchange | excluded |  | 8 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
-| [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json) | Vista Project Management v2 Direct API | app-xchange | excluded |  | 159 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
+| [xchange-connector/vista-pm-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pm/2/swagger/openapi.json) | Vista Project Management v2 Direct API | app-xchange | excluded |  | 160 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
 | [xchange-connector/vista-po-2](https://api.xchange.trimble.com/connect/v1/direct/vista/po/2/swagger/openapi.json) | Vista Purchase Order v2 Direct API | app-xchange | excluded |  | 144 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
 | [xchange-connector/vista-pr-2](https://api.xchange.trimble.com/connect/v1/direct/vista/pr/2/swagger/openapi.json) | Vista Payroll v2 Direct API | app-xchange | excluded |  | 222 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |
 | [xchange-connector/vista-sl-2](https://api.xchange.trimble.com/connect/v1/direct/vista/sl/2/swagger/openapi.json) | Vista Subcontract Ledger v2 Direct API | app-xchange | excluded |  | 70 | variant of vista; App Xchange connector definition; Trimble states these OADs 'are used internally by the platform and not directly by end users'. Operations also in the public Vista Direct API documentation are variants of it; the rest are internal |

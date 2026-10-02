@@ -8,7 +8,7 @@ Last verified: 2026-09-23 (Trimble Connect and Identity); 2026-09-29 (every othe
 
 ## Coverage at a glance
 
-The bridge accounts for every Trimble API operation that has a public machine-readable definition: **14,098 operations in 387 definitions**. Each has exactly one disposition; the per-operation lists are in [endpoints/README.md](endpoints/README.md), and ADR-0007 and ADR-0008 explain the approach.
+The bridge accounts for every Trimble API operation that has a public machine-readable definition: **14,099 operations in 387 definitions**. Each has exactly one disposition; the per-operation lists are in [endpoints/README.md](endpoints/README.md), and ADR-0007 and ADR-0008 explain the approach.
 
 | Scope | How it is covered | Disposition |
 |---|---|---|
