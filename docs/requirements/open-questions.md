@@ -1,0 +1,14 @@
+# Open questions
+
+These need answers from the project owner or from Trimble before the pilot.
+
+1. **Q-1: Target products and use cases.** The brief left products, use cases, and tenant as placeholders. This build chose Trimble Connect read-only as the first slice. Confirm, or name the intended products (Maps, ProjectSight, Vista, fleet, ...).
+2. **Q-2: Full Connect OpenAPI (resolved 2026-09-23).** The complete definition (113 paths) is now retrievable. It confirmed `GET /projects/{projectId}` (now implemented), showed that `GET /files/{fileId}` has no `revision` or `hash` (no longer read), and confirmed that folder-item sizes are in bytes and the item `hash` is MD5. Original note: the retrieved SwaggerHub definition was truncated. Obtain the complete definition to verify `GET /projects/{id}`, `GET /users/me`, and the v2.0 collection fields.
+3. **Q-3: Credentials and callback.** Is there a Trimble Connect sandbox/partner account? The loopback redirect URI (`http://127.0.0.1:8765/callback`) must be registered via connect-support@trimble.com.
+4. **Q-4: Staging identity (resolved 2026-09-29).** The staging issuer is `https://stage.id.trimblecloud.com`. Its discovery document is live, it supports S256 PKCE and revocation, and Trimble's TAP Store Postman guide uses it for staging tokens. The unresolvable `stage.id.trimble.com` was replaced in `identity.Issuers`. Set `TRIMBLE_IDENTITY_ISSUER=https://stage.id.trimblecloud.com` with `TRIMBLE_CONNECT_ENV=stage`. Still to confirm on a sandbox: that the staging Connect hosts accept its tokens.
+5. **Q-5: Remote authorization server.** Which IdP should issue tokens for remote MCP clients (Claude app, Perplexity)? This is needed for the OAuth 2.1 resource-server work.
+6. **Q-6: Data classification.** What classification applies to project names, file names, and documents, and may they be sent to third-party model providers?
+7. **Q-7: Rate limits.** Trimble does not publish Connect rate limits. Ask Trimble for tenant limits so the client-side 5 req/s default can be tuned.
+8. **Q-8: Desktop project IDs.** Do `trimbleconnect:/projects/<id>` links take the same ID as the REST API (`GET /2.1/projects` `id`)? Please confirm on a machine with Trimble Connect for Windows installed.
+9. **Q-9: Other products.** Every other product with a public definition is catalogued as `reference`: documented and plannable, never called (ADR-0008). Should any of them get an executing read-only adapter? Each would need credentials, a verified host per customer, an entitlement check and sandbox verification. Candidates by likely value: Vista, ProjectSight, Trimble Maps Places.
+10. **Q-10: Undocumented Trimble Maps definitions.** RouteReporter and the Content API (beta) publish Swagger definitions that no Trimble page links to. They are excluded. Should Trimble Maps confirm whether they are public APIs?

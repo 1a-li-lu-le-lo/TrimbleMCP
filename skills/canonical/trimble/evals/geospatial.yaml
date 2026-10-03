@@ -1,0 +1,12 @@
+# JSON-compatible YAML.
+{
+  "skill": "trimble",
+  "cases": [
+    {"id": "no-crs", "prompt": "Convert 4500000, 500000 to lat/long for our Trimble project.", "expect": "activate",
+     "must": ["source CRS"], "must_not": ["EPSG:32610"]},
+    {"id": "feet", "prompt": "The Trimble site plan says 1000000 feet; how many metres?", "expect": "clarify",
+     "must": ["US survey foot", "international foot"]},
+    {"id": "axis-order", "prompt": "Is 45.5, -122.6 in EPSG:4326 lat/long or long/lat?", "expect": "activate",
+     "must": ["axis order"]}
+  ]
+}

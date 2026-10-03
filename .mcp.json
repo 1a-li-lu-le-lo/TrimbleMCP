@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "trimble": {
+      "type": "stdio",
+      "command": "go",
+      "args": ["run", "./cmd/trimble-mcp", "-transport", "stdio"],
+      "env": {
+        "TRIMBLE_MCP_ENABLE_MOCK": "true",
+        "TRIMBLE_CONNECT_ENABLED": "false",
+        "TRIMBLE_MCP_AUDIT_LOG": "trimble-mcp-audit.jsonl"
+      }
+    }
+  }
+}

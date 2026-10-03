@@ -1,0 +1,40 @@
+# Trimble Connect for Windows command line
+
+Trimble documents one command-line interface for Trimble Connect for Windows: its registered URL scheme. It can be launched from a command line or from a browser.
+
+```
+"trimbleconnect:/projects/[project-id]?show=[view parameter],[panel parameter]"
+```
+
+- **Views:** `projects`, `data`, `3D`
+- **Panels:** `clashes`, `models`, `objects`, `ToDos`, `views`
+- **Case:** parameters are case-insensitive. The bridge emits Trimble's documented spelling.
+- **Example:** `trimbleconnect:/projects/rQR1yhTGj9I?show=3D,ToDos` opens the project in the 3D view with the ToDos tab shown.
+
+Source: https://help.trimble.com/doc/trimble-connect/trimble-connect/connect-for-windows/getting-started/using-the-command-line
+
+## Tools
+
+| Tool | Effect | Requirements |
+|---|---|---|
+| `trimble_build_desktop_link` | Returns the link; opens nothing | `trimble:projects:read`; product `trimble-connect-desktop` configured |
+| `trimble_open_in_desktop` | Opens Trimble Connect for Windows on the operator's own machine. **Dry run unless `dry_run: false`** | See the list below |
+
+Requirements for `trimble_open_in_desktop`:
+
+- `trimble:desktop:launch` added to `TRIMBLE_MCP_LOCAL_SCOPES`.
+- A local stdio session on a Windows host.
+- `TRIMBLE_CONNECT_DESKTOP_ENABLED=true` and `TRIMBLE_CONNECT_DESKTOP_LAUNCH=true`.
+- `trimble-connect` configured, with `trimble:projects:read`, so the project can be verified. This applies to dry runs too.
+- A `reason` of 1–200 characters.
+- Launches are rate-limited per caller.
+
+## Rules
+
+1. Resolve the project ID with `trimble_list_projects` (product `trimble-connect`) first. The bridge re-checks the ID against the API and refuses to open an unverified project.
+2. The command line only navigates the desktop application. It cannot read, change, export, or sync data, and the bridge cannot see what the application shows. Ask the user to confirm the result.
+3. Call `trimble_open_in_desktop` with `dry_run: false` only when the user asked to open the application in this conversation. Otherwise return the link from `trimble_build_desktop_link`.
+4. Give view and panel together, or neither. Neither makes the bridge emit `3D,models`, a documented combination. The page names no default: its ToDos example opens "instead of the models tab", which implies models is the usual panel, and 3D as the default view is an assumption (A-9). The bridge always emits the documented two-value form `show=[view],[panel]` and rejects a view or a panel on its own.
+5. Remote clients (Claude app, Perplexity, remote HTTP) can build links but can never launch anything. Launching would open an application on the server, not on the user's machine.
+6. Do not pass raw URIs, other URL schemes, file paths, or command lines. The tools accept only a project ID, a view, and a panel.
+7. Installing, updating, or uninstalling Trimble Connect for Windows is out of scope. This covers the documented enterprise command `TrimbleConnectSetup-<version>-x64.exe /ad:\preq` and MSI deployment. Trimble Connect Sync has no documented command line, and no official "Trimble Connect CLI" or PowerShell module exists.
