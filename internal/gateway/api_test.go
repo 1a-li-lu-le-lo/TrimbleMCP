@@ -304,11 +304,17 @@ func TestPlansNeverCarryCredentials(t *testing.T) {
 		"xml cdata json":        `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":"<a><![CDATA[{\"password\":\"p\"}]]></a>","reason":"x"}`,
 		"nested multipart":      `{"key":"unity-construct:PUT /api/v2/CommitmentChanges","body":{"x":"--b\r\nContent-Disposition: form-data; name=\"password\""},"reason":"x"}`,
 		"prescription import":   `{"key":"ptx-farmengage:POST /prescriptions/{orgId}/rx/importjob","path_params":{"orgId":"o"},"body":{"fileName":"a","rateColumn":"r","rateUnit":"u"},"reason":"x"}`,
+		"ecom invitation key":   `{"key":"connect-ecom:GET /entitlements/{entitlementId}","path_params":{"entitlementId":"e1"},"query_params":{"key":"k"},"reason":"x"}`,
+		"ecom account by key":   `{"key":"connect-ecom:GET /accounts/{accountId}","path_params":{"accountId":"a1"},"query_params":{"key":"k"},"reason":"x"}`,
 	} {
 		env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, args)
 		if env.Error == nil || env.Error.Code != errs.PolicyDenied {
 			t.Errorf("%s: %+v", name, env.Error)
 		}
+	}
+	// The same ECom read without the invitation key is plannable.
+	if env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"key":"connect-ecom:GET /entitlements/{entitlementId}","path_params":{"entitlementId":"e1"},"reason":"x"}`); env.Status != "ok" {
+		t.Fatalf("ecom read without key: %+v", env.Error)
 	}
 	// Pagination cursors are not credentials.
 	env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"product":"trimble-connect","key":"core:DELETE /projects/{projectId}","path_params":{"projectId":"p1"},"reason":"x"}`)
@@ -327,5 +333,20 @@ func TestPlanContentTypeIsConcrete(t *testing.T) {
 		if ct := catalog.PreferredContentType(o.BodyTypes); strings.Contains(ct, "*") && slices.Contains(o.BodyTypes, "application/json") {
 			t.Fatalf("%s: plan would present %q", o.Key, ct)
 		}
+	}
+}
+
+func TestPlansListRequiredHeadersTheyCannotSet(t *testing.T) {
+	f := setupAPI(t, func(http.ResponseWriter, *http.Request) {})
+	env := invoke(t, f.g, apiPrincipal(), ToolAPIPlan, `{"key":"truckmate-mobcomm:GET /devices","reason":"x"}`)
+	if env.Status != "ok" {
+		t.Fatalf("%+v", env.Error)
+	}
+	plan := env.Result.(map[string]any)["plan"].(map[string]any)
+	if got := plan["required_headers_not_set"]; !slices.Equal(got.([]string), []string{"NetworkGUID"}) {
+		t.Fatalf("required_headers_not_set = %v", got)
+	}
+	if !slices.ContainsFunc(env.Warnings, func(w string) bool { return strings.Contains(w, "NetworkGUID") }) {
+		t.Fatalf("no warning names NetworkGUID: %v", env.Warnings)
 	}
 }

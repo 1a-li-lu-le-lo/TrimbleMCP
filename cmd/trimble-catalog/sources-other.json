@@ -182,6 +182,9 @@
   ],
   "vista": {"index": "https://direct-api.xchange.trimble.com/llms.txt", "doc_url": "https://direct-api.xchange.trimble.com/"},
   "identity": {"id": "trimble-identity", "url": "https://id.trimble.com/.well-known/openid-configuration", "doc_url": "https://developer.trimble.com/docs/authentication"},
+  "credential_params": {
+    "connect-ecom": ["key"]
+  },
   "safety": [
     {"match_key": "^ptx-farmengage:PUT /(operations|prescriptions)/[^ ]*/vehicletarget/", "reason": "safety: sends a work order or prescription (application map) to the in-cab device of a vehicle, which can drive field machinery; the bridge never plans or performs anything that reaches machinery"},
     {"match_key": "^ptx-farmengage:PATCH /resources/[^ ]*/resourcefiles/[^ ]*/send$", "reason": "safety: sends a resource file (guidance lines, boundaries, vehicle and implement profiles) to in-cab PTx displays that guide field machinery; the bridge never plans or performs anything that reaches machinery"},

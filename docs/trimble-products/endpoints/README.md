@@ -529,9 +529,9 @@ These operations are catalogued from the products' own published definitions so 
 
 Non-production, excluded and Trimble Identity operations are listed in [non-production.md](non-production.md).
 
-## Trimble Connect services without a definition
+## Trimble Connect services without a documented definition
 
-The Trimble Connect `GET /tc/api/2.0/regions` response names these services, but Trimble publishes no API definition for them, so they have no catalogued operations and the bridge does not call them.
+The Trimble Connect `GET /tc/api/2.0/regions` response names these services, but Trimble's documentation links no API definition for them. Where a service serves an undocumented definition, its operations are catalogued as excluded (see its note); the bridge calls none of them.
 
 | Service | Note |
 |---|---|

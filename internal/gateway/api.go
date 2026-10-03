@@ -563,7 +563,7 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	if err != nil {
 		return nil, err
 	}
-	if err := refuseCredentials(in); err != nil {
+	if err := refuseCredentials(op, in); err != nil {
 		return nil, err
 	}
 	if reference {
@@ -620,9 +620,14 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 	if op.Deprecated {
 		warnings = append(warnings, "Trimble marks this operation as deprecated.")
 	}
+	missing := missingRequiredHeaders(op, headers)
+	if len(missing) > 0 {
+		warnings = append(warnings, missingHeadersWarning(missing))
+	}
 	plan := map[string]any{
 		"key": op.Key, "method": op.Method, "url": u.String(), "headers": headers,
-		"content_type": catalog.PreferredContentType(op.BodyTypes), "body": body, "reason": in.Reason,
+		"required_headers_not_set": missing,
+		"content_type":             catalog.PreferredContentType(op.BodyTypes), "body": body, "reason": in.Reason,
 		"approval_level": level, "approval": approval,
 		"executed": false,
 		"rollback": rollbackFor(op.Method),
@@ -641,9 +646,29 @@ func (g *Gateway) apiPlan(_ context.Context, c *call, args json.RawMessage) (*En
 // models and recorded, so they must never contain credentials. A string
 // body is inspected too: as JSON, and as form-encoded data whose values may
 // themselves be JSON (Unity Maintain/Permit sends data={...}).
-func refuseCredentials(in apiArgs) error {
+func refuseCredentials(op *catalog.Operation, in apiArgs) error {
 	deny := func(what, name string) error {
 		return errs.Newf(errs.PolicyDenied, "%s %q carries a credential; plans never contain credentials", what, cleanUntrusted(name))
+	}
+	// Parameters the product documents as credentials under other names.
+	for _, p := range op.Params {
+		if !p.Credential {
+			continue
+		}
+		var names []string
+		switch p.In {
+		case "path":
+			names = mapKeys(in.Path)
+		case "query":
+			names = mapKeys(in.Query)
+		case "header":
+			names = mapKeys(in.Headers)
+		}
+		for _, k := range names {
+			if strings.EqualFold(k, p.Name) {
+				return deny("parameter", k)
+			}
+		}
 	}
 	for _, m := range []map[string]string{in.Path, in.Headers} {
 		for k := range m {
@@ -819,9 +844,14 @@ func referencePlan(op *catalog.Operation, path map[string]string, query url.Valu
 	if a.Family == "transportation" || a.Family == "agriculture" || vehicleAPIs[a.ID] {
 		warnings = append(warnings, "This product manages vehicles, drivers or field operations. A qualified person must review and perform the request; the bridge never operates vehicles or machinery.")
 	}
+	unset := missingRequiredHeaders(op, headers)
+	if len(unset) > 0 {
+		warnings = append(warnings, missingHeadersWarning(unset))
+	}
 	plan := map[string]any{
 		"key": op.Key, "product": a.Product, "method": op.Method, "path": p, "headers": headers,
-		"documented_servers": a.Servers, "authentication": a.Auth, "access": a.Access, "requires": a.Requires,
+		"required_headers_not_set": unset,
+		"documented_servers":       a.Servers, "authentication": a.Auth, "access": a.Access, "requires": a.Requires,
 		"content_type": catalog.PreferredContentType(op.BodyTypes), "body": body, "reason": reason,
 		"approval_level": level, "approval": approval,
 		"executed": false,
@@ -856,4 +886,40 @@ func catalogKeys() []string {
 		out = append(out, o.Key)
 	}
 	return out
+}
+
+// mapKeys returns the keys of m in no particular order.
+func mapKeys[V any](m map[string]V) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
+}
+
+// missingRequiredHeaders lists the required header parameters that a plan
+// does not set. Agents may set only allowedHeaderParams, so the person who
+// performs the request must add the others; credential headers are left out
+// because the plan's authentication field already covers them.
+func missingRequiredHeaders(op *catalog.Operation, headers map[string]string) []string {
+	missing := []string{}
+	for _, p := range op.Params {
+		if p.In != "header" || !p.Required || p.Credential || catalog.IsCredentialName(p.Name) {
+			continue
+		}
+		set := false
+		for k := range headers {
+			if strings.EqualFold(k, p.Name) {
+				set = true
+			}
+		}
+		if !set {
+			missing = append(missing, p.Name)
+		}
+	}
+	return missing
+}
+
+func missingHeadersWarning(names []string) string {
+	return "The operation also requires the header(s) " + strings.Join(names, ", ") + ", which this plan does not set; the person performing the request must supply them."
 }

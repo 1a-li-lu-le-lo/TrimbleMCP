@@ -35,7 +35,7 @@
     - Mobile Manager changes to GNSS receiver, antenna, correction source or position stream;
     - every other product's sign-in, token and secret-storing operations, as for Trimble Identity (added after the 2026-09-29 audit).
 
-    Every plan also refuses a parameter or body field that carries a credential.
+    Every plan also refuses a parameter or body field that carries a credential, including parameters that the manifest's `credential_params` marks as credentials under other names (such as the ECom invitation `key`); the generator fails if a listed parameter matches nothing.
 
     Plans for transportation and agriculture operations carry a warning that a qualified person must review and perform them.
   - **Project-restricted callers cannot plan reference operations.** Their grants name Trimble Connect projects, which cannot be checked against another product's project IDs, so the plan fails closed.
@@ -44,10 +44,10 @@
     - publicly reachable but not linked from Trimble documentation (Maps RouteReporter, Maps Content API, the Tekla development support API);
     - an empty stub;
     - a placeholder example served from a personal site.
-  - **Trimble Connect `/regions` services with no definition** are listed with a note. The generator fails on a new service it does not know.
+  - **Trimble Connect `/regions` services without a documented definition** are listed with a note (any undocumented definition they serve is catalogued as excluded). The generator fails on a new service it does not know.
   - **Products with no machine-readable definition** are classified in the capability matrix: SDKs, desktop APIs, prose-only, WCF help-only and Postman-only APIs.
   - **Command-line tools and local launchers** are accounted for in `docs/trimble-products/cli-coverage.md`, command by command (see that page for the full list of tools). Only the Trimble Connect for Windows link is supported (ADR-0006); the others are excluded because running local programs, changing a host or handling credentials is outside the bridge's scope.
-  - The catalogue is embedded gzip-compressed (`internal/catalog/catalog.json.gz`, about 600 KB). Large multi-definition APIs get one generated page per definition.
+  - The catalogue is embedded gzip-compressed (`internal/catalog/catalog.json.gz`, about 700 KB). Large multi-definition APIs get one generated page per definition.
 - **Why not execute reference operations now:** executing them would need, for every product:
   - a credential model and a tenant binding;
   - a verified host per customer;

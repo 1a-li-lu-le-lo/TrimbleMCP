@@ -29,8 +29,11 @@ type manifest struct {
 		URL    string `json:"url"`
 		DocURL string `json:"doc_url"`
 	} `json:"identity"`
-	Rules  []*rule `json:"rules"`
-	Safety []struct {
+	Rules []*rule `json:"rules"`
+	// CredentialParams lists, per API, parameters that carry credentials
+	// under names IsCredentialName does not recognise.
+	CredentialParams map[string][]string `json:"credential_params"`
+	Safety           []struct {
 		MatchKey string `json:"match_key"`
 		Reason   string `json:"reason"`
 	} `json:"safety"`
@@ -201,6 +204,7 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 		}
 	}
 
+	credUsed := map[string]bool{}
 	for _, api := range groupOrder {
 		g := groups[api]
 		r := g.rule
@@ -232,6 +236,7 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 			ops := g.specs[i].operations()
 			for _, o := range ops {
 				o.API = api
+				markCredentialParams(&o, man.CredentialParams[api], credUsed)
 				mp := o.Method + " " + o.Path
 				if k, dup := first[mp]; dup {
 					o.Key = src.ID + ":" + mp
@@ -261,6 +266,14 @@ func addOther(cat *Catalog, dir, manifestPath string) {
 			a.Security = []string{}
 		}
 		cat.APIs = append(cat.APIs, a)
+	}
+
+	for api, names := range man.CredentialParams {
+		for _, n := range names {
+			if !credUsed[api+"/"+n] {
+				fail("credential_params %s/%s matches no catalogued parameter; review it", api, n)
+			}
+		}
 	}
 
 	// Safety exclusions: reference operations that could reach machinery,
@@ -327,12 +340,25 @@ func addWebhooks(cat *Catalog, src *Source, sp *spec) int {
 // credentialUse explains why an operation needs a credential in its
 // request (a credential-named body field, or a required credential
 // parameter), or returns "".
+// markCredentialParams sets Param.Credential on the parameters the manifest
+// names for the operation's API, and records each name it found.
+func markCredentialParams(o *Operation, names []string, used map[string]bool) {
+	for _, n := range names {
+		for i := range o.Params {
+			if strings.EqualFold(o.Params[i].Name, n) {
+				o.Params[i].Credential = true
+				used[o.API+"/"+n] = true
+			}
+		}
+	}
+}
+
 func credentialUse(o Operation) string {
 	if o.Method != "GET" && o.Method != "HEAD" && len(o.CredentialFields) > 0 {
 		return "the request body carries credential fields (" + strings.Join(o.CredentialFields, ", ") + ")"
 	}
 	for _, p := range o.Params {
-		if p.Required && catalog.IsCredentialName(p.Name) {
+		if p.Required && (p.Credential || catalog.IsCredentialName(p.Name)) {
 			return "the request requires the credential parameter " + p.Name
 		}
 	}

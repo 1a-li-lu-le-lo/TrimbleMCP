@@ -85,6 +85,10 @@ type Param struct {
 	// means one repeated parameter per value.
 	Join string `json:"join,omitempty"`
 	Desc string `json:"description,omitempty"`
+	// Credential marks a parameter that the product documents as carrying
+	// a credential under a name IsCredentialName does not recognise (for
+	// example an invitation key named "key"); plans refuse it.
+	Credential bool `json:"credential,omitempty"`
 }
 
 type Operation struct {

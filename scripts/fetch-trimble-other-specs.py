@@ -269,9 +269,10 @@ def vista(index_url, errors):
             for section, entries in frag.get("components", {}).items():
                 spec["components"].setdefault(section, {}).update(entries)
     print(f"vista: {len(ops)} operation pages, {len(merged)} modules", file=sys.stderr)
-    # The changelog can announce actions before their reference pages exist;
-    # report each one so it is reviewed (see capability-matrix.md).
-    pages = {u.lower() for _, u in ops}
+    # The changelog can announce actions before their reference pages exist.
+    # Every "Added" row that mentions an action is matched to a reference page
+    # in its module; a row that cannot be matched is reported for review.
+    pages = [u.lower() for _, u in ops]
     changelog = re.findall(r"^- \[[^\]]*\]\((https://direct-api\.xchange\.trimble\.com/changelog/[^)]+\.md)\)", idx.split("## Changelog", 1)[-1], re.M)
     for url in changelog:
         try:
@@ -279,11 +280,59 @@ def vista(index_url, errors):
         except Exception as e:
             errors.append({"id": "vista-changelog:" + url, "spec_url": url, "doc_urls": [url], "kind": "vista", "error": str(e)})
             continue
-        for row in re.findall(r"^\|[^|\n]*\|\s*Added\s*\|.*$", md, re.M):
-            for obj, action in re.findall(r"`([a-z0-9_]+)/([a-z0-9_]+)`", row):
-                if not any(u.endswith(f"{obj}actions{action}.md") for u in pages):
-                    print(f"note: {url}: action {obj}/{action} is announced but has no reference page (classify in capability-matrix.md)", file=sys.stderr)
+        for row in changelog_rows(md):
+            if row.get("change type", "").lower() != "added" or "action" not in row["text"].lower():
+                continue
+            if not changelog_row_matched(row, pages):
+                print(f"note: {url}: announced action has no matching reference page (classify in capability-matrix.md): "
+                      f"{row.get('module', '')} {row.get('data object', row.get('component', ''))}: {row['text'][:160]}", file=sys.stderr)
     return merged
+
+
+def changelog_rows(md):
+    """The rows of every Markdown table in a changelog page, keyed by the
+    table's lower-cased header cells, plus the row's whole text."""
+    header = None
+    for line in md.splitlines():
+        if not line.startswith("|"):
+            header = None
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if all(re.fullmatch(r":?-+:?", c) for c in cells if c):
+            continue
+        if header is None:
+            header = [c.lower() for c in cells]
+            continue
+        row = dict(zip(header, cells))
+        row["text"] = " ".join(cells).replace("\\_", "_")
+        yield row
+
+
+def changelog_row_matched(row, pages):
+    """Whether an announced action resolves to a Vista reference page in the
+    row's module: from an `object/action` token, or from the data object's
+    name and the action named in bold (**Add**, **Add Many**)."""
+    module = re.sub(r"[^a-z]", "", row.get("module", "").lower())
+    scope = [u for u in pages if not module or f"/vista{module}2data" in u.replace("post-directsubscriberssubscriber_code", "/")]
+    pairs = re.findall(r"`([a-z0-9_]+)/([a-z0-9_]+)`", row["text"])
+    if pairs:
+        return all(any(u.endswith(f"2data{o}actions{a}.md") for u in scope) for o, a in pairs)
+    words = re.sub(r"[^a-z0-9]+", "_", row.get("data object", row.get("component", "")).lower()).strip("_").split("_")
+    objs = ["".join(words[:n]) for n in range(len(words), 0, -1) if words[n - 1] != "action"]
+    actions = [a for a in re.findall(r"\*\*([^*]+)\*\*", row["text"])]
+    actions += re.findall(r"`([a-z][a-z0-9_]*)`", row["text"])
+    actions += re.findall(r"\bthe ([A-Z][A-Za-z ]*?) actions?\b", row["text"])
+    for a in actions:
+        a = re.sub(r"[^a-z0-9]+", "_", a.lower()).strip("_")
+        # A long display name ("Add Attachment to Header") may have a shorter
+        # slug (add_attach): then the verb is enough. Short names must match.
+        verbs = {a, a.split("_")[0]} if a.count("_") >= 2 else {a}
+        for u in scope:
+            flat = u.replace("_", "")
+            if any(o and f"{o}actions" in flat for o in objs[:max(1, len(objs) - 1)]) and \
+               any(f"actions{v.replace('_', '')}" in flat for v in verbs):
+                return True
+    return False
 
 
 DIRECT_UI = re.compile(r"""https://api\.xchange\.trimble\.com/connect/v1/(?:direct|appnetwork)/[^"'\s<>?#]+?/swagger/index\.html""")

@@ -104,13 +104,13 @@
 
 | Method | Path | Disposition | Summary | Parameters |
 |---|---|---|---|---|
-| `DELETE` | `/invitationkeys/{key}` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | Delete Invitation | key* (path) |
+| `DELETE` | `/invitationkeys/{key}` | `excluded`: safety: the request requires the credential parameter key; agents never handle credentials | Delete Invitation | key* (path) |
 | `GET` | `/accounts/{accountId}/invitationkeys` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | List Invitations under Account | accountId* (path); size (query); page (query); sort (query); includeExpired (query) |
-| `GET` | `/invitationkeys/{key}` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | Get Invitation | key* (path) |
-| `GET` | `/invitationkeys/{key}/users` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | List Users with Invitation | key* (path); size (query); page (query); sort (query) |
+| `GET` | `/invitationkeys/{key}` | `excluded`: safety: the request requires the credential parameter key; agents never handle credentials | Get Invitation | key* (path) |
+| `GET` | `/invitationkeys/{key}/users` | `excluded`: safety: the request requires the credential parameter key; agents never handle credentials | List Users with Invitation | key* (path); size (query); page (query); sort (query) |
 | `GET` | `/myinvitationkeys` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | List My Invitations | size (query); page (query); sort (query) |
 | `POST` | `/invitationkeys` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | Create Invitation | refresh (query); body: application/json |
-| `POST` | `/invitationkeys/{key}/status/{status}` | `excluded`: safety: invitation keys grant membership of an account, so they are handled as credentials; agents never handle credentials | Apply Invitation Status for User | key* (path); status* (path); body: application/json |
+| `POST` | `/invitationkeys/{key}/status/{status}` | `excluded`: safety: the request requires the credential parameter key; agents never handle credentials | Apply Invitation Status for User | key* (path); status* (path); body: application/json |
 
 ## Policy
 

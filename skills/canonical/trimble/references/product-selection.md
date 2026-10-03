@@ -41,7 +41,7 @@ Some of their operations are `excluded` with a `safety:` reason: anything that s
 
 These have no public machine-readable API definition, or are out of scope (see the capability matrix):
 
-- PC*MILER Web Services other than Route Reports (WCF help pages only), and Trimble Maps REST APIs without a published definition.
+- PC*MILER Web Services other than Route Reports (REST: WCF help pages only; SOAP: see below), and Trimble Maps REST APIs without a published definition.
 - Spectrum Data Exchange (SOAP and REST services on each customer's server), Trimble Field View (SOAP services on regional hosts), Appian DRTrack web services (SOAP on a per-customer host), Trimble Maps Trip Management and the PC*Miler Rail web services (prose only), Transporeon's and PC*MILER's SOAP services, TMWSuite SystemsLink, the TMT SOAP API, the TruckMate MCP Server, the Unity Work Management ArcGIS connector, WorksManager's ISO 15143-4 exchange, Master Builder and the Viewpoint Team connector, the Trimble Business Center Data Service (local OData), TAP Store (a prose procedure-call API), B2W Operational Suite (per-tenant Swagger only), Trimble FSM / GeoManager.
 - Tekla Structures and SketchUp (desktop SDKs, not server APIs); the desktop Tekla PowerFab XML command API; CoPilot and other SDK-only products.
 - The SketchUp Connector, a Trimble-hosted MCP service: the user connects it to their client directly; this bridge does not proxy it.

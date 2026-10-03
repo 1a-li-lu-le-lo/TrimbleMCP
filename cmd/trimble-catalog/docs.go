@@ -143,7 +143,7 @@ func writeDocs(dir string, cat *Catalog) {
 	}
 	b.WriteString("\nNon-production, excluded and Trimble Identity operations are listed in [non-production.md](non-production.md).\n\n")
 
-	b.WriteString("## Trimble Connect services without a definition\n\nThe Trimble Connect `GET /tc/api/2.0/regions` response names these services, but Trimble publishes no API definition for them, so they have no catalogued operations and the bridge does not call them.\n\n| Service | Note |\n|---|---|\n")
+	b.WriteString("## Trimble Connect services without a documented definition\n\nThe Trimble Connect `GET /tc/api/2.0/regions` response names these services, but Trimble's documentation links no API definition for them. Where a service serves an undocumented definition, its operations are catalogued as excluded (see its note); the bridge calls none of them.\n\n| Service | Note |\n|---|---|\n")
 	for _, s := range cat.Undefined {
 		fmt.Fprintf(&b, "| `%s` | %s |\n", s.Name, mdEscape(s.Note))
 	}
